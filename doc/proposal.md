@@ -1,3 +1,5 @@
+<img src="vyges-logo.svg" alt="Vyges" class="logo" height="40">
+
 # Chipalooza Challenge #2 (IHP SG13CMOS5L) — Proposal: Low-Dropout Regulator (LDO)
 
 > **Proposal submission — Chipalooza Challenge #2 (IHP SG13CMOS5L), 2026-07-22.**
