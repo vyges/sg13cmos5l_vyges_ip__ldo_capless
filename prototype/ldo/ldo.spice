@@ -1,0 +1,55 @@
+* Capless LDO feasibility — sg13cmos5l (3.3V hv devices). VIN 3.3 -> VOUT ~1.2V.
+* PMOS pass device + 5T OTA error amp + resistive feedback (Vout = Vref*(1+R1/R2)).
+* Small on-chip cap for stability (the "capless / small MOM" option).
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+
+.param VINV=3.3
+.param VREFV=0.6      ; Vout = Vref*(1+R1/R2) = 0.6*2 = 1.2V
+
+Vin  vin  0 {VINV}
+Vref vref 0 {VREFV}
+* load: DC value used by op/dc-sweep; PULSE used by tran (1mA -> 20mA step at 20us)
+Iload vout 0 PULSE(1m 20m 20u 50n 50n 20u 40u)
+
+* --- OTA tail bias (~10 uA mirror) ---  [sg13 devices are SUBCKTS -> X prefix]
+Iref  0 vbias DC 10u
+XMref  vbias vbias 0 0 sg13_hv_nmos w=2u l=1u ng=1 m=1
+XMtail ntail vbias 0 0 sg13_hv_nmos w=2u l=1u ng=1 m=1
+
+* --- 5T OTA: NMOS pair (XM1 gate=vfb, XM2 gate=vref), PMOS mirror load ---
+* negative feedback: vfb up -> XM1 up -> mirror up -> eout up -> pass PMOS off -> vout down
+XM1 n3   vfb  ntail 0   sg13_hv_nmos w=10u l=1u ng=1 m=1
+XM2 eout vref ntail 0   sg13_hv_nmos w=10u l=1u ng=1 m=1
+XM3 n3   n3   vin   vin sg13_hv_pmos w=10u l=1u ng=1 m=1
+XM4 eout n3   vin   vin sg13_hv_pmos w=10u l=1u ng=1 m=1
+
+* --- PMOS pass device (large; W = 100u x m20 = 2000u) ---
+XMpass vout eout vin vin sg13_hv_pmos w=100u l=0.5u ng=1 m=20
+
+* --- feedback divider (Vout=1.2 from Vref=0.6) ---
+R1 vout vfb 100k
+R2 vfb  0   100k
+
+* --- compensation: Miller around pass + small on-chip output cap ---
+Cc   eout vout 2p
+Cout vout 0    20p
+
+.control
+  op
+  print v(vout) v(vfb) v(eout)
+  echo "IQ_uA:" ; print -i(Vin)      ; * total current from VIN at DC load 1mA (Iq + load)
+  echo "=== LINE REG (VIN 2.8..3.6 @ ~1mA) ==="
+  dc Vin 2.8 3.6 0.02
+  meas dc vo_vinlo FIND v(vout) AT=2.9
+  meas dc vo_vinhi FIND v(vout) AT=3.58
+  echo "=== LOAD REG (Iload 0..50mA @ VIN 3.3) ==="
+  dc Iload 0 50m 2m
+  meas dc vo_noload  FIND v(vout) AT=0
+  meas dc vo_fullload FIND v(vout) AT=48m
+  echo "=== LOAD TRANSIENT (1->20mA step) ==="
+  tran 20n 80u
+  meas tran vdroop MIN v(vout) FROM=19.9u TO=25u
+  meas tran vsettle FIND v(vout) AT=39u
+  wrdata /work/ldo_tran.csv v(vout)
+.endc
+.end
