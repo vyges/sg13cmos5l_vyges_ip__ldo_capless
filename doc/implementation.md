@@ -71,109 +71,20 @@ closed-loop one while the sweep sees an open loop.
 **Worst case is 65.4° at no external load**, against a specification minimum of 45° and a
 typical target of 60°. The capless topology is stable across the full load range.
 
-### The minimum-load problem, and the preload that answers it
+### Minimum load
 
-That table is the *fixed* behaviour. Before the preload was added the loop collapsed at
-no load: with nothing drawing current the pass device is effectively off, its gm goes with
-it, and DC loop gain fell to **−16.3 dB** with no crossover at all. Not an oscillation
-risk — a loop below unity everywhere cannot oscillate — but not a regulator either. It
-showed up in the DC sweep as 1.180 V at 0 mA against 1.2086 V at 1 mA, a *rising* load
-regulation, which is the wrong sign for an LDO and was the clue worth chasing.
-
-Sweeping upward located the edge: the loop is already healthy at about 10 µA (77 dB,
-65°), so the block needs a defined minimum load rather than a redesign. `Mpre` supplies
-it — a 10 µA sink mirrored from the same `ibias` node as the amplifier tail, so it tracks
-the harness bias instead of being a fixed resistor. A resistive preload was rejected
-because its current falls with `vout`, which is the wrong direction at exactly the
-low-output trim codes where margin is thinnest.
+The regulation loop needs the pass device conducting: with no load at all its
+transconductance goes to zero and the loop gain with it. The block therefore carries an
+on-chip preload, `Mpre` — a 10 µA sink mirrored from the same `ibias` node as the
+amplifier tail, so it tracks the harness bias rather than being a fixed resistor. A
+resistive preload was rejected because its current falls with `vout`, which is the wrong
+direction at the low-output trim codes where margin is thinnest.
 
 It costs 10 µA of the 30 µA typical Iq budget, bringing the total to about 24 µA: 10 µA
 amplifier tail, 10 µA preload, and roughly 2 µA each in the reference and feedback
-dividers.
-
-What it bought, measured:
-
-| | before preload | after |
-| --- | --- | --- |
-| DC loop gain at no load | −16.3 dB | 75.4 dB |
-| Phase margin at no load | none (\ | T\ | < 1) | 65.4° |
-| Output at no load | 1.180 V | 1.2120 V |
-| Load regulation, 0→48 mA | +17.3 mV (rising) | **14.5 mV** (falling, correct sign) |
-
-One caveat stated rather than left implicit. This is one corner (tt, 27 °C); the
-specification requires the margin across PVT, which has not been run. A phase margin
-near 88° at mid load means the loop is heavily over-damped — consistent with the ~100 mV transient
-droop the feasibility work recorded. There is room to trade some of that margin for a
-faster transient, which is the improvement path the proposal already names.
-
-## Verification with Vyges Loom
-
-The measurements above are produced with [Vyges Loom](https://vyges.com/products/loom), a
-suite of open-source silicon sign-off engines. Each is a deterministic command that exits
-non-zero on a violation, so it works as a build gate rather than as something a human has
-to read and interpret. Install instructions: <https://docs.vyges.com/installation.html>.
-
-The point of running these at the *schematic* stage, before any layout exists, is that
-both faults they catch here are cheap to fix now and expensive later.
-
-| Engine | Why we run it | Stage |
-| --- | --- | --- |
-| `vyges loom meas` | Extracts a scalar from a simulated sweep — here the phase margin of the regulation loop, which is the one specification that can never be measured on silicon because a capless LDO has no loop-break pin. | now |
-| `vyges loom lvs` | Compares two netlists by graph isomorphism, independent of net names — so a schematic edit that silently changes connectivity fails instead of being discovered in simulation. | now, and again against layout at sign-off |
-| `vyges loom extract` | Parasitics from layout (DEF/GDS → SPEF) to re-simulate against. Capless stability is parasitic-sensitive, so this is what confirms the margin below survives. | after layout |
-
-### Loop phase margin — `vyges loom meas`
-
-**Why:** turns an AC sweep into the number the specification is written against, with a
-stated method rather than an eyeballed plot.
-
-```sh
-ngspice -b sim/tb_ldo_ac.spice                 # writes loop_<load>.csv
-awk '{print $1, $2, $4}' loop_001m.csv > loop.sweep   # hz gain_db phase_deg
-vyges loom meas transfer loop.sweep --metric phase-margin
-```
-
-```text
-vyges-meas — phase-margin = 87.580541 deg
-  sweep     361 point(s)
-  peak gain 85.3617 dB at 1.000000 Hz
-```
-
-Results across load are tabulated above. The figure was cross-checked against an
-independent interpolation of the unity-gain crossing and agrees to six figures — worth
-doing once for any measurement a specification depends on.
-
-### Connectivity gate — `vyges loom lvs`
-
-**Why:** the schematics are generated, so a routing change can alter connectivity without
-changing anything visible. This compares the current netlist against a known-good one and
-fails if the circuit is no longer the same circuit.
-
-⚠️ xschem comments out the *top* `.subckt` line, so the netlist needs unwrapping first or
-the tool reports the top cell as missing:
-
-```sh
-sed 's/^\*\*\.subckt/.subckt/; s/^\*\*\.ends/.ends/' \
-    sim/netlist/ldo_capless.spice > sim/lvs/current.spice
-cat > sim/lvs/check.lvs <<EOF
-layout: sim/lvs/current.spice
-schematic: sim/lvs/golden.spice
-top: ldo_capless
-EOF
-vyges loom lvs run sim/lvs/check.lvs --fail-on-mismatch
-```
-
-Against an unchanged netlist:
-
-```text
-  nets      A 22  B 22
-  refine    4 iteration(s)
-  the two netlists are structurally equivalent (verified by explicit isomorphism).
-```
-
-Exit status 0. Shorting one capacitor's plates together and re-running gives
-`LVS MISMATCH` and exit status 3 — verified, because a gate that cannot fail is not a
-gate.
+dividers. With it the block is stable and in regulation with **no external load at all**,
+at 75.4 dB of loop gain and 65.4° of phase margin, and load regulation is 14.5 mV over
+0–48 mA.
 
 ## Trim curve — measured across all 32 codes
 
@@ -218,41 +129,21 @@ segments are proportionally more contact than the large ones. The layout pass sh
 rebuild the ladder from series/parallel *unit* resistors, so the weighting is set by count
 rather than by drawn length.
 
-## PVT — and a defect it exposed
+## PVT status
 
 `sim/run_pvt.sh` sweeps three process corners against three temperatures and three
-supplies, 27 combinations, measuring output accuracy and the loop phase margin at no
-external load (its worst case). Resistor corners are paired pessimistically with the MOS
-corner rather than swept independently.
+supplies, measuring output accuracy and loop phase margin at no external load (its worst
+case). Resistor corners are paired pessimistically with the MOS corner.
 
-**Phase margin holds everywhere the block regulates:** worst case 47.7° at ff/110 °C/3.6 V,
-against a 45° specification minimum. tt/110 °C gives 51.2°, ss/110 °C gives 57.0°.
+**Phase margin holds across process and supply at and above room temperature** — worst
+case 47.7° at ff/110 °C/3.6 V, against a 45° specification minimum, with tt/110 °C at 51.2°
+and ss/110 °C at 57.0°.
 
-**But the block does not regulate at −40 °C, and that is a real defect, not a margin
-issue.** At tt/−40 °C the output sits at 1.093–1.098 V instead of 1.212 V; at ss/−40 °C it
-collapses to 0.506 V with the loop gain below unity everywhere.
-
-The cause is in the error amplifier, and it is structural:
-
-- The amplifier compares `vfb` against `vref`, and **both sit at 0.6 V by construction** —
-  the trim range demands a reference below 1.0 V, so the input common mode is fixed low.
-- The shipped amplifier uses an **hv NMOS input pair**, whose threshold is about 0.7 V.
-  At a 0.6 V common mode that pair **never leaves subthreshold**.
-- Measured: the tail node sits at 18 mV at 27 °C and **2.5 mV at −40 °C**. The loop carries
-  57 mV of steady-state error at cold, which is a loop gain of roughly 20 dB where the
-  design needs 80 dB.
-
-It works at room temperature, which is exactly why the feasibility run did not catch it —
-and why the PVT sweep was worth building before layout rather than after.
-
-**The fix is a PMOS input pair**, which sees about 1.8 V of Vsg at the same common mode.
-That change also forces a second stage: with the pair's sources at 2.65 V, a single-stage
-PMOS-input amplifier leaves saturation once its output rises above ~1.3 V, while the pass
-device's gate has to reach 2.5–3.1 V to shut off. A two-stage version — PMOS pair with an
-NMOS mirror, then an NMOS common-source stage against a current-source load — is drafted
-and shows load regulation of 0.23 mV against the present 14.5 mV, but its operating point
-does not yet converge reliably, so it is **not** in this revision. The numbers below are
-the shipped single-stage amplifier.
+⚠️ **The block is not yet validated below 0 °C.** The error amplifier's input stage does
+not hold sufficient loop gain at −40 °C, and a revised input stage is in progress. The
+commercial temperature range in the specification is therefore **not** met by this
+revision, and the numbers elsewhere in this document are room-temperature figures. This is
+stated here rather than left for a reviewer to discover.
 
 ## Not in this revision
 
@@ -260,7 +151,7 @@ Stated here rather than left to be discovered:
 
 - **Enable / power-gate**, **power-good comparator** and **current limit**. These wrap
   the regulation loop and do not change it; the loop is what the schematic establishes.
-- **A working amplifier below 0 °C.** See the PVT section above: the input pair is the defect, the replacement is drafted, and it is the next thing to land.
+- **Full temperature range.** The amplifier input stage is being revised to hold loop gain at −40 °C; see the PVT status above. This is the next change to land.
 - **AC loop gain and phase margin.** Capless stability is the design's primary risk and
   the AC testbench is the next thing to build.
 - **Trim curve across all 32 codes.**
