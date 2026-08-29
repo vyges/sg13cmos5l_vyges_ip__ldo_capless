@@ -175,13 +175,48 @@ Exit status 0. Shorting one capacitor's plates together and re-running gives
 `LVS MISMATCH` and exit status 3 — verified, because a gate that cannot fail is not a
 gate.
 
-## Known approximation in the trim ladder
+## Trim curve — measured across all 32 codes
 
-`rhigh` carries a fixed contact term of roughly 160 Ω per device on top of its
-1360 Ω/sq sheet, so binary-weighted *single* resistors are not exactly binary — the
-small segments are proportionally more contact than the large ones. The trim curve is
-therefore measured across codes rather than assumed. The layout pass should rebuild the
-ladder from series/parallel unit resistors so the weighting is set by count.
+`sim/tb_ldo_trim.spice` walks every code at 1 mA and records the output.
+
+| | measured | specification |
+| --- | --- | --- |
+| Range | 0.9996 V (code 0) – 1.7971 V (code 31) | 1.0 – 1.8 V |
+| Default, code 16 | 1.2086 V | 1.2 V nominal |
+| Monotonicity | monotonic across all 32 codes | required |
+| Step size | 8.8 mV at the bottom, 72.9 mV at the top | — |
+| Worst-case quantisation | ±2.11 % | ±3 % max |
+
+The range lands on specification almost exactly and the curve is monotonic everywhere.
+
+**The step size grows by 8.3× across the range, and that is structural rather than a
+sizing error.** Guaranteeing monotonicity from a binary code forces the lower leg to be
+binary-weighted, which makes R2 *linear* in code; but `vout = Vref × (1 + Rtop/R2)` is
+nonlinear in R2, so equal R2 steps must produce growing voltage steps. No choice of
+segment lengths avoids it while keeping the code monotonic.
+
+The consequence for accuracy, stated plainly: **±1 % quantisation holds up to code 19
+(1.275 V); above that only the ±3 % maximum applies**, with the worst case ±2.11 % at the
+top of the range. The specification is met across the whole range; the ±1 % *typical*
+figure is met over the lower two-thirds of it.
+
+Two ways out, if uniform steps are later wanted, neither free:
+
+- **Trim `Rtop` instead of `R2`.** `vout` is linear in `Rtop`, so equal steps give equal
+  voltage steps. But the switches then sit at `vout`, up to 1.8 V, and a 1.2 V control bus
+  cannot turn on an NMOS whose source is above its gate — it needs level-shifted drive or
+  PMOS switches with a high-side driver.
+- **A 32-tap ladder with a 5-to-32 decoder.** Uniform by construction, at the cost of 32
+  resistors and 32 switches instead of 5 and 5, plus the decode logic.
+
+Low-side binary trim is the right choice against a 1.2 V control bus, and the
+non-uniform step is what it costs.
+
+A second, smaller effect is folded into the same measurement: `rhigh` carries a fixed
+contact term of roughly 160 Ω per device on top of its 1360 Ω/sq sheet, so the small
+segments are proportionally more contact than the large ones. The layout pass should
+rebuild the ladder from series/parallel *unit* resistors, so the weighting is set by count
+rather than by drawn length.
 
 ## Not in this revision
 

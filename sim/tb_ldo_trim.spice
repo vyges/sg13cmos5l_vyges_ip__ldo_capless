@@ -1,0 +1,287 @@
+* tb_ldo_trim -- output voltage across all 32 VTRIM codes.
+*
+* The ladder is five binary-weighted segments, each shortable by an NMOS switch: closing
+* a switch removes its segment from the lower leg, so R2 falls and vout rises. Code 0 is
+* the bottom of the range and code 31 the top, monotonic upward by construction.
+*
+* This is measured rather than assumed because rhigh carries a fixed contact term of
+* about 160 ohm per device on top of its 1360 ohm/sq sheet. Binary-weighted SINGLE
+* resistors are therefore not exactly binary -- the small segments are proportionally
+* more contact than the large ones -- so the step size is expected to vary across the
+* code range. How much is the question this answers.
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include ../sim/netlist/ldo_capless.spice
+
+Vin    vin     0 3.3
+Vrefbg vref_bg 0 1.2
+Vss    vss     0 0
+Ibias  0       ibias DC 10u
+Iload  vout    0 DC 1m
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 0
+
+.control
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 00"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 01"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 02"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 03"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 04"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 05"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 06"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 0
+  op
+  echo "CODE 07"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 08"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 09"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 10"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 11"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 12"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 13"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 14"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 0
+  op
+  echo "CODE 15"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 16"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 17"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 18"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 19"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 20"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 21"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 22"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 0
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 23"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 24"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 25"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 26"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 0
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 27"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 28"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 0
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 29"
+  print v(vout)
+  alter Vt0 dc = 0
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 30"
+  print v(vout)
+  alter Vt0 dc = 1.2
+  alter Vt1 dc = 1.2
+  alter Vt2 dc = 1.2
+  alter Vt3 dc = 1.2
+  alter Vt4 dc = 1.2
+  op
+  echo "CODE 31"
+  print v(vout)
+.endc
+.end
