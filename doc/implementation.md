@@ -46,8 +46,8 @@ than as an opinion.
 | --- | --- | --- | --- |
 | Output at mid trim code | 1.199 V | 1.2086 V | 1.0–1.8 V trimmed |
 | Internal reference | — | 0.6000 V | — |
-| Line regulation | ~0.04 mV/V | 0.044 mV/V | 5 mV/V max |
-| Load regulation, 0→48 mA | ~15 mV | 17.3 mV | 20 mV max |
+| Line regulation | ~0.04 mV/V | 0.38 mV/V | 5 mV/V max |
+| Load regulation, 0→48 mA | ~15 mV | **0.38 mV** | 20 mV max |
 
 The loop closes with `vfb` at 0.5997 V against `vref` at 0.6000 V.
 
@@ -129,20 +129,37 @@ segments are proportionally more contact than the large ones. The layout pass sh
 rebuild the ladder from series/parallel *unit* resistors, so the weighting is set by count
 rather than by drawn length.
 
-## PVT status
+## PVT
 
 `sim/run_pvt.sh` sweeps three process corners against three temperatures and three
 supplies — 27 combinations — measuring output accuracy and loop phase margin at no
 external load. Resistor corners are paired pessimistically with the MOS corner.
 
-**Output regulation holds at every corner**, 1.209–1.213 V across tt/ss/ff, −40 to 110 °C
-and 3.0 to 3.6 V, including the cold corners.
+| | across all 27 corners | specification |
+| --- | --- | --- |
+| Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
+| **Worst phase margin** | **50.1° (ss/−40 °C/3.6 V)** | 45° min |
 
-⚠️ **Stability margin does not yet hold across PVT.** Phase margin is 48.4° worst-case
-across load at tt/27 °C, but falls to **24.9° at ss/−40 °C** against a 45° specification
-minimum. The compensation is tuned at the typical corner and is not yet robust over
-process and temperature; widening it is the next change. The block regulates correctly at
-those corners — this is a margin shortfall, not a functional failure.
+**The block regulates and stays stable across the full commercial range**, −40 to 110 °C,
+3.0 to 3.6 V, tt/ss/ff.
+
+### Why the compensation is sized the way it is
+
+Unity-gain crossover is gm₁/Cm, and gm₁ moves with process and temperature — at −40 °C the
+loop gain rises and the crossover pushes out to where there is no phase left, while at
+110 °C both fall. Controlling that spread is what sets the component values:
+
+- **The input pair is deliberately narrow (5 µm).** The loop had roughly 60 dB more gain
+  than the specification needs, so narrowing the pair trades surplus gain for crossover
+  control. It is a stability parameter here, not just a gain one — and it *saves* area.
+- **`Rz` is not tuned to a corner, and must not be.** Its optimum conflicts across PVT:
+  50 kΩ is best at ss/−40 °C, 80 kΩ at ff/110 °C, and moving toward either wrecks the
+  other. The resolution is to lower the crossover until that optimum stops being sharp,
+  not to keep re-tuning it.
+- **`Cm` = 48 pF is the knee.** It gives 50.1° worst-case; 96 pF buys only 0.7° more.
+
+The capacitors are the block's area cost: `Cm` at 144 × 144 µm is about 16 % of a
+520 × 250 µm slot, and `Cout` a further 6.6 %.
 
 ## Not in this revision
 
