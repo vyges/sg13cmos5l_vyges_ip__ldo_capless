@@ -218,13 +218,49 @@ segments are proportionally more contact than the large ones. The layout pass sh
 rebuild the ladder from series/parallel *unit* resistors, so the weighting is set by count
 rather than by drawn length.
 
+## PVT — and a defect it exposed
+
+`sim/run_pvt.sh` sweeps three process corners against three temperatures and three
+supplies, 27 combinations, measuring output accuracy and the loop phase margin at no
+external load (its worst case). Resistor corners are paired pessimistically with the MOS
+corner rather than swept independently.
+
+**Phase margin holds everywhere the block regulates:** worst case 47.7° at ff/110 °C/3.6 V,
+against a 45° specification minimum. tt/110 °C gives 51.2°, ss/110 °C gives 57.0°.
+
+**But the block does not regulate at −40 °C, and that is a real defect, not a margin
+issue.** At tt/−40 °C the output sits at 1.093–1.098 V instead of 1.212 V; at ss/−40 °C it
+collapses to 0.506 V with the loop gain below unity everywhere.
+
+The cause is in the error amplifier, and it is structural:
+
+- The amplifier compares `vfb` against `vref`, and **both sit at 0.6 V by construction** —
+  the trim range demands a reference below 1.0 V, so the input common mode is fixed low.
+- The shipped amplifier uses an **hv NMOS input pair**, whose threshold is about 0.7 V.
+  At a 0.6 V common mode that pair **never leaves subthreshold**.
+- Measured: the tail node sits at 18 mV at 27 °C and **2.5 mV at −40 °C**. The loop carries
+  57 mV of steady-state error at cold, which is a loop gain of roughly 20 dB where the
+  design needs 80 dB.
+
+It works at room temperature, which is exactly why the feasibility run did not catch it —
+and why the PVT sweep was worth building before layout rather than after.
+
+**The fix is a PMOS input pair**, which sees about 1.8 V of Vsg at the same common mode.
+That change also forces a second stage: with the pair's sources at 2.65 V, a single-stage
+PMOS-input amplifier leaves saturation once its output rises above ~1.3 V, while the pass
+device's gate has to reach 2.5–3.1 V to shut off. A two-stage version — PMOS pair with an
+NMOS mirror, then an NMOS common-source stage against a current-source load — is drafted
+and shows load regulation of 0.23 mV against the present 14.5 mV, but its operating point
+does not yet converge reliably, so it is **not** in this revision. The numbers below are
+the shipped single-stage amplifier.
+
 ## Not in this revision
 
 Stated here rather than left to be discovered:
 
 - **Enable / power-gate**, **power-good comparator** and **current limit**. These wrap
   the regulation loop and do not change it; the loop is what the schematic establishes.
-- **PVT corner sweeps.** Only the typical corner has been run.
+- **A working amplifier below 0 °C.** See the PVT section above: the input pair is the defect, the replacement is drafted, and it is the next thing to land.
 - **AC loop gain and phase margin.** Capless stability is the design's primary risk and
   the AC testbench is the next thing to build.
 - **Trim curve across all 32 codes.**
