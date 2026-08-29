@@ -1,0 +1,87 @@
+* tb_ldo_ac -- open-loop gain and phase of the capless LDO regulation loop.
+*
+* Capless stability is the design's stated primary risk: with no external output
+* capacitor, phase margin has to come from internal compensation, and it is the one
+* thing that cannot be measured on silicon at all (there is no loop-break pin), so it
+* must be established in simulation.
+*
+* The loop is broken at the feedback node by an inductor that is a short at DC and an
+* open at AC, with the injection source across it. The loop stays closed for the
+* operating point and open for the sweep, so the bias is the real one.
+*   T(f) = -v(vfbd)/v(vfb)      phase margin = 180 + arg(T) where |T| = 1
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include ldo_cells.spice
+
+Vin    vin     0 3.3
+Vrefbg vref_bg 0 1.2
+Vss    vss     0 0
+Ibias  0       ibias DC 10u
+Iload  vout    0 DC 1m
+
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+x_vref vref_bg vref vss ldo_vref
+x_amp  vref vfb ibias eout vin vss ldo_erramp
+x_pass eout vout vin ldo_pass
+x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
+
+* loop break: DC short, AC open, injection across it
+Lbrk vfbd vfb 1T
+Vinj vfbd vfb AC 1
+
+* Cc and Cout are part of the top level, not of any sub-block -- carry them here too
+XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
+XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
+
+* Phase margin is load-dependent in an LDO -- the pass device's gm, and with it the
+* output pole, move with load current. A single-load number says very little, so the
+* sweep covers no-load to full-load.
+* Phase margin is load-dependent in an LDO: the pass device's gm, and with it the
+* output pole, moves with load current. A single-load figure says very little, so the
+* sweep runs no-load to full-load. (Each load is written explicitly -- ngspice does not
+* interpolate a foreach variable into a wrdata path.)
+.control
+  alter Iload dc = 0
+  op
+  ac dec 40 1 1G
+  let T000   = -v(vfbd)/v(vfb)
+  let tdb000 = db(T000)
+  let tph000 = 180/pi*cph(T000)
+  wrdata /work/sim/loop_000.csv tdb000 tph000
+  alter Iload dc = 1m
+  op
+  ac dec 40 1 1G
+  let T001m   = -v(vfbd)/v(vfb)
+  let tdb001m = db(T001m)
+  let tph001m = 180/pi*cph(T001m)
+  wrdata /work/sim/loop_001m.csv tdb001m tph001m
+  alter Iload dc = 10m
+  op
+  ac dec 40 1 1G
+  let T010m   = -v(vfbd)/v(vfb)
+  let tdb010m = db(T010m)
+  let tph010m = 180/pi*cph(T010m)
+  wrdata /work/sim/loop_010m.csv tdb010m tph010m
+  alter Iload dc = 25m
+  op
+  ac dec 40 1 1G
+  let T025m   = -v(vfbd)/v(vfb)
+  let tdb025m = db(T025m)
+  let tph025m = 180/pi*cph(T025m)
+  wrdata /work/sim/loop_025m.csv tdb025m tph025m
+  alter Iload dc = 50m
+  op
+  ac dec 40 1 1G
+  let T050m   = -v(vfbd)/v(vfb)
+  let tdb050m = db(T050m)
+  let tph050m = 180/pi*cph(T050m)
+  wrdata /work/sim/loop_050m.csv tdb050m tph050m
+.endc
+.end

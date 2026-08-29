@@ -51,6 +51,41 @@ than as an opinion.
 
 The loop closes with `vfb` at 0.5997 V against `vref` at 0.6000 V.
 
+## Loop stability — the primary risk, now measured
+
+Capless stability is the design's stated primary risk, and it is the one specification
+that cannot be measured on silicon at all: there is no accessible loop-break pin. It is
+established here instead. `sim/tb_ldo_ac.spice` breaks the loop at the feedback node with
+an inductor that is a short at DC and an open at AC, so the operating point stays the real
+closed-loop one while the sweep sees an open loop.
+
+| Load | DC loop gain | Crossover | Phase margin |
+| --- | --- | --- | --- |
+| 0 mA | −16.3 dB | none, \ | T\ | < 1 | not applicable |
+| 1 mA | 85.4 dB | 553 kHz | 87.6° |
+| 10 mA | 84.3 dB | 538 kHz | 88.2° |
+| 25 mA | 82.2 dB | 526 kHz | 88.3° |
+| 50 mA | 78.6 dB | 509 kHz | 88.4° |
+
+**Across 1–50 mA the loop holds 87.6–88.4° of phase margin**, against a specification
+minimum of 45° and a typical target of 60°. At tt/27 °C the capless topology is stable
+with a wide margin.
+
+**At true no load the loop gain falls below unity.** With nothing drawing current the pass
+device is effectively off, DC loop gain collapses to −16 dB and there is no crossover at
+all. This is not an oscillation risk — a loop with \|T\| < 1 everywhere cannot
+oscillate — but it is not regulating either, and it is the explanation for the otherwise
+odd load-regulation figure: 1.180 V at 0 mA against 1.2086 V at 1 mA. **The block needs a
+defined minimum load.** The only preload today is the feedback and reference dividers, at
+about 4 µA combined; a explicit preload is the conventional fix and is a schematic-stage
+change, not a layout one.
+
+Two caveats stated rather than left implicit. This is one corner (tt, 27 °C); the
+specification requires the margin across PVT, which has not been run. And a phase margin
+near 88° means the loop is heavily over-damped — consistent with the ~100 mV transient
+droop the feasibility work recorded. There is room to trade some of that margin for a
+faster transient, which is the improvement path the proposal already names.
+
 ## Known approximation in the trim ladder
 
 `rhigh` carries a fixed contact term of roughly 160 Ω per device on top of its
