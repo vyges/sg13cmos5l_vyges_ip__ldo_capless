@@ -36,7 +36,9 @@ x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
 Lbrk vfbd vfb 1T
 Vinj vfbd vfb AC 1
 
-* Cc and Cout are part of the top level, not of any sub-block -- carry them here too
+* Cc, Cout and the preload are at the top level, not inside any sub-block -- this bench
+* instantiates the blocks by hand to get at the feedback node, so it carries them too.
+XMpre vout ibias vss vss sg13_hv_nmos w=2u l=1u ng=1 m=1
 XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
 XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
 
@@ -47,14 +49,48 @@ XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
 * output pole, moves with load current. A single-load figure says very little, so the
 * sweep runs no-load to full-load. (Each load is written explicitly -- ngspice does not
 * interpolate a foreach variable into a wrdata path.)
+* Phase margin is load-dependent: the pass device's gm, and with it the output pole,
+* moves with load current. At very light load the device is barely conducting and the
+* loop gain falls away entirely, so the sweep runs from no-load upward to find where the
+* loop stops holding -- that minimum is a specification number, not an incidental.
+* (Each load is written explicitly; ngspice does not interpolate a foreach variable into
+* a wrdata path.)
 .control
   alter Iload dc = 0
   op
   ac dec 40 1 1G
-  let T000   = -v(vfbd)/v(vfb)
-  let tdb000 = db(T000)
-  let tph000 = 180/pi*cph(T000)
-  wrdata /work/sim/loop_000.csv tdb000 tph000
+  let T000u   = -v(vfbd)/v(vfb)
+  let tdb000u = db(T000u)
+  let tph000u = 180/pi*cph(T000u)
+  wrdata /work/sim/loop_000u.csv tdb000u tph000u
+  alter Iload dc = 10u
+  op
+  ac dec 40 1 1G
+  let T010u   = -v(vfbd)/v(vfb)
+  let tdb010u = db(T010u)
+  let tph010u = 180/pi*cph(T010u)
+  wrdata /work/sim/loop_010u.csv tdb010u tph010u
+  alter Iload dc = 30u
+  op
+  ac dec 40 1 1G
+  let T030u   = -v(vfbd)/v(vfb)
+  let tdb030u = db(T030u)
+  let tph030u = 180/pi*cph(T030u)
+  wrdata /work/sim/loop_030u.csv tdb030u tph030u
+  alter Iload dc = 100u
+  op
+  ac dec 40 1 1G
+  let T100u   = -v(vfbd)/v(vfb)
+  let tdb100u = db(T100u)
+  let tph100u = 180/pi*cph(T100u)
+  wrdata /work/sim/loop_100u.csv tdb100u tph100u
+  alter Iload dc = 300u
+  op
+  ac dec 40 1 1G
+  let T300u   = -v(vfbd)/v(vfb)
+  let tdb300u = db(T300u)
+  let tph300u = 180/pi*cph(T300u)
+  wrdata /work/sim/loop_300u.csv tdb300u tph300u
   alter Iload dc = 1m
   op
   ac dec 40 1 1G
@@ -69,13 +105,6 @@ XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
   let tdb010m = db(T010m)
   let tph010m = 180/pi*cph(T010m)
   wrdata /work/sim/loop_010m.csv tdb010m tph010m
-  alter Iload dc = 25m
-  op
-  ac dec 40 1 1G
-  let T025m   = -v(vfbd)/v(vfb)
-  let tdb025m = db(T025m)
-  let tph025m = 180/pi*cph(T025m)
-  wrdata /work/sim/loop_025m.csv tdb025m tph025m
   alter Iload dc = 50m
   op
   ac dec 40 1 1G

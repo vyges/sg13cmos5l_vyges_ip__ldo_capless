@@ -59,30 +59,50 @@ established here instead. `sim/tb_ldo_ac.spice` breaks the loop at the feedback 
 an inductor that is a short at DC and an open at AC, so the operating point stays the real
 closed-loop one while the sweep sees an open loop.
 
-| Load | DC loop gain | Crossover | Phase margin |
+| External load | DC loop gain | Crossover | Phase margin |
 | --- | --- | --- | --- |
-| 0 mA | −16.3 dB | none, \ | T\ | < 1 | not applicable |
-| 1 mA | 85.4 dB | 553 kHz | 87.6° |
-| 10 mA | 84.3 dB | 538 kHz | 88.2° |
-| 25 mA | 82.2 dB | 526 kHz | 88.3° |
+| 0 (preload only) | 75.4 dB | 518 kHz | 65.4° |
+| 10 µA | 78.6 dB | 543 kHz | 74.2° |
+| 100 µA | 83.6 dB | 557 kHz | 84.7° |
+| 1 mA | 85.2 dB | 553 kHz | 87.6° |
+| 10 mA | 84.2 dB | 538 kHz | 88.2° |
 | 50 mA | 78.6 dB | 509 kHz | 88.4° |
 
-**Across 1–50 mA the loop holds 87.6–88.4° of phase margin**, against a specification
-minimum of 45° and a typical target of 60°. At tt/27 °C the capless topology is stable
-with a wide margin.
+**Worst case is 65.4° at no external load**, against a specification minimum of 45° and a
+typical target of 60°. The capless topology is stable across the full load range.
 
-**At true no load the loop gain falls below unity.** With nothing drawing current the pass
-device is effectively off, DC loop gain collapses to −16 dB and there is no crossover at
-all. This is not an oscillation risk — a loop with \|T\| < 1 everywhere cannot
-oscillate — but it is not regulating either, and it is the explanation for the otherwise
-odd load-regulation figure: 1.180 V at 0 mA against 1.2086 V at 1 mA. **The block needs a
-defined minimum load.** The only preload today is the feedback and reference dividers, at
-about 4 µA combined; a explicit preload is the conventional fix and is a schematic-stage
-change, not a layout one.
+### The minimum-load problem, and the preload that answers it
 
-Two caveats stated rather than left implicit. This is one corner (tt, 27 °C); the
-specification requires the margin across PVT, which has not been run. And a phase margin
-near 88° means the loop is heavily over-damped — consistent with the ~100 mV transient
+That table is the *fixed* behaviour. Before the preload was added the loop collapsed at
+no load: with nothing drawing current the pass device is effectively off, its gm goes with
+it, and DC loop gain fell to **−16.3 dB** with no crossover at all. Not an oscillation
+risk — a loop below unity everywhere cannot oscillate — but not a regulator either. It
+showed up in the DC sweep as 1.180 V at 0 mA against 1.2086 V at 1 mA, a *rising* load
+regulation, which is the wrong sign for an LDO and was the clue worth chasing.
+
+Sweeping upward located the edge: the loop is already healthy at about 10 µA (77 dB,
+65°), so the block needs a defined minimum load rather than a redesign. `Mpre` supplies
+it — a 10 µA sink mirrored from the same `ibias` node as the amplifier tail, so it tracks
+the harness bias instead of being a fixed resistor. A resistive preload was rejected
+because its current falls with `vout`, which is the wrong direction at exactly the
+low-output trim codes where margin is thinnest.
+
+It costs 10 µA of the 30 µA typical Iq budget, bringing the total to about 24 µA: 10 µA
+amplifier tail, 10 µA preload, and roughly 2 µA each in the reference and feedback
+dividers.
+
+What it bought, measured:
+
+| | before preload | after |
+| --- | --- | --- |
+| DC loop gain at no load | −16.3 dB | 75.4 dB |
+| Phase margin at no load | none (\ | T\ | < 1) | 65.4° |
+| Output at no load | 1.180 V | 1.2120 V |
+| Load regulation, 0→48 mA | +17.3 mV (rising) | **14.5 mV** (falling, correct sign) |
+
+One caveat stated rather than left implicit. This is one corner (tt, 27 °C); the
+specification requires the margin across PVT, which has not been run. A phase margin
+near 88° at mid load means the loop is heavily over-damped — consistent with the ~100 mV transient
 droop the feasibility work recorded. There is room to trade some of that margin for a
 faster transient, which is the improvement path the proposal already names.
 
