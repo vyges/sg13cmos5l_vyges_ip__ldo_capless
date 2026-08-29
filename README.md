@@ -18,16 +18,24 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 A clean, reusable local-supply regulator for sensitive analog/mixed-signal
 blocks. Designed to drop into one openframe pallet slot: 3.3 V VIN from
 the slot power switch, reference/bias from the harness V/I references, and
-`enable` / output-trim / `power_good` over the digital control-status bus. A
-**4-wire (Kelvin) output** keeps precision DC measurable through the shared analog
-mux.
+5-bit output trim over the digital control-status bus. A **4-wire (Kelvin) output**
+keeps precision DC measurable through the shared analog mux.
 
-| Parameter | Preliminary target |
-| --- | --- |
-| Input | 3.3 V |
-| Output (trimmed) | ~1.0–1.8 V (default 1.2 V) |
-| Load | up to ~50 mA |
-| Output cap | **capless** (on-chip compensation only) |
+Measured on the schematic hierarchy, tt/27 °C unless noted:
+
+| Parameter | Measured | Specification |
+| --- | --- | --- |
+| Input | 3.0 – 3.6 V | 3.3 V nominal |
+| Output, trimmed | 1.0007 – 1.7992 V, 32 monotonic codes | 1.0 – 1.8 V |
+| Load | 0 – 50 mA | up to 50 mA |
+| Line regulation | 0.38 mV/V | 5 mV/V max |
+| Load regulation, 0→48 mA | 0.38 mV | 20 mV max |
+| Phase margin, worst over load | 64.3° | 45° min |
+| Phase margin, worst over PVT | 50.1° (ss/−40 °C) | 45° min |
+| Output capacitor | **capless** — on-chip compensation only | no external cap |
+
+Enable / power-gate, power-good and current limit are **not** in this revision; see
+[`doc/implementation.md`](doc/implementation.md).
 
 ## Layout
 

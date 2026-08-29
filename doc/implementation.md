@@ -44,7 +44,7 @@ than as an opinion.
 
 | Metric | Feasibility netlist | Schematic hierarchy | Specification |
 | --- | --- | --- | --- |
-| Output at mid trim code | 1.199 V | 1.2086 V | 1.0–1.8 V trimmed |
+| Output at mid trim code | 1.199 V | 1.2100 V | 1.0–1.8 V trimmed |
 | Internal reference | — | 0.6000 V | — |
 | Line regulation | ~0.04 mV/V | 0.38 mV/V | 5 mV/V max |
 | Load regulation, 0→48 mA | ~15 mV | **0.38 mV** | 20 mV max |
@@ -56,20 +56,21 @@ The loop closes with `vfb` at 0.5997 V against `vref` at 0.6000 V.
 Capless stability is the design's stated primary risk, and it is the one specification
 that cannot be measured on silicon at all: there is no accessible loop-break pin. It is
 established here instead. `sim/tb_ldo_ac.spice` breaks the loop at the feedback node with
-an inductor that is a short at DC and an open at AC, so the operating point stays the real
-closed-loop one while the sweep sees an open loop.
+a DC-0 / AC-1 source: a short at DC, so the operating point stays the real closed-loop
+one, and a 1 V injection at AC.
 
 | External load | DC loop gain | Crossover | Phase margin |
 | --- | --- | --- | --- |
-| 0 (preload only) | 75.4 dB | 518 kHz | 65.4° |
-| 10 µA | 78.6 dB | 543 kHz | 74.2° |
-| 100 µA | 83.6 dB | 557 kHz | 84.7° |
-| 1 mA | 85.2 dB | 553 kHz | 87.6° |
-| 10 mA | 84.2 dB | 538 kHz | 88.2° |
-| 50 mA | 78.6 dB | 509 kHz | 88.4° |
+| 0 (preload only) | 104.4 dB | 1.03 MHz | 66.5° |
+| 10 µA | 108.1 dB | 1.47 MHz | 64.3° |
+| 100 µA | 114.1 dB | 2.59 MHz | 65.5° |
+| 1 mA | 116.5 dB | 3.20 MHz | 72.1° |
+| 10 mA | 116.0 dB | 3.33 MHz | 74.9° |
+| 50 mA | 110.3 dB | 3.31 MHz | 76.1° |
 
-**Worst case is 65.4° at no external load**, against a specification minimum of 45° and a
-typical target of 60°. The capless topology is stable across the full load range.
+**Worst case across load is 64.3°, at 10 µA** — not at either end of the range — against a
+specification minimum of 45° and a typical target of 60°. Over PVT the worst case is
+50.1°; see the PVT section below.
 
 ### Minimum load
 
@@ -83,7 +84,7 @@ direction at the low-output trim codes where margin is thinnest.
 It costs 10 µA of the 30 µA typical Iq budget, bringing the total to about 24 µA: 10 µA
 amplifier tail, 10 µA preload, and roughly 2 µA each in the reference and feedback
 dividers. With it the block is stable and in regulation with **no external load at all**,
-at 75.4 dB of loop gain and 65.4° of phase margin, and load regulation is 14.5 mV over
+at 104.4 dB of loop gain and 66.5° of phase margin, and load regulation is 0.38 mV over
 0–48 mA.
 
 ## Trim curve — measured across all 32 codes
@@ -92,11 +93,11 @@ at 75.4 dB of loop gain and 65.4° of phase margin, and load regulation is 14.5 
 
 | | measured | specification |
 | --- | --- | --- |
-| Range | 0.9996 V (code 0) – 1.7971 V (code 31) | 1.0 – 1.8 V |
-| Default, code 16 | 1.2086 V | 1.2 V nominal |
+| Range | 1.0007 V (code 0) – 1.7992 V (code 31) | 1.0 – 1.8 V |
+| Default, code 16 | 1.2100 V | 1.2 V nominal |
 | Monotonicity | monotonic across all 32 codes | required |
-| Step size | 8.8 mV at the bottom, 72.9 mV at the top | — |
-| Worst-case quantisation | ±2.11 % | ±3 % max |
+| Step size | 8.8 mV at the bottom, 73.0 mV at the top | — |
+| Worst-case quantisation | ±2.12 % | ±3 % max |
 
 The range lands on specification almost exactly and the curve is monotonic everywhere.
 
@@ -107,7 +108,7 @@ nonlinear in R2, so equal R2 steps must produce growing voltage steps. No choice
 segment lengths avoids it while keeping the code monotonic.
 
 The consequence for accuracy, stated plainly: **±1 % quantisation holds up to code 19
-(1.275 V); above that only the ±3 % maximum applies**, with the worst case ±2.11 % at the
+(1.276 V); above that only the ±3 % maximum applies**, with the worst case ±2.12 % at the
 top of the range. The specification is met across the whole range; the ±1 % *typical*
 figure is met over the lower two-thirds of it.
 
