@@ -1,14 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="738" height="475" viewBox="-440 -375 738 475">
 <rect x="-440.0" y="-375.0" width="737.5" height="475.0" fill="#ffffff"/>
-<line x1="0.0" y1="-170.0" x2="0.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-80.0" x2="0.0" y2="-115.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-170.0" x2="0.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-120.0" x2="0.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-80.0" x2="0.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-120.0" x2="0.0" y2="-115.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-115.0" x2="240.0" y2="-115.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="240.0" y1="-115.0" x2="240.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-20.0" x2="0.0" y2="60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="240.0" y1="-115.0" x2="240.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="240.0" y1="-120.0" x2="240.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-20.0" x2="0.0" y2="45.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="45.0" x2="0.0" y2="60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="60.0" x2="240.0" y2="60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="240.0" y1="60.0" x2="240.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="240.0" y1="60.0" x2="240.0" y2="45.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="240.0" y1="45.0" x2="240.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-230.0" x2="0.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-230.0" x2="0.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<circle cx="0.0" cy="-120.0" r="3.2" fill="#2b6cb0"/>
 <circle cx="0.0" cy="-170.0" r="2.6" fill="#c05621"/>
 <text x="7.0" y="-165.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
 <circle cx="0.0" cy="-20.0" r="2.6" fill="#c05621"/>

@@ -5,13 +5,18 @@ V {}
 S {}
 E {}
 T {ldo_vref -- reference divider, 1.2 V bandgap -> 0.6 V} -300 -280 0 0 0.4 0.4 {}
-N 0 -170 0 -80 {lab=vref}
-N 0 -80 0 -115 {lab=vref}
+N 0 -170 0 -120 {lab=vref}
+N 0 -120 0 -80 {lab=vref}
+N 0 -80 0 -120 {lab=vref}
+N 0 -120 0 -115 {lab=vref}
 N 0 -115 240 -115 {lab=vref}
-N 240 -115 240 -80 {lab=vref}
-N 0 -20 0 60 {lab=vss}
+N 240 -115 240 -120 {lab=vref}
+N 240 -120 240 -80 {lab=vref}
+N 0 -20 0 45 {lab=vss}
+N 0 45 0 60 {lab=vss}
 N 0 60 240 60 {lab=vss}
-N 240 60 240 -20 {lab=vss}
+N 240 60 240 45 {lab=vss}
+N 240 45 240 -20 {lab=vss}
 C {devices/lab_pin.sym} 0 -170 0 0 {name=l_net_vref sig_type=std_logic lab=vref}
 C {devices/lab_pin.sym} 0 -20 0 0 {name=l_net_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/rhigh.sym} 0 -200 0 0 {name=R1 w=1u l=212u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}

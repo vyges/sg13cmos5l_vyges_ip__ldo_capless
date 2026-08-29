@@ -9,34 +9,42 @@ T {Signal path: vref_bg (1.2 V harness bandgap) -> ldo_vref halves it to 0.6 V -
 compares against vfb -> eout drives the ldo_pass PMOS array -> vout -> ldo_fbtrim divides
 back to vfb with 5-bit trim.  Cc is the Miller compensation around the pass device; Cout is
 the on-chip stabilising capacitor that replaces the external one this topology does without.} -500 -380 0 0 0.25 0.25 {layer=15}
-N -430 -120 -380 -120 {lab=vref}
-N -380 -120 -380 -200 {lab=vref}
-N -60 -120 10 -120 {lab=eout}
-N 10 -120 10 -160 {lab=eout}
-N 270 -160 270 -300 {lab=vout}
-N 270 -300 520 -300 {lab=vout}
-N 520 -300 520 -90 {lab=vout}
+N -430 -200 -420 -200 {lab=vref}
+N -420 -200 -380 -200 {lab=vref}
+N -60 -120 -30 -120 {lab=eout}
+N -30 -120 -30 -160 {lab=eout}
+N -30 -160 10 -160 {lab=eout}
+N 270 -160 335 -160 {lab=vout}
+N 335 -160 335 -300 {lab=vout}
+N 335 -300 520 -300 {lab=vout}
+N 520 -300 520 -130 {lab=vout}
+N 520 -130 520 -90 {lab=vout}
 N 200 10 200 -300 {lab=vout}
 N 200 -300 520 -300 {lab=vout}
-N 520 -300 520 -90 {lab=vout}
+N 520 -300 520 -130 {lab=vout}
+N 520 -130 520 -90 {lab=vout}
 N 360 260 360 300 {lab=vfb}
-N 360 300 -380 300 {lab=vfb}
-N -380 300 -380 -120 {lab=vfb}
+N 360 300 -445 300 {lab=vfb}
+N -445 300 -445 -120 {lab=vfb}
+N -445 -120 -380 -120 {lab=vfb}
 N -40 -510 -120 -510 {lab=eout}
 N -120 -510 -120 -120 {lab=eout}
-N -120 -120 -60 -120 {lab=eout}
-N -40 -450 60 -450 {lab=vout}
-N 60 -450 60 -160 {lab=vout}
-N 60 -160 270 -160 {lab=vout}
-C {devices/lab_pin.sym} -430 -120 0 0 {name=l_net_vref sig_type=std_logic lab=vref}
+N -120 -120 55 -120 {lab=eout}
+N 55 -120 -60 -120 {lab=eout}
+N -40 -450 -40 -385 {lab=vout}
+N -40 -385 60 -385 {lab=vout}
+N 60 -385 60 -160 {lab=vout}
+N 60 -160 335 -160 {lab=vout}
+N 335 -160 270 -160 {lab=vout}
+C {devices/lab_pin.sym} -430 -200 0 0 {name=l_net_vref sig_type=std_logic lab=vref}
 C {devices/lab_pin.sym} -60 -120 0 0 {name=l_net_eout sig_type=std_logic lab=eout}
 C {devices/lab_pin.sym} 270 -160 0 0 {name=l_net_vout sig_type=std_logic lab=vout}
 C {devices/lab_pin.sym} 360 260 0 0 {name=l_net_vfb sig_type=std_logic lab=vfb}
-C {ldo_vref.sym} -560 -120 0 0 {name=x_vref }
-N -690 -120 -740 -120 {lab=vref_bg}
-C {devices/lab_pin.sym} -740 -120 0 1 {name=l_x_vref_vref_bg sig_type=std_logic lab=vref_bg}
-N -560 -30 -560 10 {lab=vss}
-C {devices/lab_pin.sym} -560 10 0 0 {name=l_x_vref_vss sig_type=std_logic lab=vss}
+C {ldo_vref.sym} -560 -200 0 0 {name=x_vref }
+N -690 -200 -740 -200 {lab=vref_bg}
+C {devices/lab_pin.sym} -740 -200 0 1 {name=l_x_vref_vref_bg sig_type=std_logic lab=vref_bg}
+N -560 -110 -560 -70 {lab=vss}
+C {devices/lab_pin.sym} -560 -70 0 0 {name=l_x_vref_vss sig_type=std_logic lab=vss}
 C {ldo_erramp.sym} -220 -120 0 0 {name=x_amp }
 N -380 -40 -380 0 {lab=ibias}
 C {devices/lab_pin.sym} -380 0 0 0 {name=l_x_amp_ibias sig_type=std_logic lab=ibias}
