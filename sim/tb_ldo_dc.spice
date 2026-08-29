@@ -1,0 +1,38 @@
+* tb_ldo_dc -- DC operating point, line regulation and load regulation for
+* ldo_capless, at the mid trim code. Numbers to beat are the 2026-07-17 feasibility
+* run on the flat netlist (prototype/ldo/ldo.spice): Vout 1.199 V, line reg
+* ~0.04 mV/V, load reg ~6.6 mV over 1->20 mA. This testbench drives the SCHEMATIC-
+* generated hierarchy instead, so a disagreement means the schematic diverged from
+* the circuit that was demonstrated -- which is the whole point of running it.
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Ibias   0       ibias DC 10u
+Iload   vout    0 DC 1m
+
+* mid code (10000b = 16): only the MSB segment shorted
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  op
+  print v(vout) v(vfb) v(vref) v(eout)
+  echo "=== LINE REG (VIN 2.8..3.6 @ 1 mA) ==="
+  dc Vin 2.8 3.6 0.02
+  meas dc vo_lo FIND v(vout) AT=2.9
+  meas dc vo_hi FIND v(vout) AT=3.58
+  echo "=== LOAD REG (Iload 0..50 mA @ VIN 3.3) ==="
+  dc Iload 0 50m 2m
+  meas dc vo_noload   FIND v(vout) AT=0
+  meas dc vo_fullload FIND v(vout) AT=48m
+.endc
+.end
