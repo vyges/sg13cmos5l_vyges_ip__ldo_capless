@@ -32,9 +32,11 @@ x_amp  vref vfb ibias eout vin vss ldo_erramp
 x_pass eout vout vin ldo_pass
 x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
 
-* loop break: DC short, AC open, injection across it
-Lbrk vfbd vfb 1T
-Vinj vfbd vfb AC 1
+* Loop break. A DC-0 / AC-1 source alone is the whole mechanism: a short at DC, so the
+* operating point is the real closed-loop one, and a 1 V injection at AC. An earlier
+* revision also placed a 1 TH inductor across it, which adds nothing and puts two
+* zero-impedance elements on the same node pair -- a degenerate loop for the DC solve.
+Vinj vfbd vfb DC 0 AC 1
 
 * Cc, Cout and the preload are at the top level, not inside any sub-block -- this bench
 * instantiates the blocks by hand to get at the feedback node, so it carries them too.
