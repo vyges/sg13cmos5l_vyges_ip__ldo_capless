@@ -12,8 +12,8 @@ N -20 -110 -70 -110 {lab=eout}
 C {devices/lab_pin.sym} -70 -110 0 1 {name=l_Mpass_G sig_type=std_logic lab=eout}
 N 20 -140 20 -180 {lab=vin}
 C {devices/lab_pin.sym} 20 -180 0 0 {name=l_Mpass_S sig_type=std_logic lab=vin}
-N 20 -110 170 -110 {lab=vin}
-C {devices/lab_pin.sym} 170 -110 0 0 {name=l_Mpass_B sig_type=std_logic lab=vin}
+N 20 -110 90 -110 {lab=vin}
+C {devices/lab_pin.sym} 90 -110 0 0 {name=l_Mpass_B sig_type=std_logic lab=vin}
 C {devices/ipin.sym} -580 -220 0 0 {name=p_eout lab=eout}
 C {devices/iopin.sym} -580 -160 0 0 {name=p_vin lab=vin}
 C {devices/iopin.sym} -580 -100 0 0 {name=p_vout lab=vout}
