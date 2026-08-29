@@ -13,11 +13,18 @@
 .lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
 .include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
 .lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+* The resistor model's body terminal is the global substrate node `sub!`. Unless it is
+* declared global AND tied, it floats inside each subcircuit, the matrix is singular, and
+* ngspice quietly abandons its DC strategies and falls back to a transient operating
+* point -- which returns numbers that look plausible and are not solutions. Declare and
+* tie it in every bench.
+.global sub!
 .include ../sim/netlist/ldo_capless.spice
 
 Vin    vin     0 3.3
 Vrefbg vref_bg 0 1.2
 Vss    vss     0 0
+Vsub sub! 0 0
 Ibias  0       ibias DC 10u
 Iload  vout    0 DC 1m
 Vt0 vtrim0 0 0

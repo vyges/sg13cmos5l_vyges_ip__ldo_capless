@@ -1,175 +1,292 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="952" height="865" viewBox="-660 -665 952 865">
-<rect x="-660.0" y="-665.0" width="952.0" height="865.0" fill="#ffffff"/>
-<line x1="-100.0" y1="-330.0" x2="-100.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-420.0" x2="-100.0" y2="-400.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-400.0" x2="140.0" y2="-400.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-400.0" x2="140.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-420.0" x2="140.0" y2="-330.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-140.0" y1="-300.0" x2="-190.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-190.0" y1="-300.0" x2="-190.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-190.0" y1="-230.0" x2="-100.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-230.0" x2="-100.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="100.0" y1="-300.0" x2="35.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="35.0" y1="-300.0" x2="35.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="35.0" y1="-250.0" x2="-100.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-250.0" x2="-100.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-230.0" x2="-100.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-270.0" x2="-100.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-230.0" x2="-100.0" y2="-190.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-190.0" x2="-100.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-270.0" x2="140.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-230.0" x2="140.0" y2="-190.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-190.0" x2="140.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-90.0" x2="-100.0" y2="0.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="0.0" x2="-100.0" y2="-40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-40.0" x2="140.0" y2="-40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-40.0" x2="140.0" y2="0.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="0.0" x2="140.0" y2="-90.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="10.0" x2="20.0" y2="-40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="-40.0" x2="-100.0" y2="-40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-40.0" x2="-100.0" y2="0.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="0.0" x2="-100.0" y2="-90.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="70.0" x2="20.0" y2="160.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="160.0" x2="20.0" y2="150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="150.0" x2="-300.0" y2="150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="150.0" x2="-300.0" y2="160.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="160.0" x2="-300.0" y2="70.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-340.0" y1="40.0" x2="-390.0" y2="40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-390.0" y1="40.0" x2="-390.0" y2="-30.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-390.0" y1="-30.0" x2="-300.0" y2="-30.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="-30.0" x2="-300.0" y2="10.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-20.0" y1="40.0" x2="-85.0" y2="40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-85.0" y1="40.0" x2="-85.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-85.0" y1="-20.0" x2="-300.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="-20.0" x2="-300.0" y2="-30.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="-30.0" x2="-300.0" y2="10.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-300.0" x2="-30.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-300.0" x2="210.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-140.0" y1="-120.0" x2="-190.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-120.0" x2="-30.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="100.0" y1="-120.0" x2="50.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-120.0" x2="210.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="40.0" x2="90.0" y2="40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="40.0" x2="-230.0" y2="40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="100.0" y1="-120.0" x2="50.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-140.0" y1="-120.0" x2="-190.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="-340.0" y1="40.0" x2="-390.0" y2="40.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-270.0" x2="140.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<circle cx="-100.0" cy="-230.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-100.0" cy="-270.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="140.0" cy="-230.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-100.0" cy="0.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-100.0" cy="-40.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-390.0" cy="40.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-300.0" cy="-30.0" r="3.2" fill="#2b6cb0"/>
-<circle cx="-100.0" cy="-330.0" r="2.6" fill="#c05621"/>
-<text x="-93.0" y="-325.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
-<circle cx="-140.0" cy="-300.0" r="2.6" fill="#c05621"/>
-<text x="-133.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">n3</text>
-<circle cx="140.0" cy="-270.0" r="2.6" fill="#c05621"/>
-<text x="147.0" y="-265.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
-<circle cx="-100.0" cy="-90.0" r="2.6" fill="#c05621"/>
-<text x="-93.0" y="-85.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ntail</text>
-<circle cx="20.0" cy="70.0" r="2.6" fill="#c05621"/>
-<text x="27.0" y="74.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<circle cx="-340.0" cy="40.0" r="2.6" fill="#c05621"/>
-<text x="-333.0" y="44.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
-<line x1="-112.5" y1="-322.5" x2="-112.5" y2="-277.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-330.0" x2="-100.0" y2="-317.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-282.5" x2="-100.0" y2="-270.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-117.5" y1="-315.0" x2="-117.5" y2="-285.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-112.5" y1="-282.5" x2="-100.0" y2="-282.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-112.5" y1="-317.5" x2="-100.0" y2="-317.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-140.0" y1="-300.0" x2="-118.0" y2="-300.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="-107.5,-320.0 -112.5,-317.5 -107.5,-315.0 -107.5,-320.0" fill="#1a202c"/>
-<polygon points="-105.0,-302.5 -100.0,-300.0 -105.0,-297.5 -105.0,-302.5" fill="#1a202c"/>
-<text x="-150.0" y="-338.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M3</text>
-<text x="-150.0" y="-325.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
-<circle cx="-30.0" cy="-300.0" r="2.6" fill="#c05621"/>
-<text x="-23.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
-<line x1="127.5" y1="-322.5" x2="127.5" y2="-277.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-330.0" x2="140.0" y2="-317.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-282.5" x2="140.0" y2="-270.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="122.5" y1="-315.0" x2="122.5" y2="-285.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="127.5" y1="-282.5" x2="140.0" y2="-282.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="127.5" y1="-317.5" x2="140.0" y2="-317.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="100.0" y1="-300.0" x2="122.0" y2="-300.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="132.5,-320.0 127.5,-317.5 132.5,-315.0 132.5,-320.0" fill="#1a202c"/>
-<polygon points="135.0,-302.5 140.0,-300.0 135.0,-297.5 135.0,-302.5" fill="#1a202c"/>
-<text x="90.0" y="-338.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M4</text>
-<text x="90.0" y="-325.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
-<circle cx="210.0" cy="-300.0" r="2.6" fill="#c05621"/>
-<text x="217.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
-<line x1="-112.5" y1="-142.5" x2="-112.5" y2="-97.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-150.0" x2="-100.0" y2="-137.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-100.0" y1="-102.5" x2="-100.0" y2="-90.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-112.5" y1="-102.5" x2="-100.0" y2="-102.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-112.5" y1="-137.5" x2="-100.0" y2="-137.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-140.0" y1="-120.0" x2="-118.0" y2="-120.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="-105.0,-100.0 -100.0,-102.5 -105.0,-105.0 -105.0,-100.0" fill="#1a202c"/>
-<polygon points="-100.0,-117.5 -105.0,-120.0 -100.0,-122.5 -100.0,-117.5" fill="#1a202c"/>
-<text x="-150.0" y="-158.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M1</text>
-<text x="-150.0" y="-145.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
-<circle cx="-190.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="-197.0" y="-115.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
-<circle cx="-30.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="-23.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<line x1="127.5" y1="-142.5" x2="127.5" y2="-97.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-150.0" x2="140.0" y2="-137.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="140.0" y1="-102.5" x2="140.0" y2="-90.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="127.5" y1="-102.5" x2="140.0" y2="-102.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="127.5" y1="-137.5" x2="140.0" y2="-137.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="100.0" y1="-120.0" x2="122.0" y2="-120.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="135.0,-100.0 140.0,-102.5 135.0,-105.0 135.0,-100.0" fill="#1a202c"/>
-<polygon points="140.0,-117.5 135.0,-120.0 140.0,-122.5 140.0,-117.5" fill="#1a202c"/>
-<text x="90.0" y="-158.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M2</text>
-<text x="90.0" y="-145.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
-<circle cx="50.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="43.0" y="-115.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
-<circle cx="210.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="217.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<line x1="7.5" y1="17.5" x2="7.5" y2="62.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="10.0" x2="20.0" y2="22.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="20.0" y1="57.5" x2="20.0" y2="70.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="7.5" y1="57.5" x2="20.0" y2="57.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="7.5" y1="22.5" x2="20.0" y2="22.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-20.0" y1="40.0" x2="2.0" y2="40.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="15.0,60.0 20.0,57.5 15.0,55.0 15.0,60.0" fill="#1a202c"/>
-<polygon points="20.0,42.5 15.0,40.0 20.0,37.5 20.0,42.5" fill="#1a202c"/>
-<text x="-30.0" y="2.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mt</text>
-<text x="-30.0" y="15.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
-<circle cx="90.0" cy="40.0" r="2.6" fill="#c05621"/>
-<text x="97.0" y="44.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<line x1="-312.5" y1="17.5" x2="-312.5" y2="62.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="10.0" x2="-300.0" y2="22.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-300.0" y1="57.5" x2="-300.0" y2="70.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-312.5" y1="57.5" x2="-300.0" y2="57.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-312.5" y1="22.5" x2="-300.0" y2="22.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<line x1="-340.0" y1="40.0" x2="-318.0" y2="40.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
-<polygon points="-305.0,60.0 -300.0,57.5 -305.0,55.0 -305.0,60.0" fill="#1a202c"/>
-<polygon points="-300.0,42.5 -305.0,40.0 -300.0,37.5 -300.0,42.5" fill="#1a202c"/>
-<text x="-350.0" y="2.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mr</text>
-<text x="-350.0" y="15.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
-<circle cx="-230.0" cy="40.0" r="2.6" fill="#c05621"/>
-<text x="-223.0" y="44.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<circle cx="50.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="43.0" y="-115.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
-<circle cx="-190.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="-197.0" y="-115.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
-<circle cx="-390.0" cy="40.0" r="2.6" fill="#c05621"/>
-<text x="-397.0" y="44.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
-<circle cx="140.0" cy="-230.0" r="2.6" fill="#c05621"/>
-<text x="147.0" y="-225.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
-<circle cx="-620.0" cy="-260.0" r="2.6" fill="#c05621"/>
-<text x="-613.0" y="-255.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
-<circle cx="-620.0" cy="-200.0" r="2.6" fill="#c05621"/>
-<text x="-613.0" y="-195.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<text x="-620.0" y="-625.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_erramp -- 5T OTA error amplifier (sg13_hv, 3.3 V domain)</text>
-<text x="-620.0" y="-590.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">Tail current is mirrored from the harness iDAC through the ibias pin: the harness</text>
-<text x="-620.0" y="-574.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">pushes current IN and Mr develops the gate voltage locally. Do NOT substitute a local</text>
-<text x="-620.0" y="-558.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">voltage bias -- the tail is meant to track the harness iDAC scale (IB_SEL), and output</text>
-<text x="-620.0" y="-542.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">accuracy is meant to inherit the harness bandgap rather than anything generated on-slot.</text>
-<text x="-620.0" y="-512.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">Loop sense: vfb up -&gt; M1 current up -&gt; n3 down -&gt; M4 gate down -&gt; eout up</text>
-<text x="-620.0" y="-496.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">-&gt; pass PMOS turns off -&gt; vout down.  Swapping the M1/M2 gates inverts the</text>
-<text x="-620.0" y="-480.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">loop and the regulator latches to a rail.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1882" height="959" viewBox="-1040 -719 1882 959">
+<rect x="-1040.0" y="-719.0" width="1882.0" height="959.0" fill="#ffffff"/>
+<line x1="-480.0" y1="-380.0" x2="-480.0" y2="-470.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-470.0" x2="-480.0" y2="-450.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-450.0" x2="-230.0" y2="-450.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-450.0" x2="-230.0" y2="-470.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-470.0" x2="-230.0" y2="-380.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-350.0" x2="-570.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-570.0" y1="-350.0" x2="-570.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-570.0" y1="-280.0" x2="-480.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-280.0" x2="-480.0" y2="-320.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-320.0" x2="-480.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-280.0" x2="-480.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-20.0" x2="-480.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-350.0" x2="-520.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-280.0" x2="-335.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-335.0" y1="-280.0" x2="-335.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-335.0" y1="-350.0" x2="-270.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-320.0" x2="-230.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-250.0" x2="-80.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-250.0" x2="-80.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-300.0" x2="-80.0" y2="-210.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-210.0" x2="-80.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-300.0" x2="-80.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-250.0" x2="170.0" y2="-250.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-250.0" x2="170.0" y2="-300.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-300.0" x2="170.0" y2="-210.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-150.0" x2="-80.0" y2="-110.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-110.0" x2="-80.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-20.0" x2="-80.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="50.0" x2="-170.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-170.0" y1="50.0" x2="-170.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-170.0" y1="-20.0" x2="-80.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-20.0" x2="-80.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="50.0" x2="-120.0" y2="140.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="140.0" x2="65.0" y2="140.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="65.0" y1="140.0" x2="65.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="65.0" y1="50.0" x2="130.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-150.0" x2="170.0" y2="-110.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-110.0" x2="170.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-20.0" x2="170.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="20.0" x2="300.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="300.0" y1="-20.0" x2="300.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="300.0" y1="50.0" x2="365.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="365.0" y1="50.0" x2="430.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="20.0" x2="470.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-20.0" x2="470.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-280.0" x2="470.0" y2="-320.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-170.0" x2="760.0" y2="-105.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-105.0" x2="760.0" y2="-30.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-30.0" x2="760.0" y2="10.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-350.0" x2="-520.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-520.0" x2="365.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="365.0" y1="-520.0" x2="365.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="365.0" y1="-350.0" x2="430.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-770.0" y1="50.0" x2="-820.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-820.0" y1="50.0" x2="-820.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-820.0" y1="-20.0" x2="-730.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="-20.0" x2="-730.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-770.0" y1="50.0" x2="-770.0" y2="140.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-770.0" y1="140.0" x2="-585.0" y2="140.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-585.0" y1="140.0" x2="-585.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-585.0" y1="50.0" x2="-520.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="80.0" x2="-730.0" y2="170.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="170.0" x2="-730.0" y2="200.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="200.0" x2="170.0" y2="200.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="200.0" x2="170.0" y2="170.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="170.0" x2="170.0" y2="80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-350.0" x2="-410.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-350.0" x2="-160.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="-180.0" x2="-170.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-180.0" x2="-10.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="130.0" y1="-180.0" x2="80.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-180.0" x2="240.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="80.0" x2="-80.0" y2="120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="50.0" x2="-10.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="50.0" x2="240.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="80.0" x2="470.0" y2="120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="50.0" x2="540.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-380.0" x2="470.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-350.0" x2="540.0" y2="-350.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-230.0" x2="760.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="70.0" x2="760.0" y2="110.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="80.0" x2="-480.0" y2="120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="50.0" x2="-410.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="50.0" x2="-660.0" y2="50.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="-180.0" x2="-170.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="130.0" y1="-180.0" x2="80.0" y2="-180.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="20.0" x2="470.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<circle cx="-520.0" cy="-350.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="-480.0" cy="-280.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="-80.0" cy="-250.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="-80.0" cy="-300.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="-80.0" cy="-20.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="470.0" cy="-20.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="-480.0" cy="-380.0" r="2.6" fill="#c05621"/>
+<text x="-473.0" y="-375.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<circle cx="-520.0" cy="-350.0" r="2.6" fill="#c05621"/>
+<text x="-513.0" y="-345.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">pbias</text>
+<circle cx="-230.0" cy="-320.0" r="2.6" fill="#c05621"/>
+<text x="-223.0" y="-315.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ptail</text>
+<circle cx="-80.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="-73.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">n3</text>
+<circle cx="170.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="177.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout1</text>
+<circle cx="470.0" cy="20.0" r="2.6" fill="#c05621"/>
+<text x="477.0" y="24.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
+<circle cx="760.0" cy="-170.0" r="2.6" fill="#c05621"/>
+<text x="767.0" y="-165.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">nzc</text>
+<circle cx="-770.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="-763.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<circle cx="-730.0" cy="80.0" r="2.6" fill="#c05621"/>
+<text x="-723.0" y="84.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="-492.5" y1="-372.5" x2="-492.5" y2="-327.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-380.0" x2="-480.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="-332.5" x2="-480.0" y2="-320.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-497.5" y1="-365.0" x2="-497.5" y2="-335.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-492.5" y1="-332.5" x2="-480.0" y2="-332.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-492.5" y1="-367.5" x2="-480.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="-350.0" x2="-498.0" y2="-350.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-487.5,-370.0 -492.5,-367.5 -487.5,-365.0 -487.5,-370.0" fill="#1a202c"/>
+<polygon points="-485.0,-352.5 -480.0,-350.0 -485.0,-347.5 -485.0,-352.5" fill="#1a202c"/>
+<text x="-530.0" y="-388.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mp0</text>
+<text x="-530.0" y="-375.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=4u L=1u</text>
+<circle cx="-410.0" cy="-350.0" r="2.6" fill="#c05621"/>
+<text x="-403.0" y="-345.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="-242.5" y1="-372.5" x2="-242.5" y2="-327.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-380.0" x2="-230.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-230.0" y1="-332.5" x2="-230.0" y2="-320.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-247.5" y1="-365.0" x2="-247.5" y2="-335.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-242.5" y1="-332.5" x2="-230.0" y2="-332.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-242.5" y1="-367.5" x2="-230.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-270.0" y1="-350.0" x2="-248.0" y2="-350.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-237.5,-370.0 -242.5,-367.5 -237.5,-365.0 -237.5,-370.0" fill="#1a202c"/>
+<polygon points="-235.0,-352.5 -230.0,-350.0 -235.0,-347.5 -235.0,-352.5" fill="#1a202c"/>
+<text x="-280.0" y="-388.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mtail</text>
+<text x="-280.0" y="-375.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=4u L=1u</text>
+<circle cx="-160.0" cy="-350.0" r="2.6" fill="#c05621"/>
+<text x="-153.0" y="-345.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="-92.5" y1="-202.5" x2="-92.5" y2="-157.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-210.0" x2="-80.0" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="-162.5" x2="-80.0" y2="-150.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-97.5" y1="-195.0" x2="-97.5" y2="-165.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-92.5" y1="-162.5" x2="-80.0" y2="-162.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-92.5" y1="-197.5" x2="-80.0" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="-180.0" x2="-98.0" y2="-180.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-87.5,-200.0 -92.5,-197.5 -87.5,-195.0 -87.5,-200.0" fill="#1a202c"/>
+<polygon points="-85.0,-182.5 -80.0,-180.0 -85.0,-177.5 -85.0,-182.5" fill="#1a202c"/>
+<text x="-130.0" y="-218.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M1</text>
+<text x="-130.0" y="-205.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=20u L=1u</text>
+<circle cx="-170.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="-177.0" y="-175.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
+<circle cx="-10.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="-3.0" y="-175.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="157.5" y1="-202.5" x2="157.5" y2="-157.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-210.0" x2="170.0" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="-162.5" x2="170.0" y2="-150.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="152.5" y1="-195.0" x2="152.5" y2="-165.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="157.5" y1="-162.5" x2="170.0" y2="-162.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="157.5" y1="-197.5" x2="170.0" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="130.0" y1="-180.0" x2="152.0" y2="-180.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="162.5,-200.0 157.5,-197.5 162.5,-195.0 162.5,-200.0" fill="#1a202c"/>
+<polygon points="165.0,-182.5 170.0,-180.0 165.0,-177.5 165.0,-182.5" fill="#1a202c"/>
+<text x="120.0" y="-218.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M2</text>
+<text x="120.0" y="-205.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=20u L=1u</text>
+<circle cx="80.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="73.0" y="-175.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
+<circle cx="240.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="247.0" y="-175.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="-92.5" y1="27.5" x2="-92.5" y2="72.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="20.0" x2="-80.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-80.0" y1="67.5" x2="-80.0" y2="80.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-92.5" y1="67.5" x2="-80.0" y2="67.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-92.5" y1="32.5" x2="-80.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-120.0" y1="50.0" x2="-98.0" y2="50.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-85.0,70.0 -80.0,67.5 -85.0,65.0 -85.0,70.0" fill="#1a202c"/>
+<polygon points="-80.0,52.5 -85.0,50.0 -80.0,47.5 -80.0,52.5" fill="#1a202c"/>
+<text x="-130.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M3</text>
+<text x="-130.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
+<circle cx="-80.0" cy="120.0" r="2.6" fill="#c05621"/>
+<text x="-73.0" y="124.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="-10.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="-3.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="157.5" y1="27.5" x2="157.5" y2="72.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="20.0" x2="170.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="170.0" y1="67.5" x2="170.0" y2="80.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="157.5" y1="67.5" x2="170.0" y2="67.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="157.5" y1="32.5" x2="170.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="130.0" y1="50.0" x2="152.0" y2="50.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="165.0,70.0 170.0,67.5 165.0,65.0 165.0,70.0" fill="#1a202c"/>
+<polygon points="170.0,52.5 165.0,50.0 170.0,47.5 170.0,52.5" fill="#1a202c"/>
+<text x="120.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M4</text>
+<text x="120.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
+<circle cx="240.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="247.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="457.5" y1="27.5" x2="457.5" y2="72.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="20.0" x2="470.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="67.5" x2="470.0" y2="80.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="457.5" y1="67.5" x2="470.0" y2="67.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="457.5" y1="32.5" x2="470.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="430.0" y1="50.0" x2="452.0" y2="50.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="465.0,70.0 470.0,67.5 465.0,65.0 465.0,70.0" fill="#1a202c"/>
+<polygon points="470.0,52.5 465.0,50.0 470.0,47.5 470.0,52.5" fill="#1a202c"/>
+<text x="420.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M5</text>
+<text x="420.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=1u</text>
+<circle cx="470.0" cy="120.0" r="2.6" fill="#c05621"/>
+<text x="477.0" y="124.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="540.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="547.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="457.5" y1="-372.5" x2="457.5" y2="-327.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-380.0" x2="470.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="470.0" y1="-332.5" x2="470.0" y2="-320.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="452.5" y1="-365.0" x2="452.5" y2="-335.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="457.5" y1="-332.5" x2="470.0" y2="-332.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="457.5" y1="-367.5" x2="470.0" y2="-367.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="430.0" y1="-350.0" x2="452.0" y2="-350.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="462.5,-370.0 457.5,-367.5 462.5,-365.0 462.5,-370.0" fill="#1a202c"/>
+<polygon points="465.0,-352.5 470.0,-350.0 465.0,-347.5 465.0,-352.5" fill="#1a202c"/>
+<text x="420.0" y="-388.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M6</text>
+<text x="420.0" y="-375.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
+<circle cx="470.0" cy="-420.0" r="2.6" fill="#c05621"/>
+<text x="477.0" y="-415.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<circle cx="540.0" cy="-350.0" r="2.6" fill="#c05621"/>
+<text x="547.0" y="-345.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="742.5" y1="-205.0" x2="777.5" y2="-205.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="742.5" y1="-195.0" x2="777.5" y2="-195.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-230.0" x2="760.0" y2="-205.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="-195.0" x2="760.0" y2="-170.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<text x="730.0" y="-238.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Cm</text>
+<text x="730.0" y="-225.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=102u L=102u</text>
+<circle cx="760.0" cy="-270.0" r="2.6" fill="#c05621"/>
+<text x="767.0" y="-265.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
+<line x1="760.0" y1="60.0" x2="760.0" y2="70.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="60.0" x2="767.5" y2="57.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="52.5" x2="767.5" y2="57.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="52.5" x2="767.5" y2="47.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="42.5" x2="767.5" y2="47.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="42.5" x2="767.5" y2="37.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="32.5" x2="767.5" y2="37.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="32.5" x2="767.5" y2="27.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="22.5" x2="767.5" y2="27.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="752.5" y1="22.5" x2="760.0" y2="20.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="760.0" y1="10.0" x2="760.0" y2="20.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<text x="730.0" y="2.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Rz</text>
+<text x="730.0" y="15.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=35.2u</text>
+<circle cx="760.0" cy="110.0" r="2.6" fill="#c05621"/>
+<text x="767.0" y="114.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout1</text>
+<line x1="-492.5" y1="27.5" x2="-492.5" y2="72.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="20.0" x2="-480.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-480.0" y1="67.5" x2="-480.0" y2="80.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-492.5" y1="67.5" x2="-480.0" y2="67.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-492.5" y1="32.5" x2="-480.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-520.0" y1="50.0" x2="-498.0" y2="50.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-485.0,70.0 -480.0,67.5 -485.0,65.0 -485.0,70.0" fill="#1a202c"/>
+<polygon points="-480.0,52.5 -485.0,50.0 -480.0,47.5 -480.0,52.5" fill="#1a202c"/>
+<text x="-530.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mn1</text>
+<text x="-530.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
+<circle cx="-480.0" cy="120.0" r="2.6" fill="#c05621"/>
+<text x="-473.0" y="124.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="-410.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="-403.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="-742.5" y1="27.5" x2="-742.5" y2="72.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="20.0" x2="-730.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-730.0" y1="67.5" x2="-730.0" y2="80.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-742.5" y1="67.5" x2="-730.0" y2="67.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-742.5" y1="32.5" x2="-730.0" y2="32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-770.0" y1="50.0" x2="-748.0" y2="50.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-735.0,70.0 -730.0,67.5 -735.0,65.0 -735.0,70.0" fill="#1a202c"/>
+<polygon points="-730.0,52.5 -735.0,50.0 -730.0,47.5 -730.0,52.5" fill="#1a202c"/>
+<text x="-780.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mr</text>
+<text x="-780.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
+<circle cx="-660.0" cy="50.0" r="2.6" fill="#c05621"/>
+<text x="-653.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="-170.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="-177.0" y="-175.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
+<circle cx="80.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="73.0" y="-175.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
+<circle cx="-1000.0" cy="-300.0" r="2.6" fill="#c05621"/>
+<text x="-993.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<circle cx="470.0" cy="-20.0" r="2.6" fill="#c05621"/>
+<text x="477.0" y="-15.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
+<circle cx="-1000.0" cy="-240.0" r="2.6" fill="#c05621"/>
+<text x="-993.0" y="-235.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<circle cx="-1000.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="-993.0" y="-175.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<text x="-1000.0" y="-679.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_erramp -- 5T OTA error amplifier, PMOS input pair (sg13_hv, 3.3 V domain)</text>
+<text x="-1000.0" y="-644.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">The input common mode is 0.6 V, set by the reference the trim range requires.</text>
+<text x="-1000.0" y="-628.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">That is below the hv NMOS threshold, so an NMOS pair here never leaves</text>
+<text x="-1000.0" y="-612.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">subthreshold -- it limps at 27 C and fails at -40 C. A PMOS pair sees about</text>
+<text x="-1000.0" y="-596.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">1.8 V of Vsg at the same common mode. Do not 'simplify' this back to an NMOS</text>
+<text x="-1000.0" y="-580.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">pair; the room-temperature bench will not show the problem.</text>
 </svg>

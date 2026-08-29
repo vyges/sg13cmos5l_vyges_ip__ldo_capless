@@ -3,11 +3,18 @@
 .lib @M@/cornerMOSlv.lib @MOS@
 .include @M@/cap_mfringe.lib
 .lib @M@/cornerRES.lib @RES@
+* The resistor model's body terminal is the global substrate node `sub!`. Unless it is
+* declared global AND tied, it floats inside each subcircuit, the matrix is singular, and
+* ngspice quietly abandons its DC strategies and falls back to a transient operating
+* point -- which returns numbers that look plausible and are not solutions. Declare and
+* tie it in every bench.
+.global sub!
 .include ldo_cells.spice
 .temp @TEMP@
 Vin vin 0 @VIN@
 Vrefbg vref_bg 0 1.2
 Vss vss 0 0
+Vsub sub! 0 0
 Ibias 0 ibias DC 10u
 Iload vout 0 DC 0
 Vt0 vtrim0 0 0
@@ -19,8 +26,10 @@ x_vref vref_bg vref vss ldo_vref
 x_amp  vref vfb ibias eout vin vss ldo_erramp
 x_pass eout vout vin ldo_pass
 x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
-Lbrk vfbd vfb 1T
-Vinj vfbd vfb AC 1
+* DC-0 / AC-1 source alone: short at DC so the operating point is the real
+* closed-loop one, 1 V injection at AC. No parallel inductor -- two zero-impedance
+* elements on one node pair is a degenerate loop for the DC solve.
+Vinj vfbd vfb DC 0 AC 1
 XMpre vout ibias vss vss sg13_hv_nmos w=2u l=1u
 XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
 XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4

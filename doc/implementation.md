@@ -9,7 +9,7 @@ schematic that realises it.
 | Cell | What it does | Schematic |
 | --- | --- | --- |
 | `ldo_vref` | Halves the 1.2 V harness bandgap to 0.6 V, RC-filtered | [SVG](schematics/ldo_vref.svg) |
-| `ldo_erramp` | 5T OTA error amplifier, `sg13_hv`, tail mirrored from the harness bias | [SVG](schematics/ldo_erramp.svg) |
+| `ldo_erramp` | Two-stage error amplifier: PMOS input pair with NMOS mirror, then an NMOS common-source stage; Miller compensated with a nulling resistor | [SVG](schematics/ldo_erramp.svg) |
 | `ldo_pass` | PMOS pass array, W = 100 µm × 20, L = 0.5 µm | [SVG](schematics/ldo_pass.svg) |
 | `ldo_fbtrim` | Feedback divider with 5-bit binary-weighted output trim | [SVG](schematics/ldo_fbtrim.svg) |
 | `ldo_capless` | Top level, plus the Miller and output capacitors | [SVG](schematics/ldo_capless.svg) |
@@ -132,18 +132,17 @@ rather than by drawn length.
 ## PVT status
 
 `sim/run_pvt.sh` sweeps three process corners against three temperatures and three
-supplies, measuring output accuracy and loop phase margin at no external load (its worst
-case). Resistor corners are paired pessimistically with the MOS corner.
+supplies — 27 combinations — measuring output accuracy and loop phase margin at no
+external load. Resistor corners are paired pessimistically with the MOS corner.
 
-**Phase margin holds across process and supply at and above room temperature** — worst
-case 47.7° at ff/110 °C/3.6 V, against a 45° specification minimum, with tt/110 °C at 51.2°
-and ss/110 °C at 57.0°.
+**Output regulation holds at every corner**, 1.209–1.213 V across tt/ss/ff, −40 to 110 °C
+and 3.0 to 3.6 V, including the cold corners.
 
-⚠️ **The block is not yet validated below 0 °C.** The error amplifier's input stage does
-not hold sufficient loop gain at −40 °C, and a revised input stage is in progress. The
-commercial temperature range in the specification is therefore **not** met by this
-revision, and the numbers elsewhere in this document are room-temperature figures. This is
-stated here rather than left for a reviewer to discover.
+⚠️ **Stability margin does not yet hold across PVT.** Phase margin is 48.4° worst-case
+across load at tt/27 °C, but falls to **24.9° at ss/−40 °C** against a 45° specification
+minimum. The compensation is tuned at the typical corner and is not yet robust over
+process and temperature; widening it is the next change. The block regulates correctly at
+those corners — this is a margin shortfall, not a functional failure.
 
 ## Not in this revision
 
