@@ -86,6 +86,75 @@ near 88° means the loop is heavily over-damped — consistent with the ~100 mV 
 droop the feasibility work recorded. There is room to trade some of that margin for a
 faster transient, which is the improvement path the proposal already names.
 
+## Verification with Vyges Loom
+
+The measurements above are produced with [Vyges Loom](https://vyges.com/products/loom), a
+suite of open-source silicon sign-off engines. Each is a deterministic command that exits
+non-zero on a violation, so it works as a build gate rather than as something a human has
+to read and interpret. Install instructions: <https://docs.vyges.com/installation.html>.
+
+The point of running these at the *schematic* stage, before any layout exists, is that
+both faults they catch here are cheap to fix now and expensive later.
+
+| Engine | Why we run it | Stage |
+| --- | --- | --- |
+| `vyges loom meas` | Extracts a scalar from a simulated sweep — here the phase margin of the regulation loop, which is the one specification that can never be measured on silicon because a capless LDO has no loop-break pin. | now |
+| `vyges loom lvs` | Compares two netlists by graph isomorphism, independent of net names — so a schematic edit that silently changes connectivity fails instead of being discovered in simulation. | now, and again against layout at sign-off |
+| `vyges loom extract` | Parasitics from layout (DEF/GDS → SPEF) to re-simulate against. Capless stability is parasitic-sensitive, so this is what confirms the margin below survives. | after layout |
+
+### Loop phase margin — `vyges loom meas`
+
+**Why:** turns an AC sweep into the number the specification is written against, with a
+stated method rather than an eyeballed plot.
+
+```sh
+ngspice -b sim/tb_ldo_ac.spice                 # writes loop_<load>.csv
+awk '{print $1, $2, $4}' loop_001m.csv > loop.sweep   # hz gain_db phase_deg
+vyges loom meas transfer loop.sweep --metric phase-margin
+```
+
+```text
+vyges-meas — phase-margin = 87.580541 deg
+  sweep     361 point(s)
+  peak gain 85.3617 dB at 1.000000 Hz
+```
+
+Results across load are tabulated above. The figure was cross-checked against an
+independent interpolation of the unity-gain crossing and agrees to six figures — worth
+doing once for any measurement a specification depends on.
+
+### Connectivity gate — `vyges loom lvs`
+
+**Why:** the schematics are generated, so a routing change can alter connectivity without
+changing anything visible. This compares the current netlist against a known-good one and
+fails if the circuit is no longer the same circuit.
+
+⚠️ xschem comments out the *top* `.subckt` line, so the netlist needs unwrapping first or
+the tool reports the top cell as missing:
+
+```sh
+sed 's/^\*\*\.subckt/.subckt/; s/^\*\*\.ends/.ends/' \
+    sim/netlist/ldo_capless.spice > sim/lvs/current.spice
+cat > sim/lvs/check.lvs <<EOF
+layout: sim/lvs/current.spice
+schematic: sim/lvs/golden.spice
+top: ldo_capless
+EOF
+vyges loom lvs run sim/lvs/check.lvs --fail-on-mismatch
+```
+
+Against an unchanged netlist:
+
+```text
+  nets      A 22  B 22
+  refine    4 iteration(s)
+  the two netlists are structurally equivalent (verified by explicit isomorphism).
+```
+
+Exit status 0. Shorting one capacitor's plates together and re-running gives
+`LVS MISMATCH` and exit status 3 — verified, because a gate that cannot fail is not a
+gate.
+
 ## Known approximation in the trim ladder
 
 `rhigh` carries a fixed contact term of roughly 160 Ω per device on top of its
