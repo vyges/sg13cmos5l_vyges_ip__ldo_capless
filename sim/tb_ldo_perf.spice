@@ -1,0 +1,61 @@
+* tb_ldo_perf -- the specification lines that DC, AC-loop, trim and PVT do not cover:
+* dropout, quiescent current, load transient and PSRR.
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 DC 3.3 AC 1
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+Vilim   ilim_en 0 1.2
+Ibias   0       ibias DC 10u
+* load: DC for the static measurements, PULSE for the transient
+Iload   vout    0 PULSE(1m 20m 20u 1u 1u 20u 60u)
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  * ---- quiescent current: no load, enabled. Subtract nothing -- Iload is zero here,
+  * so the whole VIN current is the block's own.
+  alter @Iload[pulse] = [ 0 0 20u 1u 1u 20u 60u ]
+  op
+  let iq = -i(Vin)
+  print iq
+  print v(vout)
+
+  * ---- dropout at 50 mA: reduce VIN until the output falls 1% below its 3.3 V value
+  alter @Iload[pulse] = [ 50m 50m 20u 1u 1u 20u 60u ]
+  dc Vin 3.3 1.2 -0.01
+  meas dc vo_at33 FIND v(vout) AT=3.3
+  * the 1%-droop crossing, referred to the 3.3 V value
+  meas dc vin_dr WHEN v(vout)=1.19700
+  print vin_dr
+
+  * ---- PSRR: ripple on VIN, measured at the output
+  alter @Iload[pulse] = [ 1m 1m 20u 1u 1u 20u 60u ]
+  ac dec 20 10 100meg
+  let psrr_db = db(v(vout))
+  meas ac psrr_1k   FIND psrr_db AT=1k
+  meas ac psrr_10k  FIND psrr_db AT=10k
+  meas ac psrr_100k FIND psrr_db AT=100k
+  meas ac psrr_1m   FIND psrr_db AT=1meg
+
+  * ---- load transient: 1 -> 20 mA with a 1 us edge, as the specification states
+  alter @Iload[pulse] = [ 1m 20m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vo_pre    FIND v(vout) AT=19u
+  meas tran vo_droop  MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_over   MAX  v(vout) FROM=40u TO=50u
+  meas tran vo_settle FIND v(vout) AT=39u
+.endc
+.end
