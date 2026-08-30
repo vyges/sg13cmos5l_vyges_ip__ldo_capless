@@ -34,27 +34,43 @@ Vt2 vtrim2 0 0
 Vt3 vtrim3 0 0
 Vt4 vtrim4 0 1.2
 
+* Named values, not a bare print: the reporting script can only require what has a name.
 .control
   alter Iload dc = 50m
   alter Vin dc = 3.3
   op
   echo "VIN=3.3"
-  print v(vout) v(oc)
+  let vo_33 = v(vout)
+  let oc_33 = v(oc)
+  print vo_33
+  print oc_33
   alter Vin dc = 3.0
   op
   echo "VIN=3.0"
-  print v(vout) v(oc)
+  let vo_30 = v(vout)
+  let oc_30 = v(oc)
+  print vo_30
+  print oc_30
   alter Vin dc = 2.6
   op
   echo "VIN=2.6"
-  print v(vout) v(oc)
+  let vo_26 = v(vout)
+  let oc_26 = v(oc)
+  print vo_26
+  print oc_26
   alter Vin dc = 2.2
   op
   echo "VIN=2.2"
-  print v(vout) v(oc)
+  let vo_22 = v(vout)
+  let oc_22 = v(oc)
+  print vo_22
+  print oc_22
   alter Vin dc = 2.0
   op
   echo "VIN=2.0"
-  print v(vout) v(oc)
+  let vo_20 = v(vout)
+  let oc_20 = v(oc)
+  print vo_20
+  print oc_20
 .endc
 .end

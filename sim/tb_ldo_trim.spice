@@ -35,6 +35,9 @@ Vt2 vtrim2 0 0
 Vt3 vtrim3 0 0
 Vt4 vtrim4 0 0
 
+* Each code`s output is bound to a NAMED value rather than printed anonymously. A bare
+* `print v(vout)` gives the reporting script nothing it can require, so this bench once
+* read as a pass from a container that had no ngspice on its PATH at all.
 .control
   alter Vt0 dc = 0
   alter Vt1 dc = 0
@@ -43,7 +46,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 00"
-  print v(vout)
+  let vt_00 = v(vout)
+  print vt_00
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -51,7 +55,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 01"
-  print v(vout)
+  let vt_01 = v(vout)
+  print vt_01
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -59,7 +64,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 02"
-  print v(vout)
+  let vt_02 = v(vout)
+  print vt_02
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -67,7 +73,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 03"
-  print v(vout)
+  let vt_03 = v(vout)
+  print vt_03
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -75,7 +82,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 04"
-  print v(vout)
+  let vt_04 = v(vout)
+  print vt_04
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -83,7 +91,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 05"
-  print v(vout)
+  let vt_05 = v(vout)
+  print vt_05
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -91,7 +100,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 06"
-  print v(vout)
+  let vt_06 = v(vout)
+  print vt_06
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -99,7 +109,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 07"
-  print v(vout)
+  let vt_07 = v(vout)
+  print vt_07
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -107,7 +118,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 08"
-  print v(vout)
+  let vt_08 = v(vout)
+  print vt_08
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -115,7 +127,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 09"
-  print v(vout)
+  let vt_09 = v(vout)
+  print vt_09
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -123,7 +136,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 10"
-  print v(vout)
+  let vt_10 = v(vout)
+  print vt_10
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -131,7 +145,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 11"
-  print v(vout)
+  let vt_11 = v(vout)
+  print vt_11
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -139,7 +154,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 12"
-  print v(vout)
+  let vt_12 = v(vout)
+  print vt_12
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -147,7 +163,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 13"
-  print v(vout)
+  let vt_13 = v(vout)
+  print vt_13
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -155,7 +172,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 14"
-  print v(vout)
+  let vt_14 = v(vout)
+  print vt_14
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -163,7 +181,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 0
   op
   echo "CODE 15"
-  print v(vout)
+  let vt_15 = v(vout)
+  print vt_15
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -171,7 +190,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 16"
-  print v(vout)
+  let vt_16 = v(vout)
+  print vt_16
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -179,7 +199,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 17"
-  print v(vout)
+  let vt_17 = v(vout)
+  print vt_17
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -187,7 +208,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 18"
-  print v(vout)
+  let vt_18 = v(vout)
+  print vt_18
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -195,7 +217,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 19"
-  print v(vout)
+  let vt_19 = v(vout)
+  print vt_19
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -203,7 +226,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 20"
-  print v(vout)
+  let vt_20 = v(vout)
+  print vt_20
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -211,7 +235,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 21"
-  print v(vout)
+  let vt_21 = v(vout)
+  print vt_21
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -219,7 +244,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 22"
-  print v(vout)
+  let vt_22 = v(vout)
+  print vt_22
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -227,7 +253,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 23"
-  print v(vout)
+  let vt_23 = v(vout)
+  print vt_23
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -235,7 +262,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 24"
-  print v(vout)
+  let vt_24 = v(vout)
+  print vt_24
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 0
@@ -243,7 +271,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 25"
-  print v(vout)
+  let vt_25 = v(vout)
+  print vt_25
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -251,7 +280,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 26"
-  print v(vout)
+  let vt_26 = v(vout)
+  print vt_26
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 0
@@ -259,7 +289,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 27"
-  print v(vout)
+  let vt_27 = v(vout)
+  print vt_27
   alter Vt0 dc = 0
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -267,7 +298,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 28"
-  print v(vout)
+  let vt_28 = v(vout)
+  print vt_28
   alter Vt0 dc = 1.2
   alter Vt1 dc = 0
   alter Vt2 dc = 1.2
@@ -275,7 +307,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 29"
-  print v(vout)
+  let vt_29 = v(vout)
+  print vt_29
   alter Vt0 dc = 0
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -283,7 +316,8 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 30"
-  print v(vout)
+  let vt_30 = v(vout)
+  print vt_30
   alter Vt0 dc = 1.2
   alter Vt1 dc = 1.2
   alter Vt2 dc = 1.2
@@ -291,6 +325,7 @@ Vt4 vtrim4 0 0
   alter Vt4 dc = 1.2
   op
   echo "CODE 31"
-  print v(vout)
+  let vt_31 = v(vout)
+  print vt_31
 .endc
 .end
