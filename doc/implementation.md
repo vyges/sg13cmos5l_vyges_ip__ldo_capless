@@ -225,7 +225,7 @@ Stated here rather than left to be discovered:
 
 - **Enable / power-gate**, **power-good comparator** and **current limit**. These wrap
   the regulation loop and do not change it; the loop is what the schematic establishes.
-- **Full temperature range.** The amplifier input stage is being revised to hold loop gain at −40 °C; see the PVT status above. This is the next change to land.
-- **AC loop gain and phase margin.** Capless stability is the design's primary risk and
-  the AC testbench is the next thing to build.
-- **Trim curve across all 32 codes.**
+- **Trim ladder as unit resistors.** The binary weighting is currently set by drawn
+  length, which carries `rhigh`'s fixed contact term into the small segments. The layout
+  pass should rebuild it from series/parallel unit resistors so the weighting is set by
+  count.
