@@ -277,8 +277,7 @@ rather than by drawn length.
 ## PVT
 
 `sim/run_pvt.sh` sweeps three process corners against three temperatures, three supplies
-**and three load currents** — 81 combinations. Resistor corners are paired pessimistically
-with the MOS corner.
+**three load currents and three resistor corners swept independently** — 243 combinations.
 
 The load axis was added after a design was accepted at 45.0° on a no-load-only sweep and
 found to be at 12.1° once load and corner were crossed. Phase margin in an LDO moves with
@@ -288,11 +287,12 @@ load sweep at one corner do not bound it between them.
 | | across all 27 corners | specification |
 | --- | --- | --- |
 | Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
-| **Worst phase margin** | **40.4° (ff/110 °C/3.0 V, no load)** | 45° min ❌ |
+| **Worst phase margin** | **40.2° (ff / worst-case sheet / −40 °C / 3.6 V, no load)** | 45° min ❌ |
 
 **The block regulates across the full commercial range**, −40 to 110 °C, 3.0 to 3.6 V,
-tt/ss/ff. ⚠️ **It does not meet the 45° phase-margin minimum**: the worst case is 40.4°,
-4.6° short, at ff/110 °C with no external load. Everything tried to close that gap is
+tt/ss/ff. ⚠️ **It does not meet the 45° phase-margin minimum**: the worst case is 40.2°, at ff with
+worst-case sheet resistance at −40 °C and no external load. Most of that gap is a PDK
+resistor-corner definition upstream has already corrected — see the open question. Everything tried to close that gap is
 recorded above and in the compensation section; see the open question at the end.
 
 ### Why the compensation is sized the way it is
@@ -610,7 +610,7 @@ Stated here rather than left to be discovered:
 
 ## Work remaining, in the order it should be done
 
-1. **Close the last 4.6° of phase margin** — see the open question below. Dropout,
+1. **Close the last degree of phase margin** — see the open question below. Dropout,
    quiescent current and output accuracy all pass; this is the only remaining
    small-signal gap and everything cheap has been tried.
 2. **Size `Cout` against the load-step specification rather than against area.** 20 pF was
@@ -624,42 +624,78 @@ Stated here rather than left to be discovered:
 5. Then the deferred items above: power-good hysteresis, unit-resistor trim ladder,
    `IB_SEL`.
 
-## Open question — the last 4.6° of phase margin
+## Open question — the last degree of phase margin
 
-**Posted for anyone who wants to chip in.** The block is 40.4° against a 45° minimum, at
-ff/110 °C with no external load. Everything else passes.
+**Posted for anyone who wants to chip in.** The block is 40.2° against a 45° minimum. Every
+other specification that has been measured passes: dropout 149 mV against 250 max, quiescent
+35.7 µA against 60 max, output accuracy inside ±3 % trimmed.
 
-**What it is:** capless LDO on IHP SG13G2, 3.3 V in, 1.0–1.8 V trimmed out (1.2 V
-nominal), 50 mA. Two-stage Miller-compensated amplifier, PMOS input pair (5 µm), PMOS pass
-array 6400 µm / 0.5 µm. `Cm` 48 pF MOM with a 50 kΩ `rhigh` nulling resistor, `Cc` 2 pF
-across the pass device, `Cout` 20 pF on chip, 10 µA preload. Quiescent 35.7 µA of a 60 µA
-budget, so there is current to spend. Dropout 149 mV against 250 max.
+**What it is:** capless LDO on IHP SG13G2, 3.3 V in, 1.0–1.8 V trimmed out (1.2 V nominal),
+50 mA. Two-stage Miller-compensated amplifier, PMOS input pair, PMOS pass array
+6400 µm / 0.5 µm. `Cm` 48 pF MOM with an `rhigh` nulling resistor, `Cc` 2 pF across the pass
+device, `Cout` 20 pF on chip, 10 µA preload.
 
-**What has been swept, and which way it moved** — all measured over 81 corner × load
-combinations, worst case quoted:
+### The resistor corner dominates, and the MOS corner barely matters
 
-| Change | Result |
-| --- | --- |
-| Preload 1 → 10 µA | 25.8° → **40.4°**, an interior optimum; 20 µA gives 39.9° |
-| Nulling `Rz` 50 kΩ → 140 kΩ | 40.4° → 9.8°, then −15.2° |
-| `Cm` 48 pF → 5.8 pF | worse at every step |
-| `Cc` 2 pF → 23 pF | 40.4° → 18.5° (but load-release overshoot improves 3×) |
-| Input pair 5 µm → 1 µm | 40.4° → 34.2° |
-| Stage-2 current 5 → 25 µA | no-load corners improve, corner × load gets **worse** |
-| PMOS source-follower gate driver | 33.4°, and dropout 149 → 573 mV. Removed |
+Phase margin at 3.3 V, no external load, over MOS corner × resistor corner × temperature:
 
-**The questions:**
+| | −40 °C | 27 °C | 110 °C |
+| --- | --- | --- | --- |
+| tt / res_typ | 52.3° | 58.6° | 58.5° |
+| ss / res_typ | 53.4° | 59.2° | 58.5° |
+| ff / res_typ | 51.1° | 58.0° | 57.7° |
+| tt / res_bcs | 59.8° | 59.8° | 43.9° |
+| ss / res_bcs | 60.3° | 59.6° | 44.1° |
+| ff / res_bcs | 59.2° | 59.8° | **41.4°** |
+| tt / res_wcs | 42.2° | 52.1° | 60.2° |
+| ss / res_wcs | 43.7° | 53.1° | 60.0° |
+| ff / res_wcs | **40.7°** | 51.2° | 60.8° |
 
-1. **Is there a compensation topology for this case that has not been tried?** The
-   binding corner is fast silicon, hot, no load — where the loop is slowest and the
-   phase dip sits nearest crossover.
-2. **Is 45° the right target for a capless LDO with only 20 pF of on-chip output
-   capacitance**, or is the honest answer that `Cout` has to be much larger and the
-   stability question changes shape once it is? The load-step numbers point the same way.
-3. **Anything IHP-specific?** Is there a known characteristic of the SG13G2 thick-oxide
-   devices at the ff corner and 110 °C — output resistance, or `rhigh`'s temperature and
-   sheet corner pairing — that makes this combination unusually hard, or that means our
-   corner pairing (ff with best-case sheet) is more pessimistic than the PDK intends?
+Read down the columns: **the three MOS corners are within about 2° of each other**
+everywhere. Read across the resistor corners and the spread is 20°. `rhigh` is the nulling
+resistor in the compensation, so the resistor corner sets where the recovery zero sits, and
+it interacts with temperature in opposite directions — a low sheet fails hot, a high sheet
+fails cold, and typical passes everywhere. **This is a compensation-zero placement problem,
+not a transistor problem.**
+
+Resistor corners are swept independently of the MOS corner. Pairing them — the convention
+borrowed from digital practice — is not physically justified here, since poly sheet and MOS
+drive are different process steps, and it happens to hide half the problem.
+
+### Most of the gap is a PDK corner definition that upstream has already fixed
+
+This design is pinned to a PDK where `cornerRES.lib` sets `rsh_rhigh` to **1020 / 1360 /
+1700 Ω/sq** for best / typical / worst case — **±25 %**. Upstream issue #1063 reported that
+as wider than the specified tolerance, and commit `4b7d7422` (2026-08-07) re-aligned the
+corners to **1160 / 1360 / 1560 Ω/sq**, or ±14.7 %. That commit is on `main` and is **not in
+any tagged release**, including v0.3.0.
+
+Substituting only those two numbers into a local copy of `cornerRES.lib`, changing nothing
+else:
+
+| corner | this pin | with the re-aligned corners | Δ |
+| --- | --- | --- | --- |
+| ff / res_bcs / 110 °C / 3.0 V | 40.4° | **48.5°** | +8.1° |
+| ff / res_bcs / 110 °C / 3.3 V | 41.4° | **49.3°** | +7.9° |
+| ff / res_wcs / −40 °C / 3.3 V | 40.7° | 44.4° | +3.7° |
+| ff / res_wcs / −40 °C / 3.6 V | 40.2° | 43.9° | +3.8° |
+
+The hot side passes comfortably. **The cold, high-sheet corner remains about 1.1° short.**
+
+### The questions
+
+1. **Should this design be re-pinned to `main` for the resistor corners?** The fix is not in
+   a release, and the same window carries other resistor work — the `r3_cmc` model, a
+   contact double-count fix, a bulk node on `rhigh` — that has not been assessed here. The
+   test above isolates the sheet-resistance numbers only.
+2. **Is roughly 1° at ff / worst-case sheet / −40 °C worth spending design effort on**, or is
+   it inside the noise of a schematic-stage estimate? For reference, everything swept to
+   close it — nulling resistor, both Miller capacitors, input-pair width, second-stage
+   current, and a source-follower gate driver — either moved the wrong way or cost a
+   different specification. The preload was the one interior optimum, worth 14.6°.
+3. **Is 45° the right target for a capless LDO with 20 pF of on-chip output capacitance**, or
+   does `Cout` have to be much larger anyway — in which case the load-transient numbers
+   force the same conclusion and the stability question changes shape.
 
 Everything above is reproducible from this repository: `sim/run_pvt.sh` for the corner ×
 load sweep, `sim/tb_ldo_ac.spice` for the loop-gain measurement.
