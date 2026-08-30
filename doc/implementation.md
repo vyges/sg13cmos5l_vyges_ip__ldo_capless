@@ -77,7 +77,7 @@ enable inverter, the power-good comparator and the OC logic do.
 | --- | --- | --- |
 | `ldo_vref` | Halves the 1.2 V harness bandgap to 0.6 V, RC-filtered | [SVG](schematics/ldo_vref.svg) |
 | `ldo_erramp` | Two-stage error amplifier: PMOS input pair with NMOS mirror, then an NMOS common-source stage; Miller compensated with a nulling resistor | [SVG](schematics/ldo_erramp.svg) |
-| `ldo_pass` | PMOS pass array, W = 100 µm × 20, L = 0.5 µm | [SVG](schematics/ldo_pass.svg) |
+| `ldo_pass` | PMOS pass array, W = 100 µm × 64, L = 0.5 µm | [SVG](schematics/ldo_pass.svg) |
 | `ldo_fbtrim` | Feedback divider with 5-bit binary-weighted output trim | [SVG](schematics/ldo_fbtrim.svg) |
 | `ldo_enable` | Enable / power-gate, with a 1.2 V to 3.3 V level shift | [SVG](schematics/ldo_enable.svg) |
 | `ldo_pgood` | Power-good comparator, lv domain, 1.2 V logic output | [SVG](schematics/ldo_pgood.svg) |
@@ -409,9 +409,12 @@ supply swept 3.3 → 2.0 V, `OC` stays deasserted at every point and the output 
 regulated. `Msd` defines the sense node when the cascode runs out of headroom at low supply
 — left floating between two off devices, the DC sweep would not converge at all.
 
-Sizing — 2 µm against the array's 2000 µm, so 1:1000. `Mref` sinks a reference mirrored
-from the harness bias, which makes `oc_n` the comparison itself: low below the limit,
-rising above it. No separate comparator is needed.
+Sizing — 2 µm against the array's 6400 µm, so 1:3200. **That ratio is set by the pass
+array's width, so the two cannot be changed independently**: widening the array for dropout
+moves the trip point, and `Mref` has to be rescaled with it. It was, when the array went
+from 2000 µm to 6400 µm. `Mref` sinks a reference mirrored from the harness bias, which
+makes `oc_n` the comparison itself: low below the limit, rising above it. No separate
+comparator is needed.
 
 **The limiter acts, it does not merely report.** A 3.3 V-domain inverter drives `Mlim`,
 which pulls the pass gate toward `vin` when the limit trips, so over-current reduces the
@@ -497,6 +500,63 @@ what made the loop meet its 45° minimum at all. Both are recorded above with th
 that chose them. Recovering the difference means giving back stability margin, so it is a
 trade for the review to confirm rather than a number to quietly optimise.
 
+## Large-signal response — three specifications not met
+
+Phase margin is a small-signal number and it does not see any of this. All three figures
+below come from `sim/tb_ldo_perf.spice` and are checked by the reporting script on every
+run, so they cannot quietly drop out of the record.
+
+| | measured | specification |
+| --- | --- | --- |
+| Dropout at 50 mA | 573 mV | 250 mV max |
+| Load-step droop, 1 → 20 mA, 1 µs edge | 324 mV | 120 mV max |
+| Load-release overshoot, 20 → 1 mA | **to the 3.3 V input rail** | 120 mV max |
+
+### Droop and overshoot are set by `Cout`, not by the loop
+
+A 19 mA step sustained for the microsecond the loop needs to respond moves 19 nC of
+charge. Across 20 pF of output capacitance that is three orders of magnitude more than the
+120 mV the specification allows — the output reaches the rail on release and 324 mV below
+nominal on application, and no amount of loop gain changes it. Holding 120 mV requires the
+loop to respond within
+
+    t = Cout x dV / dI = 20 pF x 120 mV / 19 mA = 126 ns
+
+which is a large-signal slew requirement on the pass gate, not a bandwidth one: turning
+16 pF of gate through half a volt in 126 ns needs about 63 µA of drive, against a
+quiescent budget of 60 µA for the whole block.
+
+**This was measured against the design as it stood before the gate driver, to be sure of
+the attribution:** droop 325 mV and overshoot to the rail, i.e. unchanged. The gate driver
+neither caused nor fixed either one. `Cout` is the variable.
+
+### Dropout regressed when the gate driver landed
+
+| | before the gate driver | with it | specification |
+| --- | --- | --- | --- |
+| Worst phase margin over PVT | 25.8° | **50.2°** | 45° min |
+| Dropout at 50 mA | **149 mV** | 573 mV | 250 mV max |
+| Load-step droop | 325 mV | 324 mV | 120 mV max |
+| Load-release overshoot | rail | rail | 120 mV max |
+| Quiescent current | 35.7 µA | 45.6 µA | 60 µA max |
+
+The mechanism is the follower's level shift, and it is the same property that makes the
+follower work at all. A PMOS follower holds its output roughly a threshold *above* its
+input, which is what lets the pass gate rise far enough to turn the device off. The same
+shift sets a *floor* on how far the gate can be pulled down — about 1.1 V — and that floor
+caps the pass device's gate-source drive, which is exactly what dropout measures.
+
+Widening `Msrc` to drive the follower harder was tried and rejected: at 12 µm the
+quiescent current goes to 64.5 µA, over budget, dropout gets *worse* at 644 mV, and the
+overshoot does not move at all.
+
+**So the block currently trades a passing dropout specification for a passing stability
+one, and cannot have both in this topology.** The proposal names capless stability as the
+primary risk and states that the honest response to an area-or-dropout squeeze is to
+derate maximum load as a declared specification change. That is why the gate driver is
+kept in this revision — but it is a review decision, not a settled one, and the numbers
+for both choices are above.
+
 ## Not in this revision
 
 Stated here rather than left to be discovered:
@@ -506,3 +566,44 @@ Stated here rather than left to be discovered:
   length, which carries `rhigh`'s fixed contact term into the small segments. The layout
   pass should rebuild it from series/parallel unit resistors so the weighting is set by
   count.
+- **`IB_SEL` bias selection.** Specified, not implemented. The block takes the 1 µA
+  harness bias unconditionally.
+- **PSRR is short of specification**: 35 dB at 1 kHz against 40 dB, and it crosses zero
+  above roughly 50 kHz — +1.2 dB at 100 kHz and +3.8 dB at 1 MHz, i.e. supply ripple is
+  *amplified* there rather than rejected. The high-frequency figure is the same `Cout`
+  limitation as the load transient.
+
+## Work remaining, in the order it should be done
+
+1. **Resolve the dropout-versus-stability trade.** The table above is the decision. The
+   three ways out, in increasing cost: derate maximum load (declarable, costs nothing to
+   build); replace the follower with a driver that has no level shift, which means a
+   third gain stage and re-doing the compensation; or accept 45° with a smaller driver.
+2. **Size `Cout` against the load-step specification rather than against area.** 20 pF was
+   chosen as 6.6 % of the slot. The transient specification implies far more, and a
+   capless LDO with a 1 µs, 19 mA step is a charge problem before it is a loop problem.
+   This needs a number from the review: what step must actually be survived, and at what
+   output droop.
+3. **Re-run PVT once 1 and 2 are settled** — both change the operating point, and the
+   corner sweep is the only thing that has caught a regression here so far.
+4. **Monte-Carlo the trim divider and the reference**, which no run has covered yet.
+5. Then the deferred items above: power-good hysteresis, unit-resistor trim ladder,
+   `IB_SEL`.
+
+## Questions that need answers before layout
+
+These block work rather than merely informing it.
+
+1. **Is a 1.2 V rail distributed to the pallets, or is 3.3 V the only supply?** The
+   enable inverter, the power-good comparator and the OC reporting path all run from
+   `vddd` at 1.2 V. If the slot supplies only 3.3 V, those three need rebuilding in
+   thick-oxide devices, and the block has to generate its own low rail. Everything else
+   in the block is already 3.3 V-native. This is the single largest unknown.
+2. **What load step must the block survive, and at what droop?** See item 2 above. The
+   answer sets `Cout`, which is the block's second-largest area consumer.
+3. **What bias currents does a pallet actually receive?** The design assumes a 1 µA
+   source and multiplies it by ten internally. The harness names `ibias1_250n`,
+   `ibias1u_*` and `ibias2_1u` suggest 250 nA and 1 µA are both available; confirmation
+   would let the internal multiplication be dropped.
+4. **Is derating maximum load acceptable** if the dropout trade in item 1 goes that way,
+   and to what current?
