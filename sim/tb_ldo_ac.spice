@@ -28,6 +28,7 @@ Vrefbg vref_bg 0 1.2
 Vss    vss     0 0
 Vddd   vddd    0 1.2
 Ven    en      0 1.2
+Vilim  ilim_en 0 1.2
 Vsub sub! 0 0
 Ibias  0       ibias DC 1u   $ harness supplies 1 uA (ibias1u_*); multiplied 10x on-slot
 Iload  vout    0 DC 1m
@@ -38,10 +39,17 @@ Vt2 vtrim2 0 0
 Vt3 vtrim3 0 0
 Vt4 vtrim4 0 1.2
 
-x_vref vref_bg vref vss ldo_vref
-x_amp  vref vfb ibias eout vin vss ldo_erramp
+* Blocks instantiated by hand so the feedback node can be broken. Port order MUST track
+* the cells -- this bench silently stopped elaborating when ldo_vref, ldo_erramp and
+* ldo_enable gained ports, and ngspice then reported "too few parameters" and produced no
+* output at all, leaving stale CSVs on disk to be read as if they were results.
+x_vref vref_bg vref vss vref_pg ldo_vref
+x_amp  vref vfb ibias en_n eout vin vss ldo_erramp
 x_pass eout vout vin ldo_pass
 x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
+x_en   en ibias eout en_n vin vddd vss ldo_enable
+x_pg   vfb vref_pg ibias pgood vddd vss ldo_pgood
+x_il   ibias ilim_en vout eout oc vin vddd vss ldo_ilim
 
 * Loop break. A DC-0 / AC-1 source alone is the whole mechanism: a short at DC, so the
 * operating point is the real closed-loop one, and a 1 V injection at AC. An earlier
@@ -51,7 +59,6 @@ Vinj vfbd vfb DC 0 AC 1
 
 * Cc, Cout and the preload are at the top level, not inside any sub-block -- this bench
 * instantiates the blocks by hand to get at the feedback node, so it carries them too.
-x_en  en ibias eout vin vddd vss ldo_enable
 XMpre vout ibias vss vss sg13_hv_nmos w=2u l=1u ng=1 m=1
 XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
 XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4

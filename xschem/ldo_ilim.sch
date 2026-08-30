@@ -37,7 +37,7 @@ N -280 -250 -280 -290 {lab=sense_d}
 C {devices/lab_pin.sym} -280 -290 0 0 {name=l_Mcas_S sig_type=std_logic lab=sense_d}
 N -280 -220 -210 -220 {lab=vin}
 C {devices/lab_pin.sym} -210 -220 0 0 {name=l_Mcas_B sig_type=std_logic lab=vin}
-C {sg13cmos5l_pr/sg13_hv_nmos.sym} -300 -60 0 0 {name=Mref l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=160u}
+C {sg13cmos5l_pr/sg13_hv_nmos.sym} -300 -60 0 0 {name=Mref l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=50u}
 N -280 -90 -280 -130 {lab=oc_n}
 C {devices/lab_pin.sym} -280 -130 0 0 {name=l_Mref_D sig_type=std_logic lab=oc_n}
 N -320 -60 -370 -60 {lab=ibias}

@@ -4,8 +4,8 @@ K {}
 V {}
 S {}
 E {}
-T {ldo_pass -- PMOS pass device array (sg13_hv, W=100u x 20)} -260 -220 0 0 0.4 0.4 {}
-C {sg13cmos5l_pr/sg13_hv_pmos.sym} 0 -110 0 0 {name=Mpass l=0.5u w=100u ng=1 m=20 model=sg13_hv_pmos spiceprefix=X}
+T {ldo_pass -- PMOS pass device array (sg13_hv, W=100u x 64)} -260 -220 0 0 0.4 0.4 {}
+C {sg13cmos5l_pr/sg13_hv_pmos.sym} 0 -110 0 0 {name=Mpass l=0.5u w=100u ng=1 m=64 model=sg13_hv_pmos spiceprefix=X}
 N 20 -80 20 -40 {lab=vout}
 C {devices/lab_pin.sym} 20 -40 0 0 {name=l_Mpass_D sig_type=std_logic lab=vout}
 N -20 -110 -70 -110 {lab=eout}
