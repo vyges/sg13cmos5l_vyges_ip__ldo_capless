@@ -34,8 +34,12 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Phase margin, worst over PVT | 50.1° (ss/−40 °C) | 45° min |
 | Output capacitor | **capless** — on-chip compensation only | no external cap |
 
-Enable / power-gate, power-good and current limit are **not** in this revision; see
-[`doc/implementation.md`](doc/implementation.md).
+| Current limit trip | 62.5 mA | 60 mA |
+| Standby current, disabled | 3.19 µA | — |
+
+Enable, power-good and current limit are implemented and exercised; see
+[`doc/implementation.md`](doc/implementation.md). The block needs a 1.2 V control-bus
+supply (`vddd`) alongside the 3.3 V rail.
 
 ## Layout
 
