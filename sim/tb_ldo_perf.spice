@@ -14,7 +14,12 @@ Vss     vss     0 0
 Vsub    sub!    0 0
 Vddd    vddd    0 1.2
 Ven     en      0 1.2
-Vilim   ilim_en 0 1.2
+* Limiter OFF for this bench. Dropout characterises the PASS DEVICE -- how far the input
+* can fall before the loop loses regulation. With the protection active the sweep measures
+* where the limiter fires instead, which is a different quantity, and the two loops fighting
+* near the trip point also stops the continuation sweep converging. The limiter's own
+* behaviour is measured in tb_ldo_status and tb_ldo_ilim_lowvin.
+Vilim   ilim_en 0 0
 Ibias   0       ibias DC 1u   $ harness supplies 1 uA (ibias1u_*); multiplied 10x on-slot
 * load: DC for the static measurements, PULSE for the transient
 Iload   vout    0 PULSE(1m 20m 20u 1u 1u 20u 60u)
