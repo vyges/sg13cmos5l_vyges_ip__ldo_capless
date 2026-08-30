@@ -216,7 +216,7 @@
 <polygon points="715.0,140.0 720.0,137.5 715.0,135.0 715.0,140.0" fill="#1a202c"/>
 <polygon points="720.0,122.5 715.0,120.0 720.0,117.5 720.0,122.5" fill="#1a202c"/>
 <text x="670.0" y="82.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mpre</text>
-<text x="670.0" y="95.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=20u L=1u</text>
+<text x="670.0" y="95.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
 <circle cx="720.0" cy="50.0" r="2.6" fill="#c05621"/>
 <text x="727.0" y="54.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vout</text>
 <circle cx="630.0" cy="120.0" r="2.6" fill="#c05621"/>

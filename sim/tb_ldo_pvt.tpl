@@ -21,7 +21,11 @@ Ven  en   0 1.2
 Vilim ilim_en 0 1.2
 Vsub sub! 0 0
 Ibias 0 ibias DC 1u   $ harness supplies 1 uA (ibias1u_*); multiplied 10x on-slot
-Iload vout 0 DC 0
+* Load is swept alongside the corner. Phase margin in an LDO is load-dependent -- the pass
+* device's gm, and with it the output pole, moves with load current -- so a no-load corner
+* sweep and a single-corner load sweep between them do NOT bound the worst case. The
+* combination is what the specification has to hold at.
+Iload vout 0 DC @ILOAD@
 Vt0 vtrim0 0 0
 Vt1 vtrim1 0 0
 Vt2 vtrim2 0 0

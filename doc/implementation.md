@@ -146,28 +146,54 @@ one, and a 1 V injection at AC.
 | 50 mA | 115.4 dB | 3.82 MHz | 75.5° |
 
 **Worst case across load is 56.6°, at 30 µA** — not at either end of the range — against a
-specification minimum of 45° and a typical target of 60°. Over PVT the worst case is
-50.2°; see the PVT section below.
+specification minimum of 45° and a typical target of 60°. ⚠️ Over corners **and load**
+the worst case is 40.4°, which does not meet the minimum; see the PVT section below.
 
-### Gate driver
+### A gate driver was tried and removed
 
-The amplifier does not drive the pass gate directly. The pass array is 6400 µm wide, so
-its gate is roughly 16 pF, and a 5 µA common-source stage driving that node puts a pole
-low enough to dominate the phase margin — 25.8° at ff/110 °C in an earlier revision, and
-short of specification at *every* pass-array width, so widening the array for dropout and
-compensating for stability were fighting over the same device.
+The pass array is 6400 µm wide, so its gate is roughly 16 pF, and the second stage drives
+it directly. A PMOS source follower between the two was built to present 1/gm at that node
+instead of the stage's output resistance. **It was removed.** The record is kept because
+the result is not obvious and the mistake it caused was worse than the design change.
 
-A source follower between the two presents 1/gm at the gate instead of the stage's output
-resistance, which moves that pole up by orders of magnitude at the same current and
-decouples compensation from the pass array entirely.
+It appeared to work: worst-case phase margin over the corner sweep went from 25.8° to
+50.2°. That number was wrong — not mis-copied, but measured by a sweep that ran every
+corner **at no load only**. Crossing load with corner (below) puts the same design at
+**33.4°**, at ss/−40 °C/3.6 V with 100 µA drawn. Meanwhile dropout had gone from 149 mV to
+573 mV, because a PMOS follower holds its output about a threshold *above* its input,
+which sets a floor on how far the pass gate can be pulled down — and that floor is exactly
+what dropout measures. Widening the follower's bias to compensate reached 64.5 µA
+quiescent, over budget, with dropout *worse* and the load transient unmoved.
 
-It has to be a **PMOS** follower. An NMOS follower puts its output a threshold *below* its
-input, and the input cannot exceed the supply less a saturation voltage, so the gate could
-never rise far enough to turn a PMOS pass device off; built that way first, the regulator
-simply stopped regulating. The PMOS shift is upward, placing the useful gate range of
-roughly 2.0–2.6 V at an amplifier output of 1.1–1.6 V, mid-rail and comfortable. Its fast
-direction is pulling the gate *down*, which is turning the pass device on — the direction
-that matters for droop on a load step.
+So the follower cost a specification and bought nothing. Removing it restores dropout to
+149 mV and improves worst-case margin to 40.4°.
+
+**The lesson is in the measurement, not the circuit:** a corner sweep at one load and a
+load sweep at one corner do not bound a quantity that varies with both. `run_pvt.sh` now
+crosses them.
+
+### Stage-2 current — the same goal without the level shift
+
+The follower's purpose was to lower the impedance at the pass gate. The second stage's own
+bias current does that too, with no level shift, so dropout is untouched at every setting.
+Scaling `M5` and `M6` together — `M6` sets the current, `M5`'s width keeps its gate-source
+voltage where the operating point was:
+
+| `M5`/`M6` | Load sweep, tt/27 | Corners at no load | Corners × load | Dropout | Iq |
+| --- | --- | --- | --- | --- | --- |
+| **10 µm / 2 µm** | **57.3°** | **40.4°** | **40.4°** | **149 mV** | **35.7 µA** |
+| 15 µm / 3 µm | 53.9° | — | 34.5° | 149 mV | — |
+| 20 µm / 4 µm | 51.0° | 43.8° | 22.8° | 149 mV | ~40 µA |
+| 25 µm / 5 µm | 46.3° | 45.0° | 12.1° | 149 mV | ~43 µA |
+| 30 µm / 6 µm | 41.9° | 46.3° | — | 149 mV | ~45 µA |
+| 40 µm / 8 µm | 32.5° | 48.5° | — | 149 mV | 49.9 µA |
+
+Read the last three columns together. Judged on corners at no load, more current looks
+monotonically better and 25 µm/5 µm appears to *pass* at 45.0°. Judged on the crossed
+sweep, the same setting is at 12.1° and more current is monotonically **worse**. The
+no-load corner sweep does not merely understate the problem — it points the wrong way.
+
+**The block ships at 10 µm/2 µm**, the best point under the sweep that bounds both.
 
 ### Minimum load
 
@@ -183,16 +209,17 @@ At no external load the output node sees only the preload and the feedback divid
 pole there is low — around 6 kHz with a 1 µA preload, close enough to crossover to cost
 most of the margin. Sweeping it over all 27 corners:
 
-| `Mpre` width | preload | Iq | worst-case PM over PVT |
-| --- | --- | --- | --- |
-| 2 µm | 1 µA | 37.7 µA | 36.2° |
-| 8 µm | 4 µA | 40.3 µA | 42.6° |
-| **20 µm** | **10 µA** | **45.6 µA** | **50.2°** |
-| 40 µm | 20 µA | 53.4 µA | 43.2° |
+| `Mpre` width | preload | worst-case PM, corners × load |
+| --- | --- | --- |
+| 2 µm | 1 µA | 25.8° |
+| 8 µm | 4 µA | 32.2° |
+| **20 µm** | **10 µA** | **40.4°** |
+| 40 µm | 20 µA | 39.9° |
 
 The relationship is not monotonic: too little preload leaves the output pole near
 crossover, too much raises crossover into the *next* pole. 20 µm is the interior optimum,
-and it is where the design sits.
+worth 14.6° over the original 2 µm, and it is where the design sits. It costs 10 µA of a
+35.7 µA total, against a 60 µA maximum.
 
 Two other knobs were swept the same way and both moved the wrong direction, which is worth
 recording so they are not retried: increasing the nulling resistor `Rz` (35.2 µm → 140 µm)
@@ -249,17 +276,24 @@ rather than by drawn length.
 
 ## PVT
 
-`sim/run_pvt.sh` sweeps three process corners against three temperatures and three
-supplies — 27 combinations — measuring output accuracy and loop phase margin at no
-external load. Resistor corners are paired pessimistically with the MOS corner.
+`sim/run_pvt.sh` sweeps three process corners against three temperatures, three supplies
+**and three load currents** — 81 combinations. Resistor corners are paired pessimistically
+with the MOS corner.
+
+The load axis was added after a design was accepted at 45.0° on a no-load-only sweep and
+found to be at 12.1° once load and corner were crossed. Phase margin in an LDO moves with
+load, because the pass device's transconductance does; a corner sweep at one load and a
+load sweep at one corner do not bound it between them.
 
 | | across all 27 corners | specification |
 | --- | --- | --- |
 | Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
-| **Worst phase margin** | **50.2° (ss/−40 °C/3.6 V)** | 45° min |
+| **Worst phase margin** | **40.4° (ff/110 °C/3.0 V, no load)** | 45° min ❌ |
 
-**The block regulates and stays stable across the full commercial range**, −40 to 110 °C,
-3.0 to 3.6 V, tt/ss/ff.
+**The block regulates across the full commercial range**, −40 to 110 °C, 3.0 to 3.6 V,
+tt/ss/ff. ⚠️ **It does not meet the 45° phase-margin minimum**: the worst case is 40.4°,
+4.6° short, at ff/110 °C with no external load. Everything tried to close that gap is
+recorded above and in the compensation section; see the open question at the end.
 
 ### Why the compensation is sized the way it is
 
@@ -274,8 +308,8 @@ loop gain rises and the crossover pushes out to where there is no phase left, wh
   50 kΩ is best at ss/−40 °C, 80 kΩ at ff/110 °C, and moving toward either wrecks the
   other. The resolution is to lower the crossover until that optimum stops being sharp,
   not to keep re-tuning it.
-- **`Cm` = 48 pF is the knee.** It gives 50.2° worst-case; both larger `Rz` and
-  smaller `Cm` were swept and both make it worse — see the preload section above.
+- **`Cm` = 48 pF is the knee.** Both larger `Rz` and smaller `Cm` were swept and both
+  make it worse — see the preload section above.
 
 The capacitors are the block's area cost: `Cm` at 144 × 144 µm is about 16 % of a
 520 × 250 µm slot, and `Cout` a further 6.6 %.
@@ -490,15 +524,13 @@ rather than 10.
 | | |
 | --- | --- |
 | Load | up to 50 mA through the slot switch |
-| Quiescent, enabled | 45.6 µA |
+| Quiescent, enabled | 35.7 µA |
 | Quiescent, disabled | 3.19 µA |
 
-Quiescent current is **above the proposal's 30 µA typical** and inside its 60 µA maximum.
-The excess is spent deliberately and in two places: the 10 µA preload, which the corner
-sweep showed to be the interior optimum for phase margin, and the gate driver, which is
-what made the loop meet its 45° minimum at all. Both are recorded above with the sweeps
-that chose them. Recovering the difference means giving back stability margin, so it is a
-trade for the review to confirm rather than a number to quietly optimise.
+Quiescent current is **above the proposal's 30 µA typical** and comfortably inside its
+60 µA maximum. The excess is the 10 µA preload, which the corner sweep showed to be the
+interior optimum for phase margin — see the minimum-load section. There is roughly 24 µA
+of headroom against the maximum, which is what any remaining stability work has to spend.
 
 ## Large-signal response — three specifications not met
 
@@ -532,13 +564,16 @@ neither caused nor fixed either one. `Cout` is the variable.
 
 ### Dropout regressed when the gate driver landed
 
-| | before the gate driver | with it | specification |
+| | without the driver | with it | specification |
 | --- | --- | --- | --- |
-| Worst phase margin over PVT | 25.8° | **50.2°** | 45° min |
+| Worst phase margin, corners × load | **40.4°** | 33.4° | 45° min |
 | Dropout at 50 mA | **149 mV** | 573 mV | 250 mV max |
 | Load-step droop | 325 mV | 324 mV | 120 mV max |
 | Load-release overshoot | rail | rail | 120 mV max |
-| Quiescent current | 35.7 µA | 45.6 µA | 60 µA max |
+| Quiescent current | **35.7 µA** | 45.6 µA | 60 µA max |
+
+Measured on the same crossed sweep for both, which is the comparison that matters: the
+driver is worse on every line. It was removed.
 
 The mechanism is the follower's level shift, and it is the same property that makes the
 follower work at all. A PMOS follower holds its output roughly a threshold *above* its
@@ -575,10 +610,9 @@ Stated here rather than left to be discovered:
 
 ## Work remaining, in the order it should be done
 
-1. **Resolve the dropout-versus-stability trade.** The table above is the decision. The
-   three ways out, in increasing cost: derate maximum load (declarable, costs nothing to
-   build); replace the follower with a driver that has no level shift, which means a
-   third gain stage and re-doing the compensation; or accept 45° with a smaller driver.
+1. **Close the last 4.6° of phase margin** — see the open question below. Dropout,
+   quiescent current and output accuracy all pass; this is the only remaining
+   small-signal gap and everything cheap has been tried.
 2. **Size `Cout` against the load-step specification rather than against area.** 20 pF was
    chosen as 6.6 % of the slot. The transient specification implies far more, and a
    capless LDO with a 1 µs, 19 mA step is a charge problem before it is a loop problem.
@@ -589,6 +623,46 @@ Stated here rather than left to be discovered:
 4. **Monte-Carlo the trim divider and the reference**, which no run has covered yet.
 5. Then the deferred items above: power-good hysteresis, unit-resistor trim ladder,
    `IB_SEL`.
+
+## Open question — the last 4.6° of phase margin
+
+**Posted for anyone who wants to chip in.** The block is 40.4° against a 45° minimum, at
+ff/110 °C with no external load. Everything else passes.
+
+**What it is:** capless LDO on IHP SG13G2, 3.3 V in, 1.0–1.8 V trimmed out (1.2 V
+nominal), 50 mA. Two-stage Miller-compensated amplifier, PMOS input pair (5 µm), PMOS pass
+array 6400 µm / 0.5 µm. `Cm` 48 pF MOM with a 50 kΩ `rhigh` nulling resistor, `Cc` 2 pF
+across the pass device, `Cout` 20 pF on chip, 10 µA preload. Quiescent 35.7 µA of a 60 µA
+budget, so there is current to spend. Dropout 149 mV against 250 max.
+
+**What has been swept, and which way it moved** — all measured over 81 corner × load
+combinations, worst case quoted:
+
+| Change | Result |
+| --- | --- |
+| Preload 1 → 10 µA | 25.8° → **40.4°**, an interior optimum; 20 µA gives 39.9° |
+| Nulling `Rz` 50 kΩ → 140 kΩ | 40.4° → 9.8°, then −15.2° |
+| `Cm` 48 pF → 5.8 pF | worse at every step |
+| `Cc` 2 pF → 23 pF | 40.4° → 18.5° (but load-release overshoot improves 3×) |
+| Input pair 5 µm → 1 µm | 40.4° → 34.2° |
+| Stage-2 current 5 → 25 µA | no-load corners improve, corner × load gets **worse** |
+| PMOS source-follower gate driver | 33.4°, and dropout 149 → 573 mV. Removed |
+
+**The questions:**
+
+1. **Is there a compensation topology for this case that has not been tried?** The
+   binding corner is fast silicon, hot, no load — where the loop is slowest and the
+   phase dip sits nearest crossover.
+2. **Is 45° the right target for a capless LDO with only 20 pF of on-chip output
+   capacitance**, or is the honest answer that `Cout` has to be much larger and the
+   stability question changes shape once it is? The load-step numbers point the same way.
+3. **Anything IHP-specific?** Is there a known characteristic of the SG13G2 thick-oxide
+   devices at the ff corner and 110 °C — output resistance, or `rhigh`'s temperature and
+   sheet corner pairing — that makes this combination unusually hard, or that means our
+   corner pairing (ff with best-case sheet) is more pessimistic than the PDK intends?
+
+Everything above is reproducible from this repository: `sim/run_pvt.sh` for the corner ×
+load sweep, `sim/tb_ldo_ac.spice` for the loop-gain measurement.
 
 ## Questions that need answers before layout
 

@@ -47,17 +47,16 @@
 <!-- amp -->
 <g id="node6" class="node">
 <title>amp</title>
-<path fill="#f4f7fb" stroke="#4a6fa5" stroke-width="1.2" d="M469.87,-198.48C469.87,-198.48 372.58,-198.48 372.58,-198.48 366.58,-198.48 360.58,-192.48 360.58,-186.48 360.58,-186.48 360.58,-163.52 360.58,-163.52 360.58,-157.52 366.58,-151.52 372.58,-151.52 372.58,-151.52 469.87,-151.52 469.87,-151.52 475.87,-151.52 481.87,-157.52 481.87,-163.52 481.87,-163.52 481.87,-186.48 481.87,-186.48 481.87,-192.48 475.87,-198.48 469.87,-198.48"/>
-<text xml:space="preserve" text-anchor="start" x="394.6" y="-183.5" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="10.00">ldo_erramp</text>
-<text xml:space="preserve" text-anchor="start" x="372.1" y="-175.4" font-family="Helvetica,sans-Serif" font-size="8.00">two&#45;stage, PMOS input pair</text>
-<text xml:space="preserve" text-anchor="start" x="381.85" y="-167.4" font-family="Helvetica,sans-Serif" font-size="8.00">Miller + nulling resistor</text>
-<text xml:space="preserve" text-anchor="start" x="374.35" y="-159.4" font-family="Helvetica,sans-Serif" font-size="8.00">PMOS follower gate driver</text>
+<path fill="#f4f7fb" stroke="#4a6fa5" stroke-width="1.2" d="M469.87,-196.48C469.87,-196.48 372.58,-196.48 372.58,-196.48 366.58,-196.48 360.58,-190.48 360.58,-184.48 360.58,-184.48 360.58,-169.52 360.58,-169.52 360.58,-163.52 366.58,-157.52 372.58,-157.52 372.58,-157.52 469.87,-157.52 469.87,-157.52 475.87,-157.52 481.87,-163.52 481.87,-169.52 481.87,-169.52 481.87,-184.48 481.87,-184.48 481.87,-190.48 475.87,-196.48 469.87,-196.48"/>
+<text xml:space="preserve" text-anchor="start" x="394.6" y="-181.5" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="10.00">ldo_erramp</text>
+<text xml:space="preserve" text-anchor="start" x="372.1" y="-173.4" font-family="Helvetica,sans-Serif" font-size="8.00">two&#45;stage, PMOS input pair</text>
+<text xml:space="preserve" text-anchor="start" x="381.85" y="-165.4" font-family="Helvetica,sans-Serif" font-size="8.00">Miller + nulling resistor</text>
 </g>
 <!-- idac&#45;&gt;amp -->
 <g id="edge3" class="edge">
 <title>idac&#45;&gt;amp</title>
-<path fill="none" stroke="#33475b" d="M106.24,-143.58C149.34,-145.64 223.17,-149.76 286.33,-156.25 307.66,-158.44 330.83,-161.46 351.79,-164.43"/>
-<polygon fill="#33475b" stroke="#33475b" points="351.24,-166.83 358.52,-165.4 351.94,-161.98 351.24,-166.83"/>
+<path fill="none" stroke="#33475b" d="M106.26,-143.42C149.37,-145.32 223.22,-149.3 286.33,-156.25 307.69,-158.6 330.86,-161.92 351.83,-165.21"/>
+<polygon fill="#33475b" stroke="#33475b" points="351.26,-167.6 358.56,-166.28 352.03,-162.76 351.26,-167.6"/>
 <text xml:space="preserve" text-anchor="middle" x="237.31" y="-157.45" font-family="Helvetica,sans-Serif" font-size="9.00">ibias</text>
 </g>
 <!-- vin -->
@@ -107,16 +106,16 @@
 <!-- vref&#45;&gt;amp -->
 <g id="edge2" class="edge">
 <title>vref&#45;&gt;amp</title>
-<path fill="none" stroke="#33475b" d="M286.58,-188.96C306.56,-186.87 330.08,-184.41 351.78,-182.15"/>
-<polygon fill="#33475b" stroke="#33475b" points="351.79,-184.61 358.49,-181.45 351.28,-179.74 351.79,-184.61"/>
-<text xml:space="preserve" text-anchor="middle" x="323.45" y="-187.96" font-family="Helvetica,sans-Serif" font-size="9.00">vref 0.6 V</text>
+<path fill="none" stroke="#33475b" d="M286.58,-189.49C306.56,-187.62 330.08,-185.42 351.78,-183.4"/>
+<polygon fill="#33475b" stroke="#33475b" points="351.75,-185.86 358.49,-182.77 351.29,-180.98 351.75,-185.86"/>
+<text xml:space="preserve" text-anchor="middle" x="323.45" y="-188.72" font-family="Helvetica,sans-Serif" font-size="9.00">vref 0.6 V</text>
 </g>
 <!-- amp&#45;&gt;pass -->
 <g id="edge5" class="edge">
 <title>amp&#45;&gt;pass</title>
-<path fill="none" stroke="#33475b" d="M482.33,-161.44C502.49,-156.89 525.16,-151.78 546.09,-147.06"/>
-<polygon fill="#33475b" stroke="#33475b" points="546.55,-149.46 552.84,-145.53 545.47,-144.68 546.55,-149.46"/>
-<text xml:space="preserve" text-anchor="middle" x="518.24" y="-158.14" font-family="Helvetica,sans-Serif" font-size="9.00">eout</text>
+<path fill="none" stroke="#33475b" d="M482.33,-162.82C502.49,-158.07 525.16,-152.72 546.09,-147.79"/>
+<polygon fill="#33475b" stroke="#33475b" points="546.59,-150.19 552.84,-146.19 545.47,-145.42 546.59,-150.19"/>
+<text xml:space="preserve" text-anchor="middle" x="518.24" y="-159.32" font-family="Helvetica,sans-Serif" font-size="9.00">eout</text>
 </g>
 <!-- cc -->
 <g id="node9" class="node">
@@ -129,7 +128,7 @@
 <!-- amp&#45;&gt;cc -->
 <g id="edge12" class="edge">
 <title>amp&#45;&gt;cc</title>
-<path fill="none" stroke="#c08a3e" stroke-dasharray="5,2" d="M482.28,-177.93C586.98,-183.03 800.45,-193.45 891.8,-197.9"/>
+<path fill="none" stroke="#c08a3e" stroke-dasharray="5,2" d="M482.28,-179.69C586.98,-184.39 800.45,-193.97 891.8,-198.07"/>
 </g>
 <!-- vout -->
 <g id="node11" class="node">
@@ -147,9 +146,9 @@
 <!-- fb&#45;&gt;amp -->
 <g id="edge8" class="edge">
 <title>fb&#45;&gt;amp</title>
-<path fill="none" stroke="#b4472e" d="M881.51,-40.15C784.2,-56.99 585.03,-92.15 554.62,-103 523.67,-114.04 491.22,-131.58 466.19,-146.58"/>
-<polygon fill="#b4472e" stroke="#b4472e" points="465.01,-144.43 460.3,-150.16 467.55,-148.62 465.01,-144.43"/>
-<text xml:space="preserve" text-anchor="middle" x="705.91" y="-73.37" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#b4472e">vfb</text>
+<path fill="none" stroke="#b4472e" d="M881.5,-40.12C784.17,-56.9 584.97,-91.98 554.62,-103 520.23,-115.49 484.17,-136.22 458.39,-152.57"/>
+<polygon fill="#b4472e" stroke="#b4472e" points="457.24,-150.39 452.67,-156.23 459.89,-154.52 457.24,-150.39"/>
+<text xml:space="preserve" text-anchor="middle" x="705.91" y="-73.27" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#b4472e">vfb</text>
 </g>
 <!-- cc&#45;&gt;vout -->
 <g id="edge13" class="edge">
