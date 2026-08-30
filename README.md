@@ -46,6 +46,7 @@ supply (`vddd`) alongside the 3.3 V rail.
 [`doc/implementation.md`](doc/implementation.md) carries two sections written for scoping
 this block into a slot:
 
+- **Assumptions** — the process, slot supply and harness resources the design rests on, with two marked as unconfirmed: the 1.2 V control-bus rail, and the bias current value.
 - **Slot requirements** — pads, harness resources, control/status bits, clocks and the
   current budget. One dedicated low-resistance pad for `vout`; no clocks; needs a 1.2 V
   digital rail alongside the 3.3 V supply.
