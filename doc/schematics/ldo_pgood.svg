@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1692" height="943" viewBox="-940 -773 1692 943">
+<rect x="-940.0" y="-773.0" width="1692.0" height="943.0" fill="#ffffff"/>
+<line x1="-100.0" y1="-250.0" x2="-100.0" y2="-290.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-140.0" y1="-220.0" x2="-190.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-190.0" x2="-100.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-220.0" x2="-30.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-250.0" x2="200.0" y2="-290.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="160.0" y1="-220.0" x2="110.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-190.0" x2="200.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-220.0" x2="270.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-490.0" x2="-100.0" y2="-450.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-140.0" y1="-520.0" x2="-190.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-550.0" x2="-100.0" y2="-590.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-520.0" x2="-30.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-490.0" x2="200.0" y2="-450.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="160.0" y1="-520.0" x2="110.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-550.0" x2="200.0" y2="-590.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-520.0" x2="270.0" y2="-520.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="50.0" y1="30.0" x2="50.0" y2="-10.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="10.0" y1="60.0" x2="-40.0" y2="60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="50.0" y1="90.0" x2="50.0" y2="130.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="50.0" y1="60.0" x2="120.0" y2="60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="520.0" y1="-220.0" x2="470.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="600.0" y1="-220.0" x2="670.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="160.0" y1="-220.0" x2="110.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-112.5" y1="-242.5" x2="-112.5" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-250.0" x2="-100.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-202.5" x2="-100.0" y2="-190.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-117.5" y1="-235.0" x2="-117.5" y2="-205.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-112.5" y1="-202.5" x2="-100.0" y2="-202.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-112.5" y1="-237.5" x2="-100.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-140.0" y1="-220.0" x2="-118.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-105.0,-200.0 -100.0,-202.5 -105.0,-205.0 -105.0,-200.0" fill="#1a202c"/>
+<polygon points="-100.0,-217.5 -105.0,-220.0 -100.0,-222.5 -100.0,-217.5" fill="#1a202c"/>
+<text x="-150.0" y="-258.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M1</text>
+<text x="-150.0" y="-245.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=0.5u</text>
+<circle cx="-100.0" cy="-290.0" r="2.6" fill="#c05621"/>
+<text x="-93.0" y="-285.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cn</text>
+<circle cx="-190.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-197.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vpg</text>
+<circle cx="-100.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="-93.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ptail</text>
+<circle cx="-30.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-23.0" y="-215.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="187.5" y1="-242.5" x2="187.5" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-250.0" x2="200.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-202.5" x2="200.0" y2="-190.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="182.5" y1="-235.0" x2="182.5" y2="-205.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="187.5" y1="-202.5" x2="200.0" y2="-202.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="187.5" y1="-237.5" x2="200.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="160.0" y1="-220.0" x2="182.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="195.0,-200.0 200.0,-202.5 195.0,-205.0 195.0,-200.0" fill="#1a202c"/>
+<polygon points="200.0,-217.5 195.0,-220.0 200.0,-222.5 200.0,-217.5" fill="#1a202c"/>
+<text x="150.0" y="-258.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M2</text>
+<text x="150.0" y="-245.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=0.5u</text>
+<circle cx="200.0" cy="-290.0" r="2.6" fill="#c05621"/>
+<text x="207.0" y="-285.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cmp</text>
+<circle cx="110.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="103.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
+<circle cx="200.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="207.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ptail</text>
+<circle cx="270.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="277.0" y="-215.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="-112.5" y1="-542.5" x2="-112.5" y2="-497.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-550.0" x2="-100.0" y2="-537.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-100.0" y1="-502.5" x2="-100.0" y2="-490.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-117.5" y1="-535.0" x2="-117.5" y2="-505.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-112.5" y1="-502.5" x2="-100.0" y2="-502.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-112.5" y1="-537.5" x2="-100.0" y2="-537.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-140.0" y1="-520.0" x2="-118.0" y2="-520.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-107.5,-540.0 -112.5,-537.5 -107.5,-535.0 -107.5,-540.0" fill="#1a202c"/>
+<polygon points="-105.0,-522.5 -100.0,-520.0 -105.0,-517.5 -105.0,-522.5" fill="#1a202c"/>
+<text x="-150.0" y="-558.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M3</text>
+<text x="-150.0" y="-545.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=0.5u</text>
+<circle cx="-100.0" cy="-450.0" r="2.6" fill="#c05621"/>
+<text x="-93.0" y="-445.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cn</text>
+<circle cx="-190.0" cy="-520.0" r="2.6" fill="#c05621"/>
+<text x="-197.0" y="-515.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cn</text>
+<circle cx="-100.0" cy="-590.0" r="2.6" fill="#c05621"/>
+<text x="-93.0" y="-585.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<circle cx="-30.0" cy="-520.0" r="2.6" fill="#c05621"/>
+<text x="-23.0" y="-515.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<line x1="187.5" y1="-542.5" x2="187.5" y2="-497.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-550.0" x2="200.0" y2="-537.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="200.0" y1="-502.5" x2="200.0" y2="-490.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="182.5" y1="-535.0" x2="182.5" y2="-505.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="187.5" y1="-502.5" x2="200.0" y2="-502.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="187.5" y1="-537.5" x2="200.0" y2="-537.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="160.0" y1="-520.0" x2="182.0" y2="-520.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="192.5,-540.0 187.5,-537.5 192.5,-535.0 192.5,-540.0" fill="#1a202c"/>
+<polygon points="195.0,-522.5 200.0,-520.0 195.0,-517.5 195.0,-522.5" fill="#1a202c"/>
+<text x="150.0" y="-558.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">M4</text>
+<text x="150.0" y="-545.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=0.5u</text>
+<circle cx="200.0" cy="-450.0" r="2.6" fill="#c05621"/>
+<text x="207.0" y="-445.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cmp</text>
+<circle cx="110.0" cy="-520.0" r="2.6" fill="#c05621"/>
+<text x="103.0" y="-515.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cn</text>
+<circle cx="200.0" cy="-590.0" r="2.6" fill="#c05621"/>
+<text x="207.0" y="-585.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<circle cx="270.0" cy="-520.0" r="2.6" fill="#c05621"/>
+<text x="277.0" y="-515.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<line x1="37.5" y1="37.5" x2="37.5" y2="82.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="50.0" y1="30.0" x2="50.0" y2="42.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="50.0" y1="77.5" x2="50.0" y2="90.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="32.5" y1="45.0" x2="32.5" y2="75.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="37.5" y1="77.5" x2="50.0" y2="77.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="37.5" y1="42.5" x2="50.0" y2="42.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="10.0" y1="60.0" x2="32.0" y2="60.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="45.0,80.0 50.0,77.5 45.0,75.0 45.0,80.0" fill="#1a202c"/>
+<polygon points="50.0,62.5 45.0,60.0 50.0,57.5 50.0,62.5" fill="#1a202c"/>
+<text x="0.0" y="22.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mt</text>
+<text x="0.0" y="35.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=4u L=0.5u</text>
+<circle cx="50.0" cy="-10.0" r="2.6" fill="#c05621"/>
+<text x="57.0" y="-5.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ptail</text>
+<circle cx="-40.0" cy="60.0" r="2.6" fill="#c05621"/>
+<text x="-47.0" y="64.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<circle cx="50.0" cy="130.0" r="2.6" fill="#c05621"/>
+<text x="57.0" y="134.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="120.0" cy="60.0" r="2.6" fill="#c05621"/>
+<text x="127.0" y="64.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="540.0" y1="-240.0" x2="540.0" y2="-200.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="540.0" y1="-240.0" x2="580.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="540.0" y1="-200.0" x2="580.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="590.0" y1="-220.0" x2="600.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="520.0" y1="-220.0" x2="540.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<text x="530.0" y="-258.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Xout</text>
+<circle cx="470.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="463.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">cmp</text>
+<circle cx="670.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="677.0" y="-215.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">pgood</text>
+<circle cx="110.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="103.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vfb</text>
+<circle cx="-900.0" cy="-300.0" r="2.6" fill="#c05621"/>
+<text x="-893.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vpg</text>
+<circle cx="-900.0" cy="-240.0" r="2.6" fill="#c05621"/>
+<text x="-893.0" y="-235.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<circle cx="-900.0" cy="-180.0" r="2.6" fill="#c05621"/>
+<text x="-893.0" y="-175.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">pgood</text>
+<circle cx="-900.0" cy="-120.0" r="2.6" fill="#c05621"/>
+<text x="-893.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<circle cx="-900.0" cy="-60.0" r="2.6" fill="#c05621"/>
+<text x="-893.0" y="-55.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<text x="-900.0" y="-733.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_pgood -- power-good comparator (lv domain, 1.2 V logic out)</text>
+<text x="-900.0" y="-698.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">Both inputs sit at ~0.6 V. That is BELOW the hv threshold and comfortably above</text>
+<text x="-900.0" y="-682.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">the lv one, so this comparator must be lv and must run from the 1.2 V rail --</text>
+<text x="-900.0" y="-666.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">the mirror image of the error amplifier, whose inputs sit at the same voltage but</text>
+<text x="-900.0" y="-650.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">which needed a PMOS pair on 3.3 V. Same constraint, opposite answer.</text>
+</svg>

@@ -44,8 +44,10 @@ C {devices/lab_pin.sym} 360 260 0 0 {name=l_net_vfb sig_type=std_logic lab=vfb}
 C {ldo_vref.sym} -560 -200 0 0 {name=x_vref }
 N -690 -200 -740 -200 {lab=vref_bg}
 C {devices/lab_pin.sym} -740 -200 0 1 {name=l_x_vref_vref_bg sig_type=std_logic lab=vref_bg}
-N -560 -110 -560 -70 {lab=vss}
-C {devices/lab_pin.sym} -560 -70 0 0 {name=l_x_vref_vss sig_type=std_logic lab=vss}
+N -520 -110 -520 -70 {lab=vref_pg}
+C {devices/lab_pin.sym} -520 -70 0 0 {name=l_x_vref_vref_pg sig_type=std_logic lab=vref_pg}
+N -600 -110 -600 -70 {lab=vss}
+C {devices/lab_pin.sym} -600 -70 0 0 {name=l_x_vref_vss sig_type=std_logic lab=vss}
 C {ldo_erramp.sym} -220 -120 0 0 {name=x_amp }
 N -380 -80 -380 -40 {lab=ibias}
 C {devices/lab_pin.sym} -380 -40 0 0 {name=l_x_amp_ibias sig_type=std_logic lab=ibias}
@@ -96,6 +98,34 @@ N -730 430 -730 390 {lab=vddd}
 C {devices/lab_pin.sym} -730 390 0 0 {name=l_x_en_vddd sig_type=std_logic lab=vddd}
 N -780 690 -780 730 {lab=vss}
 C {devices/lab_pin.sym} -780 730 0 0 {name=l_x_en_vss sig_type=std_logic lab=vss}
+C {ldo_pgood.sym} -780 980 0 0 {name=x_pg }
+N -925 900 -925 860 {lab=vfb}
+C {devices/lab_pin.sym} -925 860 0 0 {name=l_x_pg_vfb sig_type=std_logic lab=vfb}
+N -925 980 -975 980 {lab=vref_pg}
+C {devices/lab_pin.sym} -975 980 0 1 {name=l_x_pg_vpg sig_type=std_logic lab=vref_pg}
+N -925 1060 -925 1100 {lab=ibias}
+C {devices/lab_pin.sym} -925 1100 0 0 {name=l_x_pg_ibias sig_type=std_logic lab=ibias}
+N -635 980 -565 980 {lab=pgood}
+C {devices/lab_pin.sym} -565 980 0 0 {name=l_x_pg_pgood sig_type=std_logic lab=pgood}
+N -780 810 -780 770 {lab=vddd}
+C {devices/lab_pin.sym} -780 770 0 0 {name=l_x_pg_vddd sig_type=std_logic lab=vddd}
+N -780 1150 -780 1190 {lab=vss}
+C {devices/lab_pin.sym} -780 1190 0 0 {name=l_x_pg_vss sig_type=std_logic lab=vss}
+C {ldo_ilim.sym} 420 980 0 0 {name=x_il }
+N 550 940 550 900 {lab=eout}
+C {devices/lab_pin.sym} 550 900 0 0 {name=l_x_il_eout sig_type=std_logic lab=eout}
+N 290 940 290 900 {lab=ibias}
+C {devices/lab_pin.sym} 290 900 0 0 {name=l_x_il_ibias sig_type=std_logic lab=ibias}
+N 290 1020 290 1060 {lab=ilim_en}
+C {devices/lab_pin.sym} 290 1060 0 0 {name=l_x_il_ilim_en sig_type=std_logic lab=ilim_en}
+N 550 1020 550 1060 {lab=oc}
+C {devices/lab_pin.sym} 550 1060 0 0 {name=l_x_il_oc sig_type=std_logic lab=oc}
+N 380 850 380 810 {lab=vin}
+C {devices/lab_pin.sym} 380 810 0 0 {name=l_x_il_vin sig_type=std_logic lab=vin}
+N 460 850 460 810 {lab=vddd}
+C {devices/lab_pin.sym} 460 810 0 0 {name=l_x_il_vddd sig_type=std_logic lab=vddd}
+N 420 1110 420 1150 {lab=vss}
+C {devices/lab_pin.sym} 420 1150 0 0 {name=l_x_il_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/cap_mfringe.sym} 520 -60 0 0 {name=Cout model=cap_mfringe mmin=1 mmax=4 spiceprefix=X w=93u l=93u}
 N 520 -30 520 10 {lab=vss}
 C {devices/lab_pin.sym} 520 10 0 0 {name=l_Cout_c2 sig_type=std_logic lab=vss}
@@ -106,8 +136,11 @@ C {devices/ipin.sym} -640 -120 0 0 {name=p_ibias lab=ibias}
 C {devices/ipin.sym} -640 -60 0 0 {name=p_en lab=en}
 C {devices/iopin.sym} -640 0 0 0 {name=p_vddd lab=vddd}
 C {devices/iopin.sym} -640 60 0 0 {name=p_vss lab=vss}
-C {devices/ipin.sym} -640 120 0 0 {name=p_vtrim0 lab=vtrim0}
-C {devices/ipin.sym} -640 180 0 0 {name=p_vtrim1 lab=vtrim1}
-C {devices/ipin.sym} -640 240 0 0 {name=p_vtrim2 lab=vtrim2}
-C {devices/ipin.sym} -640 300 0 0 {name=p_vtrim3 lab=vtrim3}
-C {devices/ipin.sym} -640 360 0 0 {name=p_vtrim4 lab=vtrim4}
+C {devices/opin.sym} -640 120 0 0 {name=p_pgood lab=pgood}
+C {devices/ipin.sym} -640 180 0 0 {name=p_ilim_en lab=ilim_en}
+C {devices/opin.sym} -640 240 0 0 {name=p_oc lab=oc}
+C {devices/ipin.sym} -640 300 0 0 {name=p_vtrim0 lab=vtrim0}
+C {devices/ipin.sym} -640 360 0 0 {name=p_vtrim1 lab=vtrim1}
+C {devices/ipin.sym} -640 420 0 0 {name=p_vtrim2 lab=vtrim2}
+C {devices/ipin.sym} -640 480 0 0 {name=p_vtrim3 lab=vtrim3}
+C {devices/ipin.sym} -640 540 0 0 {name=p_vtrim4 lab=vtrim4}

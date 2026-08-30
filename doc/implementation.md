@@ -13,6 +13,8 @@ schematic that realises it.
 | `ldo_pass` | PMOS pass array, W = 100 µm × 20, L = 0.5 µm | [SVG](schematics/ldo_pass.svg) |
 | `ldo_fbtrim` | Feedback divider with 5-bit binary-weighted output trim | [SVG](schematics/ldo_fbtrim.svg) |
 | `ldo_enable` | Enable / power-gate, with a 1.2 V to 3.3 V level shift | [SVG](schematics/ldo_enable.svg) |
+| `ldo_pgood` | Power-good comparator, lv domain, 1.2 V logic output | [SVG](schematics/ldo_pgood.svg) |
+| `ldo_ilim` | Current limit: 1:1000 sense, throttle and OC flag | [SVG](schematics/ldo_ilim.svg) |
 | `ldo_capless` | Top level, plus the Miller and output capacitors | [SVG](schematics/ldo_capless.svg) |
 
 ## Two decisions worth stating
@@ -257,14 +259,67 @@ margin is unchanged by the wrapper.
 depended on it — the trim switches rely on a 1.2 V gate drive — so this makes an existing
 assumption visible rather than adding a requirement.
 
+## Power-good and current limit
+
+### Power-good
+
+**The domain is forced, and it is the opposite of the error amplifier's.** Both comparator
+inputs sit near 0.6 V, which is below the hv threshold — the constraint that forced the
+amplifier onto a PMOS pair — but comfortably above the lv one. So this comparator is lv,
+runs from the 1.2 V control-bus rail, and its output is already a logic level with no
+shift. Same constraint, opposite answer.
+
+The trip threshold is 90 % of `vref`, taken as a **tap off the reference chain itself**.
+Generating it locally was tried and rejected: a second divider hung on `vref` loads it, and
+that measurably shifted the regulated output from 1.21 V to 0.998 V. Splitting the
+reference's lower leg 1 : 0.1 : 0.9 gives both taps from the same 2 µA, with the ratio set
+by resistor matching rather than by an added load.
+
+| | `vout` | `PGOOD` |
+| --- | --- | --- |
+| In regulation | 1.2091 V | **1.20 V (asserted)** |
+| Disabled | 0.27 mV | **0.06 µV (deasserted)** |
+
+Hysteresis is **not** included. A comparator without it will chatter while the output sits
+near the trip point; adding it is a feedback device from the output stage back to the
+threshold node, deliberately left until the trip level is fixed.
+
+### Current limit
+
+`Msense` shares the pass device's gate and source, so it carries a scaled copy of the pass
+current — 2 µm against the array's 2000 µm, so 1:1000. `Mref` sinks a reference mirrored
+from the harness bias, which makes `oc_n` the comparison itself: low below the limit,
+rising above it. No separate comparator is needed.
+
+**The limiter acts, it does not merely report.** A 3.3 V-domain inverter drives `Mlim`,
+which pulls the pass gate toward `vin` when the limit trips, so over-current reduces the
+drive rather than waiting for firmware to notice. A separate level-shift path reports `OC`
+on the 1.2 V rail.
+
+| load | `vout` | `OC` |
+| --- | --- | --- |
+| 10 mA | 1.2090 V | low |
+| 50 mA (rated) | 1.2088 V | low |
+| **62.5 mA** | — | **trips** |
+| 100 mA, `ILIM_EN` = 0 | 1.2087 V | low — limiter disabled |
+
+**The trip point is sized by measurement, not by the width ratio.** At the drawn 1:1000 the
+limit came out at 39 mA, well below the 50 mA rated load, because `Msense` sees a larger
+Vds than the pass device and channel-length modulation makes it carry more than its share.
+Scaling the reference moved the trip to 62.5 mA — above the rated load, at the stated 60 mA
+absolute limit. This is why the ratio is characterised rather than calculated.
+
+`ILIM_EN` gates both behaviours with a single device: forcing `oc_n` low disables the trip,
+which disables the throttle **and** the flag together. Gating them separately would allow a
+state where the limiter acts but does not report, which is the worst of both.
+
+Neither block disturbs the regulator: the loop's phase margins are unchanged to six figures.
+
 ## Not in this revision
 
 Stated here rather than left to be discovered:
 
-- **Power-good comparator** and **current limit**. These wrap the regulation loop and do
-  not change it. Note for the power-good comparator: its inputs sit at 0.6 V, which is
-  below the hv threshold but comfortably above the lv one, so it belongs in the 1.2 V
-  domain — the same constraint that shaped the error amplifier.
+- **Hysteresis on the power-good comparator.** See above.
 - **Trim ladder as unit resistors.** The binary weighting is currently set by drawn
   length, which carries `rhigh`'s fixed contact term into the small segments. The layout
   pass should rebuild it from series/parallel unit resistors so the weighting is set by

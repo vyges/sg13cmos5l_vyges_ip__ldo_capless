@@ -1,0 +1,57 @@
+* tb_ldo_status -- power-good and current-limit behaviour.
+*
+* PGOOD should assert while the output is in regulation and deassert when it is not.
+* OC should assert once the pass current exceeds the limit, and the limiter should THROTTLE
+* the output rather than merely reporting -- so vout must fold back, not keep rising with
+* the load.
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+Vilim   ilim_en 0 1.2
+Ibias   0       ibias DC 10u
+Iload   vout    0 DC 1m
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  op
+  echo "=== in regulation ==="
+  print v(vout) v(pgood) v(oc)
+  echo "=== disabled: output collapses, PGOOD must deassert ==="
+  alter Ven dc = 0
+  alter Iload dc = 0
+  op
+  print v(vout) v(pgood)
+  alter Ven dc = 1.2
+  alter Iload dc = 1m
+  echo "=== load sweep 0 to 120 mA: OC and fold-back ==="
+  dc Iload 0 120m 5m
+  meas dc vo_010 FIND v(vout) AT=10m
+  meas dc vo_040 FIND v(vout) AT=40m
+  meas dc vo_060 FIND v(vout) AT=60m
+  meas dc vo_100 FIND v(vout) AT=100m
+  meas dc oc_010 FIND v(oc) AT=10m
+  meas dc oc_040 FIND v(oc) AT=40m
+  meas dc oc_060 FIND v(oc) AT=60m
+  meas dc oc_100 FIND v(oc) AT=100m
+  echo "=== ILIM_EN low: limiter disabled, OC must stay low ==="
+  alter Vilim dc = 0
+  alter Iload dc = 100m
+  op
+  print v(oc) v(vout)
+.endc
+.end
