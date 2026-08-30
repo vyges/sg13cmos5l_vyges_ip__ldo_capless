@@ -112,20 +112,22 @@ C {devices/lab_pin.sym} -780 770 0 0 {name=l_x_pg_vddd sig_type=std_logic lab=vd
 N -780 1150 -780 1190 {lab=vss}
 C {devices/lab_pin.sym} -780 1190 0 0 {name=l_x_pg_vss sig_type=std_logic lab=vss}
 C {ldo_ilim.sym} 420 980 0 0 {name=x_il }
-N 550 940 550 900 {lab=eout}
-C {devices/lab_pin.sym} 550 900 0 0 {name=l_x_il_eout sig_type=std_logic lab=eout}
-N 290 940 290 900 {lab=ibias}
-C {devices/lab_pin.sym} 290 900 0 0 {name=l_x_il_ibias sig_type=std_logic lab=ibias}
-N 290 1020 290 1060 {lab=ilim_en}
-C {devices/lab_pin.sym} 290 1060 0 0 {name=l_x_il_ilim_en sig_type=std_logic lab=ilim_en}
-N 550 1020 550 1060 {lab=oc}
-C {devices/lab_pin.sym} 550 1060 0 0 {name=l_x_il_oc sig_type=std_logic lab=oc}
-N 380 850 380 810 {lab=vin}
-C {devices/lab_pin.sym} 380 810 0 0 {name=l_x_il_vin sig_type=std_logic lab=vin}
-N 460 850 460 810 {lab=vddd}
-C {devices/lab_pin.sym} 460 810 0 0 {name=l_x_il_vddd sig_type=std_logic lab=vddd}
-N 420 1110 420 1150 {lab=vss}
-C {devices/lab_pin.sym} 420 1150 0 0 {name=l_x_il_vss sig_type=std_logic lab=vss}
+N 550 925 550 885 {lab=eout}
+C {devices/lab_pin.sym} 550 885 0 0 {name=l_x_il_eout sig_type=std_logic lab=eout}
+N 290 1060 290 1100 {lab=vout}
+C {devices/lab_pin.sym} 290 1100 0 0 {name=l_x_il_vout sig_type=std_logic lab=vout}
+N 290 900 290 860 {lab=ibias}
+C {devices/lab_pin.sym} 290 860 0 0 {name=l_x_il_ibias sig_type=std_logic lab=ibias}
+N 290 980 240 980 {lab=ilim_en}
+C {devices/lab_pin.sym} 240 980 0 1 {name=l_x_il_ilim_en sig_type=std_logic lab=ilim_en}
+N 550 1035 550 1075 {lab=oc}
+C {devices/lab_pin.sym} 550 1075 0 0 {name=l_x_il_oc sig_type=std_logic lab=oc}
+N 380 810 380 770 {lab=vin}
+C {devices/lab_pin.sym} 380 770 0 0 {name=l_x_il_vin sig_type=std_logic lab=vin}
+N 460 810 460 770 {lab=vddd}
+C {devices/lab_pin.sym} 460 770 0 0 {name=l_x_il_vddd sig_type=std_logic lab=vddd}
+N 420 1150 420 1190 {lab=vss}
+C {devices/lab_pin.sym} 420 1190 0 0 {name=l_x_il_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/cap_mfringe.sym} 520 -60 0 0 {name=Cout model=cap_mfringe mmin=1 mmax=4 spiceprefix=X w=93u l=93u}
 N 520 -30 520 10 {lab=vss}
 C {devices/lab_pin.sym} 520 10 0 0 {name=l_Cout_c2 sig_type=std_logic lab=vss}

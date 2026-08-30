@@ -354,7 +354,19 @@ threshold node, deliberately left until the trip level is fixed.
 ### Current limit
 
 `Msense` shares the pass device's gate and source, so it carries a scaled copy of the pass
-current — 2 µm against the array's 2000 µm, so 1:1000. `Mref` sinks a reference mirrored
+current, and a **cascode** holds its drain at `vout` plus a threshold so its Vds tracks the
+pass device's. That cascode is not a refinement — without it the sense error *grows* as the
+supply falls, because the pass device enters triode while the sense device stays saturated.
+It made the limiter fire before the pass device had run out, which showed up as a dropout
+reading of 730 mV against the 460 mV the device actually achieves. A protection circuit that
+fires early is not conservative; it truncates the specified operating range.
+
+`sim/tb_ldo_ilim_lowvin.spice` is the regression test: at the rated 50 mA load, with the
+supply swept 3.3 → 2.0 V, `OC` stays deasserted at every point and the output stays
+regulated. `Msd` defines the sense node when the cascode runs out of headroom at low supply
+— left floating between two off devices, the DC sweep would not converge at all.
+
+Sizing — 2 µm against the array's 2000 µm, so 1:1000. `Mref` sinks a reference mirrored
 from the harness bias, which makes `oc_n` the comparison itself: low below the limit,
 rising above it. No separate comparator is needed.
 
@@ -367,13 +379,13 @@ on the 1.2 V rail.
 | --- | --- | --- |
 | 10 mA | 1.2090 V | low |
 | 50 mA (rated) | 1.2088 V | low |
-| **62.5 mA** | — | **trips** |
+| **59.5 mA** | — | **trips** |
 | 100 mA, `ILIM_EN` = 0 | 1.2087 V | low — limiter disabled |
 
 **The trip point is sized by measurement, not by the width ratio.** At the drawn 1:1000 the
 limit came out at 39 mA, well below the 50 mA rated load, because `Msense` sees a larger
 Vds than the pass device and channel-length modulation makes it carry more than its share.
-Scaling the reference moved the trip to 62.5 mA — above the rated load, at the stated 60 mA
+With the cascode the trip sits at 59.5 mA — above the rated load and at the stated 60 mA
 absolute limit. This is why the ratio is characterised rather than calculated.
 
 `ILIM_EN` gates both behaviours with a single device: forcing `oc_n` low disables the trip,

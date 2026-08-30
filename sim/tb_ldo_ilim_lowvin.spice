@@ -1,0 +1,60 @@
+* tb_ldo_ilim_lowvin -- REGRESSION TEST for the current-sense cascode.
+*
+* At the rated 50 mA load, sweeping the supply down must NOT trip the limiter: the pass
+* device has not run out, and a protection circuit that fires early truncates the operating
+* range the block is specified for. Before the cascode this excursion tripped, which showed
+* up as a dropout reading of 730 mV against the 460 mV the pass device actually achieves.
+*
+* Originally derived from tb_ldo_status -- power-good and current-limit behaviour.
+*
+* PGOOD should assert while the output is in regulation and deassert when it is not.
+* OC should assert once the pass current exceeds the limit, and the limiter should THROTTLE
+* the output rather than merely reporting -- so vout must fold back, not keep rising with
+* the load.
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+Vilim   ilim_en 0 1.2
+Ibias   0       ibias DC 1u   $ harness supplies 1 uA (ibias1u_*); multiplied 10x on-slot
+Iload   vout    0 DC 50m
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  alter Iload dc = 50m
+  alter Vin dc = 3.3
+  op
+  echo "VIN=3.3"
+  print v(vout) v(oc)
+  alter Vin dc = 3.0
+  op
+  echo "VIN=3.0"
+  print v(vout) v(oc)
+  alter Vin dc = 2.6
+  op
+  echo "VIN=2.6"
+  print v(vout) v(oc)
+  alter Vin dc = 2.2
+  op
+  echo "VIN=2.2"
+  print v(vout) v(oc)
+  alter Vin dc = 2.0
+  op
+  echo "VIN=2.0"
+  print v(vout) v(oc)
+.endc
+.end

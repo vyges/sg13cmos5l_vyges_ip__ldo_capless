@@ -4,6 +4,14 @@
 <line x1="-320.0" y1="-400.0" x2="-370.0" y2="-400.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-430.0" x2="-280.0" y2="-470.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-400.0" x2="-210.0" y2="-400.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-540.0" y1="-250.0" x2="-540.0" y2="-290.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-580.0" y1="-220.0" x2="-630.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-540.0" y1="-190.0" x2="-540.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-540.0" y1="-220.0" x2="-470.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-280.0" y1="-190.0" x2="-280.0" y2="-150.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-320.0" y1="-220.0" x2="-370.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-280.0" y1="-250.0" x2="-280.0" y2="-290.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-280.0" y1="-220.0" x2="-210.0" y2="-220.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-90.0" x2="-280.0" y2="-130.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="-320.0" y1="-60.0" x2="-370.0" y2="-60.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-30.0" x2="-280.0" y2="10.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
@@ -48,13 +56,50 @@
 <text x="-330.0" y="-438.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Msense</text>
 <text x="-330.0" y="-425.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=0.5u</text>
 <circle cx="-280.0" cy="-330.0" r="2.6" fill="#c05621"/>
-<text x="-273.0" y="-325.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">oc_n</text>
+<text x="-273.0" y="-325.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">sense_d</text>
 <circle cx="-370.0" cy="-400.0" r="2.6" fill="#c05621"/>
 <text x="-377.0" y="-395.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
 <circle cx="-280.0" cy="-470.0" r="2.6" fill="#c05621"/>
 <text x="-273.0" y="-465.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
 <circle cx="-210.0" cy="-400.0" r="2.6" fill="#c05621"/>
 <text x="-203.0" y="-395.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
+<line x1="-552.5" y1="-242.5" x2="-552.5" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-540.0" y1="-250.0" x2="-540.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-540.0" y1="-202.5" x2="-540.0" y2="-190.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-552.5" y1="-202.5" x2="-540.0" y2="-202.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-552.5" y1="-237.5" x2="-540.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-580.0" y1="-220.0" x2="-558.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-545.0,-200.0 -540.0,-202.5 -545.0,-205.0 -545.0,-200.0" fill="#1a202c"/>
+<polygon points="-540.0,-217.5 -545.0,-220.0 -540.0,-222.5 -540.0,-217.5" fill="#1a202c"/>
+<text x="-590.0" y="-258.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Msd</text>
+<text x="-590.0" y="-245.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=4u</text>
+<circle cx="-540.0" cy="-290.0" r="2.6" fill="#c05621"/>
+<text x="-533.0" y="-285.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">sense_d</text>
+<circle cx="-630.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-637.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<circle cx="-540.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="-533.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="-470.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-463.0" y="-215.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="-292.5" y1="-242.5" x2="-292.5" y2="-197.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-280.0" y1="-250.0" x2="-280.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-280.0" y1="-202.5" x2="-280.0" y2="-190.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-297.5" y1="-235.0" x2="-297.5" y2="-205.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-292.5" y1="-202.5" x2="-280.0" y2="-202.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-292.5" y1="-237.5" x2="-280.0" y2="-237.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-320.0" y1="-220.0" x2="-298.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<polygon points="-287.5,-240.0 -292.5,-237.5 -287.5,-235.0 -287.5,-240.0" fill="#1a202c"/>
+<polygon points="-285.0,-222.5 -280.0,-220.0 -285.0,-217.5 -285.0,-222.5" fill="#1a202c"/>
+<text x="-330.0" y="-258.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mcas</text>
+<text x="-330.0" y="-245.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=4u L=0.5u</text>
+<circle cx="-280.0" cy="-150.0" r="2.6" fill="#c05621"/>
+<text x="-273.0" y="-145.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">oc_n</text>
+<circle cx="-370.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-377.0" y="-215.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vout</text>
+<circle cx="-280.0" cy="-290.0" r="2.6" fill="#c05621"/>
+<text x="-273.0" y="-285.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">sense_d</text>
+<circle cx="-210.0" cy="-220.0" r="2.6" fill="#c05621"/>
+<text x="-203.0" y="-215.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
 <line x1="-292.5" y1="-82.5" x2="-292.5" y2="-37.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-90.0" x2="-280.0" y2="-77.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-280.0" y1="-42.5" x2="-280.0" y2="-30.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
@@ -205,17 +250,19 @@
 <circle cx="-960.0" cy="-320.0" r="2.6" fill="#c05621"/>
 <text x="-953.0" y="-315.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">eout</text>
 <circle cx="-960.0" cy="-260.0" r="2.6" fill="#c05621"/>
-<text x="-953.0" y="-255.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
+<text x="-953.0" y="-255.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vout</text>
+<circle cx="-960.0" cy="-200.0" r="2.6" fill="#c05621"/>
+<text x="-953.0" y="-195.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ibias</text>
 <circle cx="-710.0" cy="200.0" r="2.6" fill="#c05621"/>
 <text x="-717.0" y="204.5" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">ilim_en</text>
 <circle cx="1310.0" cy="-300.0" r="2.6" fill="#c05621"/>
 <text x="1317.0" y="-295.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">oc</text>
-<circle cx="-960.0" cy="-200.0" r="2.6" fill="#c05621"/>
-<text x="-953.0" y="-195.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
 <circle cx="-960.0" cy="-140.0" r="2.6" fill="#c05621"/>
-<text x="-953.0" y="-135.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<text x="-953.0" y="-135.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vin</text>
 <circle cx="-960.0" cy="-80.0" r="2.6" fill="#c05621"/>
-<text x="-953.0" y="-75.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<text x="-953.0" y="-75.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vddd</text>
+<circle cx="-960.0" cy="-20.0" r="2.6" fill="#c05621"/>
+<text x="-953.0" y="-15.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
 <text x="-960.0" y="-869.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_ilim -- current limit: 1:1000 sense, throttle and OC flag</text>
 <text x="-960.0" y="-834.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">Msense shares the pass device's gate and source, so it carries 1/1000 of the pass</text>
 <text x="-960.0" y="-818.0" font-family="Helvetica,Arial,sans-serif" font-size="12.0" font-weight="normal" fill="#5a4b81">current; Mref sinks a 50 uA reference. oc_n is therefore the comparison itself --</text>

@@ -11,14 +11,32 @@ low below the limit, rising above it -- and needs no separate comparator.
 The limiter ACTS: Mlim pulls the pass gate up when it trips, rather than only
 raising a flag and waiting for firmware.} -880 -560 0 0 0.25 0.25 {layer=15}
 C {sg13cmos5l_pr/sg13_hv_pmos.sym} -300 -400 0 0 {name=Msense l=0.5u ng=1 m=1 model=sg13_hv_pmos spiceprefix=X w=2u}
-N -280 -370 -280 -330 {lab=oc_n}
-C {devices/lab_pin.sym} -280 -330 0 0 {name=l_Msense_D sig_type=std_logic lab=oc_n}
+N -280 -370 -280 -330 {lab=sense_d}
+C {devices/lab_pin.sym} -280 -330 0 0 {name=l_Msense_D sig_type=std_logic lab=sense_d}
 N -320 -400 -370 -400 {lab=eout}
 C {devices/lab_pin.sym} -370 -400 0 1 {name=l_Msense_G sig_type=std_logic lab=eout}
 N -280 -430 -280 -470 {lab=vin}
 C {devices/lab_pin.sym} -280 -470 0 0 {name=l_Msense_S sig_type=std_logic lab=vin}
 N -280 -400 -210 -400 {lab=vin}
 C {devices/lab_pin.sym} -210 -400 0 0 {name=l_Msense_B sig_type=std_logic lab=vin}
+C {sg13cmos5l_pr/sg13_hv_nmos.sym} -560 -220 0 0 {name=Msd l=4u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=1u}
+N -540 -250 -540 -290 {lab=sense_d}
+C {devices/lab_pin.sym} -540 -290 0 0 {name=l_Msd_D sig_type=std_logic lab=sense_d}
+N -580 -220 -630 -220 {lab=ibias}
+C {devices/lab_pin.sym} -630 -220 0 1 {name=l_Msd_G sig_type=std_logic lab=ibias}
+N -540 -190 -540 -150 {lab=vss}
+C {devices/lab_pin.sym} -540 -150 0 0 {name=l_Msd_S sig_type=std_logic lab=vss}
+N -540 -220 -470 -220 {lab=vss}
+C {devices/lab_pin.sym} -470 -220 0 0 {name=l_Msd_B sig_type=std_logic lab=vss}
+C {sg13cmos5l_pr/sg13_hv_pmos.sym} -300 -220 0 0 {name=Mcas l=0.5u ng=1 m=1 model=sg13_hv_pmos spiceprefix=X w=4u}
+N -280 -190 -280 -150 {lab=oc_n}
+C {devices/lab_pin.sym} -280 -150 0 0 {name=l_Mcas_D sig_type=std_logic lab=oc_n}
+N -320 -220 -370 -220 {lab=vout}
+C {devices/lab_pin.sym} -370 -220 0 1 {name=l_Mcas_G sig_type=std_logic lab=vout}
+N -280 -250 -280 -290 {lab=sense_d}
+C {devices/lab_pin.sym} -280 -290 0 0 {name=l_Mcas_S sig_type=std_logic lab=sense_d}
+N -280 -220 -210 -220 {lab=vin}
+C {devices/lab_pin.sym} -210 -220 0 0 {name=l_Mcas_B sig_type=std_logic lab=vin}
 C {sg13cmos5l_pr/sg13_hv_nmos.sym} -300 -60 0 0 {name=Mref l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=160u}
 N -280 -90 -280 -130 {lab=oc_n}
 C {devices/lab_pin.sym} -280 -130 0 0 {name=l_Mref_D sig_type=std_logic lab=oc_n}
@@ -89,11 +107,12 @@ C {devices/lab_pin.sym} 1110 -300 0 1 {name=l_Xinv_oc_A sig_type=std_logic lab=o
 N 1240 -300 1310 -300 {lab=oc}
 C {devices/lab_pin.sym} 1310 -300 0 0 {name=l_Xinv_oc_Y sig_type=std_logic lab=oc}
 C {devices/iopin.sym} -960 -320 0 0 {name=p_eout lab=eout}
-C {devices/ipin.sym} -960 -260 0 0 {name=p_ibias lab=ibias}
+C {devices/ipin.sym} -960 -260 0 0 {name=p_vout lab=vout}
+C {devices/ipin.sym} -960 -200 0 0 {name=p_ibias lab=ibias}
 N -660 200 -710 200 {lab=ilim_en}
 C {devices/ipin.sym} -710 200 0 1 {name=p_ilim_en lab=ilim_en}
 N 1240 -300 1310 -300 {lab=oc}
 C {devices/opin.sym} 1310 -300 0 0 {name=p_oc lab=oc}
-C {devices/iopin.sym} -960 -200 0 0 {name=p_vin lab=vin}
-C {devices/iopin.sym} -960 -140 0 0 {name=p_vddd lab=vddd}
-C {devices/iopin.sym} -960 -80 0 0 {name=p_vss lab=vss}
+C {devices/iopin.sym} -960 -140 0 0 {name=p_vin lab=vin}
+C {devices/iopin.sym} -960 -80 0 0 {name=p_vddd lab=vddd}
+C {devices/iopin.sym} -960 -20 0 0 {name=p_vss lab=vss}
