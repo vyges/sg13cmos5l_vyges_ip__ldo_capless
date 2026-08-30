@@ -136,16 +136,38 @@ one, and a 1 V injection at AC.
 
 | External load | DC loop gain | Crossover | Phase margin |
 | --- | --- | --- | --- |
-| 0 (preload only) | 104.4 dB | 1.03 MHz | 66.5° |
-| 10 µA | 108.1 dB | 1.47 MHz | 64.3° |
-| 100 µA | 114.1 dB | 2.59 MHz | 65.5° |
-| 1 mA | 116.5 dB | 3.20 MHz | 72.1° |
-| 10 mA | 116.0 dB | 3.33 MHz | 74.9° |
-| 50 mA | 110.3 dB | 3.31 MHz | 76.1° |
+| 0 (preload only) | 106.9 dB | 0.87 MHz | 64.6° |
+| 10 µA | 110.7 dB | 1.35 MHz | 60.1° |
+| 30 µA | 113.7 dB | 1.94 MHz | 56.6° |
+| 100 µA | 116.4 dB | 2.77 MHz | 57.3° |
+| 300 µA | 117.7 dB | 3.33 MHz | 63.2° |
+| 1 mA | 118.2 dB | 3.63 MHz | 69.3° |
+| 10 mA | 117.6 dB | 3.79 MHz | 74.4° |
+| 50 mA | 115.4 dB | 3.82 MHz | 75.5° |
 
-**Worst case across load is 64.3°, at 10 µA** — not at either end of the range — against a
+**Worst case across load is 56.6°, at 30 µA** — not at either end of the range — against a
 specification minimum of 45° and a typical target of 60°. Over PVT the worst case is
-50.1°; see the PVT section below.
+50.2°; see the PVT section below.
+
+### Gate driver
+
+The amplifier does not drive the pass gate directly. The pass array is 6400 µm wide, so
+its gate is roughly 16 pF, and a 5 µA common-source stage driving that node puts a pole
+low enough to dominate the phase margin — 25.8° at ff/110 °C in an earlier revision, and
+short of specification at *every* pass-array width, so widening the array for dropout and
+compensating for stability were fighting over the same device.
+
+A source follower between the two presents 1/gm at the gate instead of the stage's output
+resistance, which moves that pole up by orders of magnitude at the same current and
+decouples compensation from the pass array entirely.
+
+It has to be a **PMOS** follower. An NMOS follower puts its output a threshold *below* its
+input, and the input cannot exceed the supply less a saturation voltage, so the gate could
+never rise far enough to turn a PMOS pass device off; built that way first, the regulator
+simply stopped regulating. The PMOS shift is upward, placing the useful gate range of
+roughly 2.0–2.6 V at an amplifier output of 1.1–1.6 V, mid-rail and comfortable. Its fast
+direction is pulling the gate *down*, which is turning the pass device on — the direction
+that matters for droop on a load step.
 
 ### Minimum load
 
@@ -156,11 +178,31 @@ amplifier tail, so it tracks the harness bias rather than being a fixed resistor
 resistive preload was rejected because its current falls with `vout`, which is the wrong
 direction at the low-output trim codes where margin is thinnest.
 
-It costs 10 µA of the 30 µA typical Iq budget, bringing the total to about 24 µA: 10 µA
-amplifier tail, 10 µA preload, and roughly 2 µA each in the reference and feedback
-dividers. With it the block is stable and in regulation with **no external load at all**,
-at 104.4 dB of loop gain and 66.5° of phase margin, and load regulation is 0.38 mV over
-0–48 mA.
+**The preload also sets the second pole, and its size was measured rather than assumed.**
+At no external load the output node sees only the preload and the feedback divider, so the
+pole there is low — around 6 kHz with a 1 µA preload, close enough to crossover to cost
+most of the margin. Sweeping it over all 27 corners:
+
+| `Mpre` width | preload | Iq | worst-case PM over PVT |
+| --- | --- | --- | --- |
+| 2 µm | 1 µA | 37.7 µA | 36.2° |
+| 8 µm | 4 µA | 40.3 µA | 42.6° |
+| **20 µm** | **10 µA** | **45.6 µA** | **50.2°** |
+| 40 µm | 20 µA | 53.4 µA | 43.2° |
+
+The relationship is not monotonic: too little preload leaves the output pole near
+crossover, too much raises crossover into the *next* pole. 20 µm is the interior optimum,
+and it is where the design sits.
+
+Two other knobs were swept the same way and both moved the wrong direction, which is worth
+recording so they are not retried: increasing the nulling resistor `Rz` (35.2 µm → 140 µm)
+took the worst case from 36.2° to 1.7°, because a large series resistor stops the Miller
+capacitor shunting at high frequency and the dominant pole disappears with it; and
+reducing `Cm` (48 pF → 5.8 pF) took it from 36.2° to −1.3°, because crossover rises into
+the pole the compensation exists to stay below.
+
+With the preload the block is stable and in regulation with **no external load at all**,
+at 106.9 dB of loop gain and 64.6° of phase margin.
 
 ## Trim curve — measured across all 32 codes
 
@@ -214,7 +256,7 @@ external load. Resistor corners are paired pessimistically with the MOS corner.
 | | across all 27 corners | specification |
 | --- | --- | --- |
 | Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
-| **Worst phase margin** | **50.1° (ss/−40 °C/3.6 V)** | 45° min |
+| **Worst phase margin** | **50.2° (ss/−40 °C/3.6 V)** | 45° min |
 
 **The block regulates and stays stable across the full commercial range**, −40 to 110 °C,
 3.0 to 3.6 V, tt/ss/ff.
@@ -232,7 +274,8 @@ loop gain rises and the crossover pushes out to where there is no phase left, wh
   50 kΩ is best at ss/−40 °C, 80 kΩ at ff/110 °C, and moving toward either wrecks the
   other. The resolution is to lower the crossover until that optimum stops being sharp,
   not to keep re-tuning it.
-- **`Cm` = 48 pF is the knee.** It gives 50.1° worst-case; 96 pF buys only 0.7° more.
+- **`Cm` = 48 pF is the knee.** It gives 50.2° worst-case; both larger `Rz` and
+  smaller `Cm` were swept and both make it worse — see the preload section above.
 
 The capacitors are the block's area cost: `Cm` at 144 × 144 µm is about 16 % of a
 520 × 250 µm slot, and `Cout` a further 6.6 %.
@@ -444,8 +487,15 @@ rather than 10.
 | | |
 | --- | --- |
 | Load | up to 50 mA through the slot switch |
-| Quiescent, enabled | 35.7 µA |
+| Quiescent, enabled | 45.6 µA |
 | Quiescent, disabled | 3.19 µA |
+
+Quiescent current is **above the proposal's 30 µA typical** and inside its 60 µA maximum.
+The excess is spent deliberately and in two places: the 10 µA preload, which the corner
+sweep showed to be the interior optimum for phase margin, and the gate driver, which is
+what made the loop meet its 45° minimum at all. Both are recorded above with the sweeps
+that chose them. Recovering the difference means giving back stability margin, so it is a
+trade for the review to confirm rather than a number to quietly optimise.
 
 ## Not in this revision
 

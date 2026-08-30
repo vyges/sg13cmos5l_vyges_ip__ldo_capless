@@ -42,7 +42,7 @@ x_il   ibias ilim_en vout eout oc vin vddd vss ldo_ilim
 * closed-loop one, 1 V injection at AC. No parallel inductor -- two zero-impedance
 * elements on one node pair is a degenerate loop for the DC solve.
 Vinj vfbd vfb DC 0 AC 1
-XMpre vout ibias vss vss sg13_hv_nmos w=2u l=1u
+XMpre vout ibias vss vss sg13_hv_nmos w=20u l=1u ng=1 m=1
 XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
 XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
 .control
