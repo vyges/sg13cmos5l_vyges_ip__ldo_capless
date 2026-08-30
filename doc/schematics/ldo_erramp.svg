@@ -277,7 +277,7 @@
 <polygon points="-485.0,70.0 -480.0,67.5 -485.0,65.0 -485.0,70.0" fill="#1a202c"/>
 <polygon points="-480.0,52.5 -485.0,50.0 -480.0,47.5 -480.0,52.5" fill="#1a202c"/>
 <text x="-530.0" y="12.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mn1</text>
-<text x="-530.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=2u L=1u</text>
+<text x="-530.0" y="25.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=20u L=1u</text>
 <circle cx="-480.0" cy="120.0" r="2.6" fill="#c05621"/>
 <text x="-473.0" y="124.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
 <circle cx="-410.0" cy="50.0" r="2.6" fill="#c05621"/>

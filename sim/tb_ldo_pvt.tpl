@@ -19,7 +19,7 @@ Vss vss 0 0
 Vddd vddd 0 1.2
 Ven  en   0 1.2
 Vsub sub! 0 0
-Ibias 0 ibias DC 10u
+Ibias 0 ibias DC 1u   $ harness supplies 1 uA (ibias1u_*); multiplied 10x on-slot
 Iload vout 0 DC 0
 Vt0 vtrim0 0 0
 Vt1 vtrim1 0 0

@@ -55,11 +55,17 @@ the rail exists on the die; whether it is distributed to the pallets is the open
 
 ### Block-specific
 
-⚠️ **`ibias` is assumed to be 10 µA, and the harness appears to offer 250 nA and 1 µA.**
-The amplifier tail, the minimum-load preload and the current-limit reference are all
-mirrored from it, so if the available source is 1 µA the mirror ratios change by 10×. That
-is a sizing change rather than a redesign — the ratios are set by device widths — but it has
-not been done, and every current in this document assumes 10 µA.
+✅ **`ibias` is 1 µA, matching the harness.** The harness bias nets are `ibias1_250n`,
+`ibias1u_*` and `ibias2_1u`, so 1 µA is what a pallet can expect. The block was originally
+drawn around 10 µA and has been re-ratioed: `Mn1` is 10× the reference device, so the
+amplifier's internal operating current is unchanged, and the three NMOS mirrors that hang
+off the reference — the preload, the power-good tail and the current-limit reference —
+are 10× in width.
+
+Regenerating a 10 µA reference node internally, so those three could keep their original
+widths, was tried and **rejected on current**: that leg draws its 10 µA from `vin` and put
+quiescent current up from 39 µA to 47 µA against a 30 µA typical. Width is nearly free in
+this block; supply current is the scarce thing.
 
 ⚠️ **`vddd` (1.2 V) is required and unconfirmed**, per the slot-supply note above. The trim
 switches do *not* need it — they are NMOS switches driven by the harness's control lines. The
@@ -404,7 +410,7 @@ not a circuit, but it needs a pad slot to be worth adding.
 | `vin` | 3.3 V slot supply, through the enable-gated pMOS switch. **Size that switch for 50 mA plus quiescent** — larger than a signal-path slot needs. |
 | `vddd` | **1.2 V digital supply.** Required, not optional: the trim switches and the control-side logic run from it. |
 | `vref_bg` | 1.2 V harness bandgap. Drawn current ~2 µA. |
-| `ibias` | Bias current, 10 µA nominal, mirrored internally. |
+| `ibias` | **1 µA**, as the harness provides. Multiplied 10× on-slot. |
 | `vss` | Ground. |
 
 ### Control and status bits (register field, no pads)
@@ -426,7 +432,7 @@ rather than 10.
 | | |
 | --- | --- |
 | Load | up to 50 mA through the slot switch |
-| Quiescent, enabled | 39.4 µA |
+| Quiescent, enabled | 35.7 µA |
 | Quiescent, disabled | 3.19 µA |
 
 ## Not in this revision

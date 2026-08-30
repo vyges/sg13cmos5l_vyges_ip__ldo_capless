@@ -45,7 +45,7 @@ N 200 -550 200 -590 {lab=vddd}
 C {devices/lab_pin.sym} 200 -590 0 0 {name=l_M4_S sig_type=std_logic lab=vddd}
 N 200 -520 270 -520 {lab=vddd}
 C {devices/lab_pin.sym} 270 -520 0 0 {name=l_M4_B sig_type=std_logic lab=vddd}
-C {sg13cmos5l_pr/sg13_lv_nmos.sym} 30 60 0 0 {name=Mt l=0.5u ng=1 m=1 model=sg13_lv_nmos spiceprefix=X w=4u}
+C {sg13cmos5l_pr/sg13_lv_nmos.sym} 30 60 0 0 {name=Mt l=0.5u ng=1 m=1 model=sg13_lv_nmos spiceprefix=X w=40u}
 N 50 30 50 -10 {lab=ptail}
 C {devices/lab_pin.sym} 50 -10 0 0 {name=l_Mt_D sig_type=std_logic lab=ptail}
 N 10 60 -40 60 {lab=ibias}

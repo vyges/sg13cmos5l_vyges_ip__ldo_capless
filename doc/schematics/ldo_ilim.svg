@@ -64,7 +64,7 @@
 <polygon points="-285.0,-40.0 -280.0,-42.5 -285.0,-45.0 -285.0,-40.0" fill="#1a202c"/>
 <polygon points="-280.0,-57.5 -285.0,-60.0 -280.0,-62.5 -280.0,-57.5" fill="#1a202c"/>
 <text x="-330.0" y="-98.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Mref</text>
-<text x="-330.0" y="-85.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=16u L=1u</text>
+<text x="-330.0" y="-85.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=160u L=1u</text>
 <circle cx="-280.0" cy="-130.0" r="2.6" fill="#c05621"/>
 <text x="-273.0" y="-125.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">oc_n</text>
 <circle cx="-370.0" cy="-60.0" r="2.6" fill="#c05621"/>

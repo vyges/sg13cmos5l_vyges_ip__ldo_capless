@@ -134,7 +134,7 @@ N 320 230 320 270 {lab=vss}
 C {devices/lab_pin.sym} 320 270 0 0 {name=l_Men1_S sig_type=std_logic lab=vss}
 N 320 200 390 200 {lab=vss}
 C {devices/lab_pin.sym} 390 200 0 0 {name=l_Men1_B sig_type=std_logic lab=vss}
-C {sg13cmos5l_pr/sg13_hv_nmos.sym} -500 50 0 0 {name=Mn1 l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=2u}
+C {sg13cmos5l_pr/sg13_hv_nmos.sym} -500 50 0 0 {name=Mn1 l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=20u}
 N -480 80 -480 120 {lab=vss}
 C {devices/lab_pin.sym} -480 120 0 0 {name=l_Mn1_S sig_type=std_logic lab=vss}
 N -480 50 -410 50 {lab=vss}
