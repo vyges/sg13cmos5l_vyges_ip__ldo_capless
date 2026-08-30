@@ -13,12 +13,17 @@
 * ngspice quietly abandons its DC strategies and falls back to a transient operating
 * point -- which returns numbers that look plausible and are not solutions. Declare and
 * tie it in every bench.
+* ldo_enable instantiates a standard-cell inverter for the 1.2 V control-bus side.
+.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
 .global sub!
 .include ../sim/netlist/ldo_capless.spice
 
 Vin     vin     0 3.3
 Vrefbg  vref_bg 0 1.2
 Vss     vss     0 0
+* 1.2 V control-bus supply and the enable input
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
 Vsub sub! 0 0
 Ibias   0       ibias DC 10u
 Iload   vout    0 DC 1m
@@ -41,5 +46,19 @@ Vt4 vtrim4 0 1.2
   dc Iload 0 50m 2m
   meas dc vo_noload   FIND v(vout) AT=0
   meas dc vo_fullload FIND v(vout) AT=48m
+  echo "=== ENABLE: disabled state ==="
+  * remove the load as well: an ideal current sink on an undriven node drags vout
+  * negative, which is a property of the testbench and not of the regulator
+  alter Iload dc = 0
+  alter Ven dc = 0
+  op
+  print v(vout) v(eout)
+  print -i(Vin)
+  echo "=== ENABLE: re-enabled ==="
+  alter Ven dc = 1.2
+  alter Iload dc = 1m
+  op
+  print v(vout) v(eout)
+  print -i(Vin)
 .endc
 .end

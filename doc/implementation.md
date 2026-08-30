@@ -12,6 +12,7 @@ schematic that realises it.
 | `ldo_erramp` | Two-stage error amplifier: PMOS input pair with NMOS mirror, then an NMOS common-source stage; Miller compensated with a nulling resistor | [SVG](schematics/ldo_erramp.svg) |
 | `ldo_pass` | PMOS pass array, W = 100 µm × 20, L = 0.5 µm | [SVG](schematics/ldo_pass.svg) |
 | `ldo_fbtrim` | Feedback divider with 5-bit binary-weighted output trim | [SVG](schematics/ldo_fbtrim.svg) |
+| `ldo_enable` | Enable / power-gate, with a 1.2 V to 3.3 V level shift | [SVG](schematics/ldo_enable.svg) |
 | `ldo_capless` | Top level, plus the Miller and output capacitors | [SVG](schematics/ldo_capless.svg) |
 
 ## Two decisions worth stating
@@ -219,12 +220,51 @@ gate that cannot fail is not a gate.
 ℹ️ Device-sizing comparison needs a build newer than v0.1.33; that release compares
 topology only.
 
+## Enable
+
+`EN` arrives from the harness control bus at 1.2 V logic while the amplifier and pass
+device sit on the 3.3 V rail, so **the engineering content here is a domain crossing, not
+a switch**: a 1.2 V signal cannot turn off a PMOS whose source is at 3.3 V — it would sit
+at Vsg = 2.1 V, permanently on. `ldo_enable` level-shifts the high side.
+
+Disabling does two things, and doing only the first is a trap:
+
+1. **Kill the bias**, so the mirrors stop drawing current.
+2. **Force `eout` to the rail**, so the pass device is definitely off. With every mirror
+   off, nothing drives `eout` — and a floating gate on the pass device can drift low and
+   turn it *on*.
+
+The same argument applies one level deeper, and it cost real current before it was
+handled: the amplifier's stage-1 output is a deliberately high-impedance node, so with the
+bias off it floats too, and a floating gate on the second stage can sit above threshold.
+That opened a path from `vin` through the disable PMOS to ground. A pull-down on that node
+defines it.
+
+| | enabled | disabled |
+| --- | --- | --- |
+| `vout` | 1.2100 V | 0.27 mV |
+| `eout` (pass gate) | 2.594 V | 3.300 V — full rail |
+| Supply current | 1.04 mA at 1 mA load | **3.19 µA** |
+
+Standby current is the level-shifter's pull-up leg and essentially nothing else — the leg
+only conducts while disabled. A smaller resistor would switch harder and cost more standby
+current; this is that trade.
+
+The block recovers to regulation on re-enable with no latched state, and the loop's phase
+margin is unchanged by the wrapper.
+
+⚠️ **`vddd` is a new port.** The 1.2 V control-bus supply is now explicit. The block always
+depended on it — the trim switches rely on a 1.2 V gate drive — so this makes an existing
+assumption visible rather than adding a requirement.
+
 ## Not in this revision
 
 Stated here rather than left to be discovered:
 
-- **Enable / power-gate**, **power-good comparator** and **current limit**. These wrap
-  the regulation loop and do not change it; the loop is what the schematic establishes.
+- **Power-good comparator** and **current limit**. These wrap the regulation loop and do
+  not change it. Note for the power-good comparator: its inputs sit at 0.6 V, which is
+  below the hv threshold but comfortably above the lv one, so it belongs in the 1.2 V
+  domain — the same constraint that shaped the error amplifier.
 - **Trim ladder as unit resistors.** The binary weighting is currently set by drawn
   length, which carries `rhigh`'s fixed contact term into the small segments. The layout
   pass should rebuild it from series/parallel unit resistors so the weighting is set by

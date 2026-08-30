@@ -8,12 +8,16 @@
 * ngspice quietly abandons its DC strategies and falls back to a transient operating
 * point -- which returns numbers that look plausible and are not solutions. Declare and
 * tie it in every bench.
+* ldo_enable instantiates a standard-cell inverter for the 1.2 V control-bus side.
+.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
 .global sub!
 .include ldo_cells.spice
 .temp @TEMP@
 Vin vin 0 @VIN@
 Vrefbg vref_bg 0 1.2
 Vss vss 0 0
+Vddd vddd 0 1.2
+Ven  en   0 1.2
 Vsub sub! 0 0
 Ibias 0 ibias DC 10u
 Iload vout 0 DC 0
@@ -30,6 +34,7 @@ x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
 * closed-loop one, 1 V injection at AC. No parallel inductor -- two zero-impedance
 * elements on one node pair is a degenerate loop for the DC solve.
 Vinj vfbd vfb DC 0 AC 1
+x_en  en ibias eout vin vddd vss ldo_enable
 XMpre vout ibias vss vss sg13_hv_nmos w=2u l=1u
 XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
 XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4

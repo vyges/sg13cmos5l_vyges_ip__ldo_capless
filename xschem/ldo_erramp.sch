@@ -125,6 +125,15 @@ C {devices/lab_pin.sym} 760 -270 0 0 {name=l_Cm_c1 sig_type=std_logic lab=eout}
 C {sg13cmos5l_pr/rhigh.sym} 760 40 0 0 {name=Rz w=1u l=35.2u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
 N 760 70 760 110 {lab=eout1}
 C {devices/lab_pin.sym} 760 110 0 0 {name=l_Rz_M sig_type=std_logic lab=eout1}
+C {sg13cmos5l_pr/sg13_lv_nmos.sym} 300 200 0 0 {name=Men1 l=0.13u w=5u ng=1 m=1 model=sg13_lv_nmos spiceprefix=X}
+N 320 170 320 130 {lab=eout1}
+C {devices/lab_pin.sym} 320 130 0 0 {name=l_Men1_D sig_type=std_logic lab=eout1}
+N 280 200 230 200 {lab=en_n}
+C {devices/lab_pin.sym} 230 200 0 1 {name=l_Men1_G sig_type=std_logic lab=en_n}
+N 320 230 320 270 {lab=vss}
+C {devices/lab_pin.sym} 320 270 0 0 {name=l_Men1_S sig_type=std_logic lab=vss}
+N 320 200 390 200 {lab=vss}
+C {devices/lab_pin.sym} 390 200 0 0 {name=l_Men1_B sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/sg13_hv_nmos.sym} -500 50 0 0 {name=Mn1 l=1u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X w=2u}
 N -480 80 -480 120 {lab=vss}
 C {devices/lab_pin.sym} -480 120 0 0 {name=l_Mn1_S sig_type=std_logic lab=vss}
@@ -138,7 +147,8 @@ C {devices/ipin.sym} -170 -180 0 1 {name=p_vref lab=vref}
 N 130 -180 80 -180 {lab=vfb}
 C {devices/ipin.sym} 80 -180 0 1 {name=p_vfb lab=vfb}
 C {devices/ipin.sym} -1000 -300 0 0 {name=p_ibias lab=ibias}
+C {devices/ipin.sym} -1000 -240 0 0 {name=p_en_n lab=en_n}
 N 470 20 470 -20 {lab=eout}
 C {devices/opin.sym} 470 -20 0 0 {name=p_eout lab=eout}
-C {devices/iopin.sym} -1000 -240 0 0 {name=p_vin lab=vin}
-C {devices/iopin.sym} -1000 -180 0 0 {name=p_vss lab=vss}
+C {devices/iopin.sym} -1000 -180 0 0 {name=p_vin lab=vin}
+C {devices/iopin.sym} -1000 -120 0 0 {name=p_vss lab=vss}
