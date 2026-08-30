@@ -28,8 +28,13 @@ stack is 2.32 fF/µm²:
 
 | Capacitor | Value | Drawn size | Share of a 520 × 250 µm slot |
 | --- | --- | --- | --- |
+| `Cm` (amplifier compensation) | 48 pF | 144 × 144 µm | **16.0%** |
 | `Cout` | 20 pF | 93 × 93 µm | 6.6% |
 | `Cc` | 2 pF | 30 × 30 µm | 0.7% |
+
+`Cm` sits inside `ldo_erramp` rather than at the top level, but it is the largest single
+device in the block and dominates its area budget — see the PVT section for why it is
+sized as it is.
 
 This answers the "no MiM capacitor" area question directly. One caveat carried from the
 model's own header: `cap_mfringe` is an empirical fit to extraction, not a foundry
@@ -161,6 +166,58 @@ loop gain rises and the crossover pushes out to where there is no phase left, wh
 
 The capacitors are the block's area cost: `Cm` at 144 × 144 µm is about 16 % of a
 520 × 250 µm slot, and `Cout` a further 6.6 %.
+
+## Verification with Vyges Loom
+
+The measurements above are produced with [Vyges Loom](https://vyges.com/products/loom), a
+suite of open-source silicon sign-off engines. Each is a deterministic command that exits
+non-zero on a violation, so it works as a build gate rather than as something a human has
+to read. Install: <https://docs.vyges.com/installation.html>.
+
+| Engine | Why we run it | Stage |
+| --- | --- | --- |
+| `vyges loom meas` | Extracts a scalar from a simulated sweep — here the phase margin of the regulation loop, which can never be measured on silicon because a capless LDO has no loop-break pin. | now |
+| `vyges loom lvs` | Compares two netlists by graph isomorphism, independent of net names, **and compares device sizing** — so an edit that changes connectivity *or* re-sizes a component fails instead of surviving to silicon. | now, and again against layout at sign-off |
+| `vyges loom extract` | Parasitics from layout (DEF/GDS → SPEF) to re-simulate against. Capless stability is parasitic-sensitive, so this is what confirms the margin survives. | after layout |
+
+### Loop phase margin — `vyges loom meas`
+
+**Why:** turns an AC sweep into the number the specification is written against, by a
+stated method rather than an eyeballed plot.
+
+```sh
+ngspice -b sim/tb_ldo_ac.spice                        # writes loop_<load>.csv
+awk '{print $1, $2, $4}' loop_001m.csv > loop.sweep   # hz gain_db phase_deg
+vyges loom meas transfer loop.sweep --metric phase-margin
+```
+
+Cross-checked once against an independent interpolation of the unity-gain crossing, which
+agreed to six figures — worth doing for any measurement a specification depends on.
+
+### Connectivity and sizing gate — `vyges loom lvs`
+
+**Why:** the schematics are generated, so an edit can change the circuit without changing
+anything visible in the drawing. This compares the current netlist against a known-good one
+and fails if it is no longer the same circuit.
+
+⚠️ xschem comments out the *top* `.subckt` line, so the netlist needs unwrapping first or
+the tool reports the top cell as missing:
+
+```sh
+sed 's/^\*\*\.subckt/.subckt/; s/^\*\*\.ends/.ends/' \
+    sim/netlist/ldo_capless.spice > sim/lvs/current.spice
+vyges loom lvs run sim/lvs/check.lvs --fail-on-mismatch
+```
+
+Against an unchanged netlist it reports the two netlists structurally equivalent and exits
+
+0. Shorting one capacitor's plates together gives `LVS MISMATCH` and exit 3, and so does
+
+re-sizing a device while leaving the topology untouched — verified both ways, because a
+gate that cannot fail is not a gate.
+
+ℹ️ Device-sizing comparison needs a build newer than v0.1.33; that release compares
+topology only.
 
 ## Not in this revision
 
