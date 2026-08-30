@@ -41,6 +41,17 @@ Enable, power-good and current limit are implemented and exercised; see
 [`doc/implementation.md`](doc/implementation.md). The block needs a 1.2 V control-bus
 supply (`vddd`) alongside the 3.3 V rail.
 
+## For the integrator
+
+[`doc/implementation.md`](doc/implementation.md) carries two sections written for scoping
+this block into a slot:
+
+- **Slot requirements** — pads, harness resources, control/status bits, clocks and the
+  current budget. One dedicated low-resistance pad for `vout`; no clocks; needs a 1.2 V
+  digital rail alongside the 3.3 V supply.
+- **Against the proposal** — every specification line with what the schematic measures,
+  including the three that do not yet meet target.
+
 ## Layout
 
 | Dir | Contents |
