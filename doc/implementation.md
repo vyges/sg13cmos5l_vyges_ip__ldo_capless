@@ -315,6 +315,59 @@ state where the limiter acts but does not report, which is the worst of both.
 
 Neither block disturbs the regulator: the loop's phase margins are unchanged to six figures.
 
+## Slot requirements — pins, power and clocks
+
+For scoping pin allocation. This is the **implemented** port list, not the proposal's.
+
+```text
+.subckt ldo_capless  vref_bg ibias en ilim_en vtrim0..4 vout pgood oc vin vddd vss
+```
+
+### Pads required
+
+| Signal | Kind | Requirement |
+| --- | --- | --- |
+| `vout` | analog out | **1 dedicated pad, low resistance.** Carries the full load, up to 50 mA. At 50 mA a 1 Ω mux switch drops 50 mV, which is more than the entire load-regulation specification — so a shared mux path makes the headline number unmeasurable. If it must be shared, R_on ≤ 0.2 Ω, and we would derate the maximum load accordingly. |
+
+**One dedicated pad, and no other sole-use analog access is requested.**
+
+⚠️ The proposal also asked for a **muxable `vout_sense`** Kelvin pin, on which mux
+resistance is irrelevant because it is sensed by a high-impedance meter. **That pin is not
+in this revision** — the block currently brings out a single `vout`. Adding it is a wire,
+not a circuit, but it needs a pad slot to be worth adding.
+
+### Harness resources (shared, no pads)
+
+| Signal | From the harness |
+| --- | --- |
+| `vin` | 3.3 V slot supply, through the enable-gated pMOS switch. **Size that switch for 50 mA plus quiescent** — larger than a signal-path slot needs. |
+| `vddd` | **1.2 V digital supply.** Required, not optional: the trim switches and the control-side logic run from it. |
+| `vref_bg` | 1.2 V harness bandgap. Drawn current ~2 µA. |
+| `ibias` | Bias current, 10 µA nominal, mirrored internally. |
+| `vss` | Ground. |
+
+### Control and status bits (register field, no pads)
+
+| Bits | Direction | |
+| --- | --- | --- |
+| 7 | control | `EN` (1), `ILIM_EN` (1), `VTRIM[4:0]` (5) |
+| 2 | status | `PGOOD` (1), `OC` (1) |
+
+`IB_SEL` from the proposal's field is **not implemented**, so the control side is 7 bits
+rather than 10.
+
+### Clocks
+
+**None.** The block needs no clock of any kind.
+
+### Current budget
+
+| | |
+| --- | --- |
+| Load | up to 50 mA through the slot switch |
+| Quiescent, enabled | 39.4 µA |
+| Quiescent, disabled | 3.19 µA |
+
 ## Not in this revision
 
 Stated here rather than left to be discovered:
