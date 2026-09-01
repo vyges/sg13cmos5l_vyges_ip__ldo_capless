@@ -9,33 +9,55 @@ schematic that realises it.
 Every measured number in this document is scoped to this PDK state. Quote it with any
 result taken from here.
 
-⚠️ **The PDK is two repositories, not one, and both are needed.** `ihp-sg13cmos5l` is an
-overlay: most of its ngspice model files are symlinks into a sibling `ihp-sg13g2`
-checkout. The models that decide this block's results resolve to the *second* tree.
+✅ **The PDK is now ONE repository and one commit.** Upstream merged the SG13CMOS-5L
+overlay into IHP-Open-PDK on 2026-09-01 (PR #1124), so `ihp-sg13cmos5l/`, `ihp-sg13g2/`
+and `ihp-common/` sit in one tree on the `dev` branch.
 
-| | repository | commit |
+| | repository | branch @ commit |
 | --- | --- | --- |
-| overlay | [`IHP-GmbH/ihp-sg13cmos5l`](https://github.com/IHP-GmbH/ihp-sg13cmos5l) | `9f614c48af6a97a47c541030e6a1e2f5e2819d79` |
-| base | [`IHP-GmbH/IHP-Open-PDK`](https://github.com/IHP-GmbH/IHP-Open-PDK) (sg13g2) | `144f811cdffda49b71d28f64e8a92b697b61cf06` |
+| base + overlay | [`IHP-GmbH/IHP-Open-PDK`](https://github.com/IHP-GmbH/IHP-Open-PDK) | `dev@ab1510cbdcbd61fe82e24ec28179c02ea7083299` |
 
-Content hashes of the model files actually read, so the pin is verifiable without git
-history — the PDK in the simulation container is a flat tree with no `.git`:
+⚠️ **This is a branch pin, not a release.** `dev` carries no version tags, so quote the
+commit. It also carries git submodules under `ihp-sg13g2/libs.tech/` — clone
+`--recurse-submodules` or the PDK is silently incomplete.
+
+🔑 **Why one tree matters, beyond convenience.** The overlay is not self-contained: 528
+symlinks live in it and the overlay's point back into the base by *relative* path
+(`sg13cmos5l_sram -> ../../ihp-sg13g2/libs.ref/sg13g2_sram`). They resolve only when base
+and overlay are siblings under one root. Two separately pinned repositories satisfied that
+by convention; one tree satisfies it by construction. The models that decide this block's
+results still resolve into the `ihp-sg13g2` half — the hash table below says which.
+
+Content hashes of the model files actually read, so the pin is verifiable independently of
+git — the container's own bundled PDK is a flat tree with no `.git`, and a hash cannot
+silently disagree with the tree it names:
 
 | model file | sha256 (first 16) | comes from |
 | --- | --- | --- |
 | `cornerMOShv.lib` | `5a1f862dc304fdfe` | sg13g2 |
 | `cornerMOSlv.lib` | `03d505847c880d23` | sg13g2 |
-| `cornerRES.lib` | `a18170ecf22f739e` | sg13g2 |
-| `cap_mfringe.lib` | `17a72bc1dd82c554` | sg13cmos5l |
+| `cornerRES.lib` | `c6d749e72cfa2e06` | sg13g2 |
+| `cap_cmomf.lib` | `4704625f619ad55a` | sg13cmos5l |
+
+🔑 **The two MOS hashes are byte-identical to the old pin.** Nothing about the transistors
+moved, which is why the VCO tuning curve and every DC figure are unchanged and the whole
+delta sits in `cornerRES.lib` and the capacitor model.
 
 `tools/report.py` prints this block above every set of results, so a number cannot be
 quoted without the pin that produced it.
 
-ℹ️ **Our `pdk-store` mirror does not currently cover both trees.**
-`vyges-tools/ihp-sg13cmos5l` is pinned at `v0.2.0` and carries the same symlinks, whose
-targets are absent — so it cannot supply the MOS or resistor corner models on its own. The
-sibling `ihp-sg13g2` needs pinning alongside it before that mirror can reproduce these
-results.
+✅ **The `pdk-store` mirror now covers the whole PDK.**
+[`vyges-tools/ihp-open-pdk`](https://github.com/vyges-tools/ihp-open-pdk) tracks upstream
+`dev` and both descriptors (`ihp_sg13g2`, `ihp_sg13cmos5l`) pin the same commit, so one
+fetch reproduces these results. The former `vyges-tools/ihp-sg13cmos5l` overlay mirror is
+superseded.
+
+⚠️ **One gap upstream, worked around here.** Both `.spiceinit` files load all six OSDI
+models from `$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/`, but `install.py` compiles only four
+(`psp103`, `psp103_nqs`, `r3_cmc`, `mosvar`) and only into the base, while the overlay
+ships only the other two (`cap_cmomf`, `cap_cmomi`) prebuilt. Neither directory has all
+six, so a CMOS5L design fails to elaborate whichever `$PDK` it selects. Cross-link the two
+sets after running `install.py`.
 
 ## Assumptions
 
@@ -47,12 +69,12 @@ mismatch in the schematic. **Two are known to be unconfirmed and are marked.**
 
 | | |
 | --- | --- |
-| PDK | IHP Open Source PDK, `ihp-sg13cmos5l` v0.2.0, commit `9f614c48` |
-| Source | <https://github.com/IHP-GmbH/ihp-sg13cmos5l> |
+| PDK | IHP Open Source PDK, `ihp-sg13cmos5l` overlay in IHP-Open-PDK `dev@ab1510c` |
+| Source | <https://github.com/IHP-GmbH/IHP-Open-PDK> (branch `dev`) |
 | lv devices | maximum Vds **1.5 V** (`cornerMOSlv.lib`) |
 | hv devices | maximum Vds **3.3 V** (`cornerMOShv.lib`) |
 | Standard cells | characterised **1.08 – 1.65 V**. They are 1.2/1.5 V core cells and **cannot be operated from 3.3 V.** |
-| Passives | `rhigh` 1360 Ω/sq, `rppd` 260, `rsil` 7; `cap_mfringe` at 0.67 + (mmax−mmin)×0.55 fF/µm², so 2.32 fF/µm² on an M1–M4 stack |
+| Passives | `rhigh` 1360 Ω/sq, `rppd` 260, `rsil` 7; `cap_cmomf` at 0.372 + (mmax−mmin)×0.305 fF/µm², so **1.287 fF/µm²** on an M1–M4 stack — measured, not read off the header |
 | No MiM capacitor | correct for this process — the CMOS5L overlay deliberately omits `capacitors_mod.lib` |
 
 ### Slot supply — the one to check first
@@ -125,24 +147,37 @@ the 1.2 V harness bandgap directly would put the bottom of the specified 1.0–1
 window out of reach. `ldo_vref` divides it by two, and the trim range is then symmetric
 about the 1.2 V default.
 
-**Compensation capacitors are sized from the PDK model, not estimated.** The
-`cap_mfringe` model gives `areacap = 0.67 + (mmax − mmin) × 0.55 fF/µm²`, so an M1–M4
-stack is 2.32 fF/µm²:
+**Compensation capacitors are sized from the PDK model, not estimated** — and the model
+changed under them. `cap_mfringe` was renamed `cap_cmomf` upstream and its density was
+recalibrated against a full 3D OpenEMS analysis: `areacap = 0.372 + (mmax − mmin) × 0.305
+fF/µm²`, so an M1–M4 stack is **1.287 fF/µm²**, against 2.32 before. Measured directly
+from the model rather than taken from its header — a 10 × 10 µm device reads 0.1287 pF.
 
-| Capacitor | Value | Drawn size | Share of a 520 × 250 µm slot |
+⟹ **The design parameter here is capacitance, not drawn size**, so the drawn sizes were
+increased by ×1.80 in area to hold the same values. That is the area cost of the
+recalibration, and it lands on the review's predicted "×2" row:
+
+| Capacitor | Value | Drawn size (was) | Share of a 530 × 310 µm slot |
 | --- | --- | --- | --- |
-| `Cm` (amplifier compensation) | 48 pF | 144 × 144 µm | **16.0%** |
-| `Cout` | 20 pF | 93 × 93 µm | 6.6% |
-| `Cc` | 2 pF | 30 × 30 µm | 0.7% |
+| `Cm` (amplifier compensation) | 47.98 pF | 193 × 193 µm (144 × 144) | **22.7%** |
+| `Cout` | 20.11 pF | 125 × 125 µm (93 × 93) | 9.5% |
+| `Cc` | 2.06 pF | 40 × 40 µm (30 × 30) | 1.0% |
+
+ℹ️ Tim Edwards measured **1.20 fF/µm²** with a magic MoM generator at the 2026-09-01
+review, against the 2.32 this document then carried. The recalibrated model gives 1.287 —
+within 7 % of his number. **His measurement was right and ours was the stale model.**
 
 `Cm` sits inside `ldo_erramp` rather than at the top level, but it is the largest single
 device in the block and dominates its area budget — see the PVT section for why it is
 sized as it is.
 
-This answers the "no MiM capacitor" area question directly. One caveat carried from the
-model's own header: `cap_mfringe` is an empirical fit to extraction, not a foundry
-compact model, and it degrades for small devices — re-extract after layout rather than
-quoting these as silicon-grade.
+This answers the "no MiM capacitor" area question directly. ⚠️ One caveat carried from the
+model's own header, and it is now stated by upstream rather than inferred: `cap_cmomf` is
+*"LOW-FREQUENCY MODEL ONLY — NOT VALIDATED ON SILICON"*, its density coming from the magic
+device generator after recalibration against a full 3D OpenEMS analysis. It is
+simulation-derived, not foundry silicon data — re-extract after layout rather than quoting
+these as silicon-grade. The 2.32 → 1.287 fF/µm² move is itself the demonstration: this
+number has already changed by 1.8× once.
 
 ## Measured, against the feasibility netlist
 
@@ -169,18 +204,19 @@ one, and a 1 V injection at AC.
 
 | External load | DC loop gain | Crossover | Phase margin |
 | --- | --- | --- | --- |
-| 0 (preload only) | 102.0 dB | 0.71 MHz | 58.6° |
-| **10 µA** | **106.6 dB** | **1.02 MHz** | **57.3°** |
-| 30 µA | 110.3 dB | 1.33 MHz | 58.9° |
-| 100 µA | 113.8 dB | 1.70 MHz | 65.3° |
-| 300 µA | 115.6 dB | 1.90 MHz | 71.6° |
-| 1 mA | 116.7 dB | 1.99 MHz | 75.7° |
-| 10 mA | 117.1 dB | 2.03 MHz | 78.5° |
-| 50 mA | 115.6 dB | 2.03 MHz | 79.2° |
+| 0 (preload only) | 101.9 dB | 0.69 MHz | 59.2° |
+| **10 µA** | **106.5 dB** | **0.98 MHz** | **58.2°** |
+| 30 µA | 110.2 dB | 1.28 MHz | 59.8° |
+| 100 µA | 113.7 dB | 1.64 MHz | 66.1° |
+| 300 µA | 115.6 dB | 1.84 MHz | 72.2° |
+| 1 mA | 116.7 dB | 1.92 MHz | 76.1° |
+| 10 mA | 117.1 dB | 1.96 MHz | 78.8° |
+| 50 mA | 115.6 dB | 1.96 MHz | 79.5° |
 
-**Worst case across load is 57.3°, at 10 µA** — not at either end of the range — against a
-specification minimum of 45° and a typical target of 60°. ⚠️ Over corners **and load**
-the worst case is **40.2°**, which does not meet the minimum; see the PVT section below.
+**Worst case across load is 58.2°, at 10 µA** — not at either end of the range — against a
+specification minimum of 45° and a typical target of 60°. ✅ Over corners **and load** the
+worst case is **45.6°**, which now meets the minimum for the first time; see the PVT
+section below for what changed and why.
 
 ### A gate driver was tried and removed
 
@@ -211,6 +247,10 @@ The follower's purpose was to lower the impedance at the pass gate. The second s
 bias current does that too, with no level shift, so dropout is untouched at every setting.
 Scaling `M5` and `M6` together — `M6` sets the current, `M5`'s width keeps its gate-source
 voltage where the operating point was:
+
+⚠️ **This sweep was measured at the old PDK pin and has not been repeated.** The shipping
+row's current values are in the tables above (58.2° over load, 45.6° over corners × load);
+the other rows are kept for the comparison they make, not as current figures.
 
 | `M5`/`M6` | Load sweep, tt/27 | Corners at no load | Corners × load | Dropout | Iq |
 | --- | --- | --- | --- | --- | --- |
@@ -320,12 +360,13 @@ load sweep at one corner do not bound it between them.
 | | across all 27 corners | specification |
 | --- | --- | --- |
 | Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
-| **Worst phase margin** | **40.2° (ff / worst-case sheet / −40 °C / 3.6 V, no load)** | 45° min ❌ |
+| Worst phase margin | 45.6° (ff / worst-case sheet / −40 °C / 3.6 V, no load) | 45° min ✅ |
 
 **The block regulates across the full commercial range**, −40 to 110 °C, 3.0 to 3.6 V,
-tt/ss/ff. ⚠️ **It does not meet the 45° phase-margin minimum**: the worst case is 40.2°, at ff with
-worst-case sheet resistance at −40 °C and no external load. Most of that gap is a PDK
-resistor-corner definition upstream has already corrected — see the open question. Everything tried to close that gap is
+tt/ss/ff. ✅ **It now meets the 45° phase-margin minimum**: the worst case is 45.6°, at ff
+with worst-case sheet resistance at −40 °C and no external load, and none of the 243
+corners falls below. That gap was a PDK resistor-corner definition, and the re-pin to
+`dev@ab1510c` closed it — see the section below. Everything tried to close that gap is
 recorded above and in the compensation section; see the open question at the end.
 
 ### Why the compensation is sized the way it is
@@ -344,8 +385,10 @@ loop gain rises and the crossover pushes out to where there is no phase left, wh
 - **`Cm` = 48 pF is the knee.** Both larger `Rz` and smaller `Cm` were swept and both
   make it worse — see the preload section above.
 
-The capacitors are the block's area cost: `Cm` at 144 × 144 µm is about 16 % of a
-520 × 250 µm slot, and `Cout` a further 6.6 %.
+The capacitors are the block's area cost, and it roughly doubled with the capacitor
+model's recalibration: `Cm` at 193 × 193 µm is about **23 %** of a 530 × 310 µm slot, and
+`Cout` a further **9.5 %**. Holding the same 48 pF under a density of 1.287 fF/µm² instead
+of 2.32 is what bought the margin back.
 
 ## Verification with Vyges Loom
 
@@ -581,7 +624,7 @@ run, so they cannot quietly drop out of the record.
 | | measured | specification |
 | --- | --- | --- |
 | Dropout at 50 mA | **149.3 mV** ✅ | 250 mV max |
-| Load-step droop, 1 → 20 mA, 1 µs edge | 325.8 mV ❌ | 120 mV max |
+| Load-step droop, 1 → 20 mA, 1 µs edge | 338.1 mV ❌ | 120 mV max |
 | Load-release overshoot, 20 → 1 mA | **to 3.292 V, i.e. the input rail** ❌ | 120 mV max |
 
 ⚠️ This heading is kept for the two transient lines, which do not meet specification.
@@ -638,8 +681,8 @@ so there was no trade to make: it is worse on every line in the table above.
 This paragraph previously said it was kept, which contradicted both the section above it
 and the 149.3 mV dropout the benches produce. **The block ships without it**: dropout
 passes at 149.3 mV, quiescent current at 35.7 µA, and the remaining gap is small-signal
-margin — 40.2° against 45°, of which roughly 1° survives the upstream PDK resistor-corner
-fix discussed below.
+margin, which the re-pin to `dev@ab1510c` closed outright: 45.6° against 45°, no corner
+below specification.
 
 If a future revision does face a genuine area-or-dropout squeeze, the proposal names
 capless stability as the primary risk and states that the honest response is to derate
@@ -678,32 +721,40 @@ Stated here rather than left to be discovered:
 5. Then the deferred items above: power-good hysteresis, unit-resistor trim ladder,
    `IB_SEL`.
 
-## Open question — the last degree of phase margin
+## Closed — the last degree of phase margin
 
-**Posted for anyone who wants to chip in.** The block is 40.2° against a 45° minimum. Every
-other specification that has been measured passes: dropout 149 mV against 250 max, quiescent
-35.7 µA against 60 max, output accuracy inside ±3 % trimmed.
+✅ **Resolved by the 2026-09-01 re-pin, not by a circuit change.** The block was 40.2°
+against a 45° minimum; it now measures **45.6° at the worst of 243 corners, with none
+below specification**. Kept here because the reasoning below is what identified the cause,
+and because the conclusion it reached — that a degree would still be missing — was wrong
+in an instructive way.
+
+The two ingredients, both measured rather than assumed: the `rhigh` corner re-alignment
+described above, worth **+5.4°** at the binding corner; and holding `Cm` at 48 pF through
+the capacitor-model recalibration, which cost area but no margin. Dropout 149 mV against
+250 max, quiescent 35.7 µA against 60 max, and output accuracy inside ±3 % trimmed are
+unchanged.
 
 **What it is:** capless LDO on IHP SG13G2, 3.3 V in, 1.0–1.8 V trimmed out (1.2 V nominal),
 50 mA. Two-stage Miller-compensated amplifier, PMOS input pair, PMOS pass array
-6400 µm / 0.5 µm. `Cm` 48 pF MOM with an `rhigh` nulling resistor, `Cc` 2 pF across the pass
-device, `Cout` 20 pF on chip, 10 µA preload.
+6400 µm / 0.5 µm. `Cm` 48 pF MOM (193 × 193 µm) with an `rhigh` nulling resistor, `Cc` 2 pF
+across the pass device, `Cout` 20 pF on chip (125 × 125 µm), 10 µA preload.
 
 ### The resistor corner dominates, and the MOS corner barely matters
 
 Phase margin at 3.3 V, no external load, over MOS corner × resistor corner × temperature:
 
-| | −40 °C | 27 °C | 110 °C |
-| --- | --- | --- | --- |
-| tt / res_typ | 52.3° | 58.6° | 58.5° |
-| ss / res_typ | 53.4° | 59.2° | 58.5° |
-| ff / res_typ | 51.1° | 58.0° | 57.7° |
-| tt / res_bcs | 59.8° | 59.8° | 43.9° |
-| ss / res_bcs | 60.3° | 59.6° | 44.1° |
-| ff / res_bcs | 59.2° | 59.8° | **41.4°** |
-| tt / res_wcs | 42.2° | 52.1° | 60.2° |
-| ss / res_wcs | 43.7° | 53.1° | 60.0° |
-| ff / res_wcs | **40.7°** | 51.2° | 60.8° |
+| | −40 °C | 27 °C | 110 °C | | was, at the old pin |
+| --- | --- | --- | --- | --- | --- |
+| tt / res_typ | 53.5° | 59.2° | 57.4° | | 52.3 / 58.6 / 58.5 |
+| ss / res_typ | 54.5° | 59.7° | 57.4° | | 53.4 / 59.2 / 58.5 |
+| ff / res_typ | 52.4° | 58.7° | 56.4° | | 51.1 / 58.0 / 57.7 |
+| tt / res_bcs | 58.3° | 60.4° | 49.1° | | 59.8 / 59.8 / 43.9 |
+| ss / res_bcs | 59.0° | 60.5° | 49.3° | | 60.3 / 59.6 / 44.1 |
+| ff / res_bcs | 57.6° | 60.2° | **46.9°** | | 59.2 / 59.8 / **41.4** |
+| tt / res_wcs | 47.4° | 55.7° | 60.3° | | 42.2 / 52.1 / 60.2 |
+| ss / res_wcs | 48.7° | 56.5° | 60.2° | | 43.7 / 53.1 / 60.0 |
+| ff / res_wcs | **46.1°** | 54.9° | 60.3° | | **40.7** / 51.2 / 60.8 |
 
 Read down the columns: **the three MOS corners are within about 2° of each other**
 everywhere. Read across the resistor corners and the spread is 20°. `rhigh` is the nulling
@@ -716,25 +767,40 @@ Resistor corners are swept independently of the MOS corner. Pairing them — the
 borrowed from digital practice — is not physically justified here, since poly sheet and MOS
 drive are different process steps, and it happens to hide half the problem.
 
-### Most of the gap is a PDK corner definition that upstream has already fixed
+### The PDK corner definition that closed the gap — landed, and measured
 
-This design is pinned to a PDK where `cornerRES.lib` sets `rsh_rhigh` to **1020 / 1360 /
-1700 Ω/sq** for best / typical / worst case — **±25 %**. Upstream issue #1063 reported that
-as wider than the specified tolerance, and commit `4b7d7422` (2026-08-07) re-aligned the
-corners to **1160 / 1360 / 1560 Ω/sq**, or ±14.7 %. That commit is on `main` and is **not in
-any tagged release**, including v0.3.0.
+The old pin set `rsh_rhigh` to **1020 / 1360 / 1700 Ω/sq** for best / typical / worst case,
+**±25 %**. Upstream issue #1063 reported that as wider than the specified tolerance, and
+commit `4b7d7422` (2026-08-07) re-aligned them to **1160 / 1360 / 1560 Ω/sq**, ±14.7 %.
+That commit is an ancestor of `dev`, so re-pinning brought it in.
 
-Substituting only those two numbers into a local copy of `cornerRES.lib`, changing nothing
-else:
+⚠️ **It also changed the resistor's NOMINAL value, which the earlier estimate did not
+model.** `dw_rhigh_par` went from −0.04 µm to 0, so the drawn `Rz` measures 4.1 % lower at
+typical sheet. Measured on the two pins, the same drawn device:
 
-| corner | this pin | with the re-aligned corners | Δ |
-| --- | --- | --- | --- |
-| ff / res_bcs / 110 °C / 3.0 V | 40.4° | **48.5°** | +8.1° |
-| ff / res_bcs / 110 °C / 3.3 V | 41.4° | **49.3°** | +7.9° |
-| ff / res_wcs / −40 °C / 3.3 V | 40.7° | 44.4° | +3.7° |
-| ff / res_wcs / −40 °C / 3.6 V | 40.2° | 43.9° | +3.8° |
+| `rhigh` corner | old pin | dev@ab1510c |
+| --- | --- | --- |
+| res_bcs | 37.56 kΩ | 40.99 kΩ |
+| res_typ | 52.19 kΩ | 50.03 kΩ |
+| res_wcs | 68.16 kΩ | 59.85 kΩ |
 
-The hot side passes comfortably. **The cold, high-sheet corner remains about 1.1° short.**
+**Predicted against measured**, at the four corners this document estimated by substituting
+only the two sheet numbers into a local `cornerRES.lib`:
+
+| corner | old pin | predicted | **measured on dev** | prediction error |
+| --- | --- | --- | --- | --- |
+| ff / res_bcs / 110 °C / 3.0 V | 40.4° | 48.5° | **46.1°** | −2.4° |
+| ff / res_bcs / 110 °C / 3.3 V | 41.4° | 49.3° | **46.9°** | −2.4° |
+| ff / res_wcs / −40 °C / 3.3 V | 40.7° | 44.4° | **46.1°** | +1.7° |
+| ff / res_wcs / −40 °C / 3.6 V | 40.2° | 43.9° | **45.6°** | +1.7° |
+
+🔑 **The prediction was wrong in both directions and right about the shape.** It
+over-estimated the hot/low-sheet side by 2.4° and under-estimated the cold/high-sheet side
+by 1.7° — because it moved the corner sheets and nothing else, while the real commit also
+removed the width correction. The conclusion it drew, *"the cold, high-sheet corner remains
+about 1.1° short"*, is the one that did not survive: **that corner now measures 45.6° and
+the block passes at every one of the 243 corners.** Estimating a PDK change by editing two
+numbers in a model file is a useful bound, not a substitute for the pin.
 
 ### The questions
 

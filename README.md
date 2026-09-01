@@ -34,19 +34,26 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Quiescent current, enabled | 35.7 µA | 60 µA max | ✅ |
 | Standby current, disabled | 3.19 µA | — | |
 | Current limit trip | 58.5 mA | 60 mA | ✅ |
-| Phase margin, worst over load | 57.3° (at 10 µA) | 45° min | ✅ |
-| **Phase margin, worst over PVT** | **40.2°** (ff / worst-case sheet / −40 °C / 3.6 V / no load) | 45° min | ❌ |
-| **PSRR at 1 kHz** | **35.0 dB** | 40 dB | ❌ |
-| **Load-step droop, 1 → 20 mA** | **325.8 mV** | 120 mV max | ❌ |
+| Phase margin, worst over load | 58.2° (at 10 µA) | 45° min | ✅ |
+| Phase margin, worst over PVT | 45.6° (ff / worst-case sheet / −40 °C / 3.6 V / no load), 0 of 243 corners below | 45° min | ✅ |
+| **PSRR at 1 kHz** | **35.1 dB** | 40 dB | ❌ |
+| **Load-step droop, 1 → 20 mA** | **338.1 mV** | 120 mV max | ❌ |
 | **Load-release overshoot, 20 → 1 mA** | **to the 3.3 V rail** | 120 mV max | ❌ |
 | Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
-⚠️ **Four specifications are not met and are documented with numbers rather than omitted.**
-The three large-signal figures are all the same limitation — 20 pF of on-chip output
-capacitance cannot hold a 19 mA step for the microsecond the loop needs, which is a charge
-problem before it is a loop problem. The phase-margin gap is about 1° at one corner once a
-PDK resistor-corner fix already on upstream `main` is accounted for. Both are worked
-through in [`doc/implementation.md`](doc/implementation.md).
+⚠️ **Three specifications are not met and are documented with numbers rather than
+omitted.** They are all the same limitation — 20 pF of on-chip output capacitance cannot
+hold a 19 mA step for the microsecond the loop needs, which is a charge problem before it
+is a loop problem.
+
+✅ **Phase margin over PVT now passes**, at 45.6° with no corner below specification. It was
+40.2°. **No device changed value**: the block was re-pinned to IHP-Open-PDK
+`dev@ab1510c`, which carries a `rhigh` corner re-alignment worth **+5.4°** at the binding
+corner. The same re-pin renamed the MoM capacitor `cap_mfringe` → `cap_cmomf` and
+recalibrated its density from 2.32 to **1.287 fF/µm²**, so the two compensation capacitors
+were re-drawn ×1.80 in area to hold the same 48 pF and 20 pF they always specified — the
+capacitance is identical, the silicon it takes is not. Both are worked through in
+[`doc/implementation.md`](doc/implementation.md).
 
 Enable, power-good and current limit are implemented and exercised; see
 [`doc/implementation.md`](doc/implementation.md). The block needs a 1.2 V control-bus
@@ -95,10 +102,27 @@ results are in [`doc/implementation.md`](doc/implementation.md).
 ## Reproducing the results
 
 `sim/run.sh` netlists the schematic hierarchy and runs every testbench from a clean
-clone. It needs xschem, ngspice, and **both** IHP PDKs under one root: the
-`ihp-sg13cmos5l` overlay for the models and stdcells, and the `ihp-sg13g2` base for the
-compiled OSDI models. That root is `$PDK_ROOT`, which defaults to `/foss/pdks` (what
-IIC-OSIC-TOOLS sets), so pass `PDK_ROOT=/your/pdks` to run against a checkout anywhere
-else; `$PDK` names the base directory and defaults to `ihp-sg13g2`.
+clone. It needs xschem, ngspice, and the IHP PDK — **one checkout now covers both halves**,
+since upstream merged the `ihp-sg13cmos5l` overlay into IHP-Open-PDK:
+
+```sh
+git clone --branch dev --recurse-submodules https://github.com/IHP-GmbH/IHP-Open-PDK.git
+git -C IHP-Open-PDK checkout ab1510cbdcbd61fe82e24ec28179c02ea7083299
+PDK_ROOT=$PWD/IHP-Open-PDK python3 IHP-Open-PDK/ihp-sg13g2/libs.tech/ngspice/install.py
+PDK_ROOT=$PWD/IHP-Open-PDK PDK=ihp-sg13cmos5l sh sim/run.sh
+```
+
+`--recurse-submodules` is not optional, and `install.py` compiles the Verilog-A models
+(`psp103`, `psp103_nqs`, `r3_cmc`, `mosvar`) that ship as sources rather than binaries.
+
+⚠️ **One upstream gap to work around.** Both `.spiceinit` files load all six OSDI models
+from `$PDK_ROOT/$PDK/libs.tech/ngspice/osdi/`, but `install.py` writes its four only into
+`ihp-sg13g2`, while `ihp-sg13cmos5l` ships only the other two (`cap_cmomf`, `cap_cmomi`)
+prebuilt. Neither directory holds all six, so whichever `$PDK` you select the elaboration
+fails on the missing pair. Symlink the two sets into each other after installing.
+
+`$PDK_ROOT` defaults to `/foss/pdks` (what IIC-OSIC-TOOLS sets) and `$PDK` to
+`ihp-sg13g2`, so the bundled PDK still works — but it is the *old* two-repository pin and
+will not reproduce the numbers above.
 
 Apache-2.0. See [`NOTICE`](NOTICE) for attribution.

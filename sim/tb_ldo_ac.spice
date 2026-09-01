@@ -12,7 +12,7 @@
 *   T(f) = -v(vfbd)/v(vfb)      phase margin = 180 + arg(T) where |T| = 1
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
-.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
 * The resistor model's body terminal is the global substrate node `sub!`. Unless it is
 * declared global AND tied, it floats inside each subcircuit, the matrix is singular, and
@@ -61,8 +61,8 @@ Vinj vfbd vfb DC 0 AC 1
 * Cc, Cout and the preload are at the top level, not inside any sub-block -- this bench
 * instantiates the blocks by hand to get at the feedback node, so it carries them too.
 XMpre vout ibias vss vss sg13_hv_nmos w=20u l=1u ng=1 m=1
-XCc   eout vout cap_mfringe w=30u l=30u mmin=1 mmax=4
-XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
+XCc   eout vout cap_cmomf w=40u l=40u mmin=1 mmax=4
+XCout vout vss  cap_cmomf w=125u l=125u mmin=1 mmax=4
 
 * Phase margin is load-dependent in an LDO -- the pass device's gm, and with it the
 * output pole, move with load current. A single-load number says very little, so the
@@ -70,7 +70,10 @@ XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
 * Phase margin is load-dependent in an LDO: the pass device's gm, and with it the
 * output pole, moves with load current. A single-load figure says very little, so the
 * sweep runs no-load to full-load. (Each load is written explicitly -- ngspice does not
-* interpolate a foreach variable into a wrdata path.)
+* interpolate a foreach variable into a wrdata path.) Paths are RELATIVE: the runner and
+* report.py both chdir into sim/, and an absolute /work/... path only resolved when the
+* repository itself was the mount point -- it wrote nothing under the documented
+* invocation, so the AC bench silently produced no data at all.
 * Phase margin is load-dependent: the pass device's gm, and with it the output pole,
 * moves with load current. At very light load the device is barely conducting and the
 * loop gain falls away entirely, so the sweep runs from no-load upward to find where the
@@ -84,55 +87,55 @@ XCout vout vss  cap_mfringe w=93u l=93u mmin=1 mmax=4
   let T000u   = -v(vfbd)/v(vfb)
   let tdb000u = db(T000u)
   let tph000u = 180/pi*cph(T000u)
-  wrdata /work/sim/loop_000u.csv tdb000u tph000u
+  wrdata loop_000u.csv tdb000u tph000u
   alter Iload dc = 10u
   op
   ac dec 40 1 1G
   let T010u   = -v(vfbd)/v(vfb)
   let tdb010u = db(T010u)
   let tph010u = 180/pi*cph(T010u)
-  wrdata /work/sim/loop_010u.csv tdb010u tph010u
+  wrdata loop_010u.csv tdb010u tph010u
   alter Iload dc = 30u
   op
   ac dec 40 1 1G
   let T030u   = -v(vfbd)/v(vfb)
   let tdb030u = db(T030u)
   let tph030u = 180/pi*cph(T030u)
-  wrdata /work/sim/loop_030u.csv tdb030u tph030u
+  wrdata loop_030u.csv tdb030u tph030u
   alter Iload dc = 100u
   op
   ac dec 40 1 1G
   let T100u   = -v(vfbd)/v(vfb)
   let tdb100u = db(T100u)
   let tph100u = 180/pi*cph(T100u)
-  wrdata /work/sim/loop_100u.csv tdb100u tph100u
+  wrdata loop_100u.csv tdb100u tph100u
   alter Iload dc = 300u
   op
   ac dec 40 1 1G
   let T300u   = -v(vfbd)/v(vfb)
   let tdb300u = db(T300u)
   let tph300u = 180/pi*cph(T300u)
-  wrdata /work/sim/loop_300u.csv tdb300u tph300u
+  wrdata loop_300u.csv tdb300u tph300u
   alter Iload dc = 1m
   op
   ac dec 40 1 1G
   let T001m   = -v(vfbd)/v(vfb)
   let tdb001m = db(T001m)
   let tph001m = 180/pi*cph(T001m)
-  wrdata /work/sim/loop_001m.csv tdb001m tph001m
+  wrdata loop_001m.csv tdb001m tph001m
   alter Iload dc = 10m
   op
   ac dec 40 1 1G
   let T010m   = -v(vfbd)/v(vfb)
   let tdb010m = db(T010m)
   let tph010m = 180/pi*cph(T010m)
-  wrdata /work/sim/loop_010m.csv tdb010m tph010m
+  wrdata loop_010m.csv tdb010m tph010m
   alter Iload dc = 50m
   op
   ac dec 40 1 1G
   let T050m   = -v(vfbd)/v(vfb)
   let tdb050m = db(T050m)
   let tph050m = 180/pi*cph(T050m)
-  wrdata /work/sim/loop_050m.csv tdb050m tph050m
+  wrdata loop_050m.csv tdb050m tph050m
 .endc
 .end

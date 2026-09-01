@@ -20,7 +20,7 @@ N 0 130 0 90 {lab=vref_pg}
 C {devices/lab_pin.sym} 0 90 0 0 {name=l_R2b_P sig_type=std_logic lab=vref_pg}
 N 0 190 0 230 {lab=vss}
 C {devices/lab_pin.sym} 0 230 0 0 {name=l_R2b_M sig_type=std_logic lab=vss}
-C {sg13cmos5l_pr/cap_mfringe.sym} 240 -50 0 0 {name=Cf model=cap_mfringe w=10u l=10u mmin=1 mmax=4 spiceprefix=X}
+C {sg13cmos5l_pr/cap_cmomf.sym} 240 -50 0 0 {name=Cf model=cap_cmomf w=10u l=10u mmin=1 mmax=4 spiceprefix=X}
 N 240 -80 240 -120 {lab=vref}
 C {devices/lab_pin.sym} 240 -120 0 0 {name=l_Cf_c1 sig_type=std_logic lab=vref}
 N 240 -20 240 20 {lab=vss}

@@ -73,7 +73,7 @@ N 40 340 40 380 {lab=vtrim3}
 C {devices/lab_pin.sym} 40 380 0 0 {name=l_x_fb_vtrim3 sig_type=std_logic lab=vtrim3}
 N 40 420 40 460 {lab=vtrim4}
 C {devices/lab_pin.sym} 40 460 0 0 {name=l_x_fb_vtrim4 sig_type=std_logic lab=vtrim4}
-C {sg13cmos5l_pr/cap_mfringe.sym} -40 -480 0 0 {name=Cc model=cap_mfringe mmin=1 mmax=4 spiceprefix=X w=30u l=30u}
+C {sg13cmos5l_pr/cap_cmomf.sym} -40 -480 0 0 {name=Cc model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=40u l=40u}
 C {sg13cmos5l_pr/sg13_hv_nmos.sym} 700 120 0 0 {name=Mpre l=1u w=20u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X}
 N 720 90 720 50 {lab=vout}
 C {devices/lab_pin.sym} 720 50 0 0 {name=l_Mpre_D sig_type=std_logic lab=vout}
@@ -128,7 +128,7 @@ N 460 810 460 770 {lab=vddd}
 C {devices/lab_pin.sym} 460 770 0 0 {name=l_x_il_vddd sig_type=std_logic lab=vddd}
 N 420 1150 420 1190 {lab=vss}
 C {devices/lab_pin.sym} 420 1190 0 0 {name=l_x_il_vss sig_type=std_logic lab=vss}
-C {sg13cmos5l_pr/cap_mfringe.sym} 520 -60 0 0 {name=Cout model=cap_mfringe mmin=1 mmax=4 spiceprefix=X w=93u l=93u}
+C {sg13cmos5l_pr/cap_cmomf.sym} 520 -60 0 0 {name=Cout model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=125u l=125u}
 N 520 -30 520 10 {lab=vss}
 C {devices/lab_pin.sym} 520 10 0 0 {name=l_Cout_c2 sig_type=std_logic lab=vss}
 C {devices/iopin.sym} -640 -300 0 0 {name=p_vin lab=vin}
