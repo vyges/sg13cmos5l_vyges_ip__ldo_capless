@@ -9,7 +9,7 @@
 * point -- which returns numbers that look plausible and are not solutions. Declare and
 * tie it in every bench.
 * ldo_enable instantiates a standard-cell inverter for the 1.2 V control-bus side.
-.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
 .global sub!
 .include ldo_cells.spice
 .temp @TEMP@

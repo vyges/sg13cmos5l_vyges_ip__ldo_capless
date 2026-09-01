@@ -1,7 +1,7 @@
 * Capless LDO feasibility — sg13cmos5l (3.3V hv devices). VIN 3.3 -> VOUT ~1.2V.
 * PMOS pass device + 5T OTA error amp + resistive feedback (Vout = Vref*(1+R1/R2)).
 * Small on-chip cap for stability (the "capless / small MOM" option).
-.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
 
 .param VINV=3.3
 .param VREFV=0.6      ; Vout = Vref*(1+R1/R2) = 0.6*2 = 1.2V

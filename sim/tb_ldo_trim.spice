@@ -9,17 +9,17 @@
 * resistors are therefore not exactly binary -- the small segments are proportionally
 * more contact than the large ones -- so the step size is expected to vary across the
 * code range. How much is the question this answers.
-.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
-.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
-.include /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
-.lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_mfringe.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
 * The resistor model's body terminal is the global substrate node `sub!`. Unless it is
 * declared global AND tied, it floats inside each subcircuit, the matrix is singular, and
 * ngspice quietly abandons its DC strategies and falls back to a transient operating
 * point -- which returns numbers that look plausible and are not solutions. Declare and
 * tie it in every bench.
 * ldo_enable instantiates a standard-cell inverter for the 1.2 V control-bus side.
-.include /foss/pdks/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
 .global sub!
 .include ../sim/netlist/ldo_capless.spice
 
