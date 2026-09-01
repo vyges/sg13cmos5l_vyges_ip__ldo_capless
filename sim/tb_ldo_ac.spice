@@ -5,9 +5,10 @@
 * thing that cannot be measured on silicon at all (there is no loop-break pin), so it
 * must be established in simulation.
 *
-* The loop is broken at the feedback node by an inductor that is a short at DC and an
-* open at AC, with the injection source across it. The loop stays closed for the
-* operating point and open for the sweep, so the bias is the real one.
+* The loop is broken at the feedback node by a series source, DC 0 / AC 1 (Vinj below):
+* a short at DC, so the operating point is the real closed-loop one, and a 1 V injection
+* at AC. (This comment described an inductor for several revisions; the netlist has always
+* used the source, which is the same idea with one fewer component.)
 *   T(f) = -v(vfbd)/v(vfb)      phase margin = 180 + arg(T) where |T| = 1
 .lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
 .lib /foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt

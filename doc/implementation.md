@@ -80,7 +80,7 @@ the rail exists on the die; whether it is distributed to the pallets is the open
 
 | | |
 | --- | --- |
-| Corners | `cornerMOShv/lv.lib` (tt, ss, ff) with `cornerRES.lib` paired pessimistically (`res_typ`, `res_wcs`, `res_bcs`) |
+| Corners | `cornerMOShv/lv.lib` (tt, ss, ff) **crossed with** `cornerRES.lib` (`res_typ`, `res_bcs`, `res_wcs`) — swept **independently**, not paired. `rhigh` is the compensation's nulling resistor, so a low sheet is not the benign corner digital practice assumes; pairing hid the dominant term |
 | Temperature | −40, 27, 110 °C |
 | Supply | 3.0, 3.3, 3.6 V |
 | Tools | xschem 3.4.8RC, ngspice-46, in an IIC-OSIC-TOOLS-derived container |
@@ -169,18 +169,18 @@ one, and a 1 V injection at AC.
 
 | External load | DC loop gain | Crossover | Phase margin |
 | --- | --- | --- | --- |
-| 0 (preload only) | 106.9 dB | 0.87 MHz | 64.6° |
-| 10 µA | 110.7 dB | 1.35 MHz | 60.1° |
-| 30 µA | 113.7 dB | 1.94 MHz | 56.6° |
-| 100 µA | 116.4 dB | 2.77 MHz | 57.3° |
-| 300 µA | 117.7 dB | 3.33 MHz | 63.2° |
-| 1 mA | 118.2 dB | 3.63 MHz | 69.3° |
-| 10 mA | 117.6 dB | 3.79 MHz | 74.4° |
-| 50 mA | 115.4 dB | 3.82 MHz | 75.5° |
+| 0 (preload only) | 102.0 dB | 0.71 MHz | 58.6° |
+| **10 µA** | **106.6 dB** | **1.02 MHz** | **57.3°** |
+| 30 µA | 110.3 dB | 1.33 MHz | 58.9° |
+| 100 µA | 113.8 dB | 1.70 MHz | 65.3° |
+| 300 µA | 115.6 dB | 1.90 MHz | 71.6° |
+| 1 mA | 116.7 dB | 1.99 MHz | 75.7° |
+| 10 mA | 117.1 dB | 2.03 MHz | 78.5° |
+| 50 mA | 115.6 dB | 2.03 MHz | 79.2° |
 
-**Worst case across load is 56.6°, at 30 µA** — not at either end of the range — against a
+**Worst case across load is 57.3°, at 10 µA** — not at either end of the range — against a
 specification minimum of 45° and a typical target of 60°. ⚠️ Over corners **and load**
-the worst case is 40.4°, which does not meet the minimum; see the PVT section below.
+the worst case is **40.2°**, which does not meet the minimum; see the PVT section below.
 
 ### A gate driver was tried and removed
 
@@ -262,7 +262,7 @@ reducing `Cm` (48 pF → 5.8 pF) took it from 36.2° to −1.3°, because crosso
 the pole the compensation exists to stay below.
 
 With the preload the block is stable and in regulation with **no external load at all**,
-at 106.9 dB of loop gain and 64.6° of phase margin.
+at 102.0 dB of loop gain and 58.6° of phase margin.
 
 ## Trim curve — measured across all 32 codes
 
@@ -490,16 +490,23 @@ on the 1.2 V rail.
 
 | load | `vout` | `OC` |
 | --- | --- | --- |
-| 10 mA | 1.2090 V | low |
-| 50 mA (rated) | 1.2088 V | low |
-| **59.5 mA** | — | **trips** |
+| 10 mA | 1.2091 V | low |
+| 40 mA | 1.2090 V | low |
+| 50 mA (rated) | 1.2089 V | low |
+| **58.5 mA** | — | **trips** |
 | 100 mA, `ILIM_EN` = 0 | 1.2087 V | low — limiter disabled |
+
+🔑 **58.5 mA is a declared measurement, not a figure read off the sweep.**
+`tb_ldo_status.spice` now derives it with `meas dc i_trip WHEN v(oc)=0.6` on a 1 mA grid,
+and `report.py` requires it by name. The 5 mA grid it used before could only show `OC` low
+at 40 mA and high at 60 mA, and two different numbers — 59.5 mA here and 62.5 mA in the
+README — were published off that same curve. Neither was right.
 
 **The trip point is sized by measurement, not by the width ratio.** At the drawn 1:1000 the
 limit came out at 39 mA, well below the 50 mA rated load, because `Msense` sees a larger
 Vds than the pass device and channel-length modulation makes it carry more than its share.
-With the cascode the trip sits at 59.5 mA — above the rated load and at the stated 60 mA
-absolute limit. This is why the ratio is characterised rather than calculated.
+With the cascode the trip sits at 58.5 mA — above the rated load and just inside the
+stated 60 mA absolute limit. This is why the ratio is characterised rather than calculated.
 
 `ILIM_EN` gates both behaviours with a single device: forcing `oc_n` low disables the trip,
 which disables the throttle **and** the flag together. Gating them separately would allow a
@@ -565,7 +572,7 @@ Quiescent current is **above the proposal's 30 µA typical** and comfortably ins
 interior optimum for phase margin — see the minimum-load section. There is roughly 24 µA
 of headroom against the maximum, which is what any remaining stability work has to spend.
 
-## Large-signal response — three specifications not met
+## Large-signal response — two specifications not met
 
 Phase margin is a small-signal number and it does not see any of this. All three figures
 below come from `sim/tb_ldo_perf.spice` and are checked by the reporting script on every
@@ -573,9 +580,14 @@ run, so they cannot quietly drop out of the record.
 
 | | measured | specification |
 | --- | --- | --- |
-| Dropout at 50 mA | 573 mV | 250 mV max |
-| Load-step droop, 1 → 20 mA, 1 µs edge | 324 mV | 120 mV max |
-| Load-release overshoot, 20 → 1 mA | **to the 3.3 V input rail** | 120 mV max |
+| Dropout at 50 mA | **149.3 mV** ✅ | 250 mV max |
+| Load-step droop, 1 → 20 mA, 1 µs edge | 325.8 mV ❌ | 120 mV max |
+| Load-release overshoot, 20 → 1 mA | **to 3.292 V, i.e. the input rail** ❌ | 120 mV max |
+
+⚠️ This heading is kept for the two transient lines, which do not meet specification.
+**Dropout does**, at 149.3 mV. This table previously read 573 mV — the figure measured
+*with* the source-follower gate driver, which was removed in `7944583`; it was not updated
+with the removal.
 
 ### Droop and overshoot are set by `Cout`, not by the loop
 
@@ -618,12 +630,21 @@ Widening `Msrc` to drive the follower harder was tried and rejected: at 12 µm t
 quiescent current goes to 64.5 µA, over budget, dropout gets *worse* at 644 mV, and the
 overshoot does not move at all.
 
-**So the block currently trades a passing dropout specification for a passing stability
-one, and cannot have both in this topology.** The proposal names capless stability as the
-primary risk and states that the honest response to an area-or-dropout squeeze is to
-derate maximum load as a declared specification change. That is why the gate driver is
-kept in this revision — but it is a review decision, not a settled one, and the numbers
-for both choices are above.
+**Dropout and small-signal margin pull against each other in this topology, and the
+driver bought neither.** It cost 424 mV of dropout and 7° of margin on the crossed sweep,
+so there was no trade to make: it is worse on every line in the table above.
+
+⛔ **The gate driver is therefore NOT in this revision — it was removed in `7944583`.**
+This paragraph previously said it was kept, which contradicted both the section above it
+and the 149.3 mV dropout the benches produce. **The block ships without it**: dropout
+passes at 149.3 mV, quiescent current at 35.7 µA, and the remaining gap is small-signal
+margin — 40.2° against 45°, of which roughly 1° survives the upstream PDK resistor-corner
+fix discussed below.
+
+If a future revision does face a genuine area-or-dropout squeeze, the proposal names
+capless stability as the primary risk and states that the honest response is to derate
+maximum load as a **declared** specification change. That remains the fallback; it is not
+what this revision does.
 
 ## Not in this revision
 

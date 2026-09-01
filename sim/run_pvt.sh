@@ -1,8 +1,9 @@
 #!/bin/sh
 # PVT sweep -- part 1: simulate. Writes one loop-gain sweep per corner.
 # Phase margin is evaluated at three loads per corner, not at no load alone: the
-# no-load corner and the mid-load dip are different failures and neither bounds the other. Resistor corners are paired pessimistically with
-# the MOS corner rather than swept independently: slow silicon with worst-case sheet.
+# no-load corner and the mid-load dip are different failures and neither bounds the other.
+# Resistor corners are swept INDEPENDENTLY of the MOS corner -- see the reasoning below.
+# (This header used to say they were paired, contradicting the loop it introduces.)
 set -e
 cd "$(dirname "$0")"
 M=/foss/pdks/ihp-sg13cmos5l/libs.tech/ngspice/models

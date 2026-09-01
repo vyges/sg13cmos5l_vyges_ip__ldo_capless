@@ -23,19 +23,30 @@ keeps precision DC measurable through the shared analog mux.
 
 Measured on the schematic hierarchy, tt/27 °C unless noted:
 
-| Parameter | Measured | Specification |
-| --- | --- | --- |
-| Input | 3.0 – 3.6 V | 3.3 V nominal |
-| Output, trimmed | 1.0007 – 1.7992 V, 32 monotonic codes | 1.0 – 1.8 V |
-| Load | 0 – 50 mA | up to 50 mA |
-| Line regulation | 0.38 mV/V | 5 mV/V max |
-| Load regulation, 0→48 mA | 0.38 mV | 20 mV max |
-| Phase margin, worst over load | 64.3° | 45° min |
-| Phase margin, worst over PVT | 50.1° (ss/−40 °C) | 45° min |
-| Output capacitor | **capless** — on-chip compensation only | no external cap |
+| Parameter | Measured | Specification | |
+| --- | --- | --- | --- |
+| Input | 3.0 – 3.6 V | 3.3 V nominal | |
+| Output, trimmed | 1.0007 – 1.7992 V, 32 monotonic codes | 1.0 – 1.8 V | ✅ |
+| Load | 0 – 50 mA | up to 50 mA | ✅ |
+| Line regulation | 0.38 mV/V | 5 mV/V max | ✅ |
+| Load regulation, 0→48 mA | 0.38 mV | 20 mV max | ✅ |
+| Dropout at 50 mA | 149.3 mV | 250 mV max | ✅ |
+| Quiescent current, enabled | 35.7 µA | 60 µA max | ✅ |
+| Standby current, disabled | 3.19 µA | — | |
+| Current limit trip | 58.5 mA | 60 mA | ✅ |
+| Phase margin, worst over load | 57.3° (at 10 µA) | 45° min | ✅ |
+| **Phase margin, worst over PVT** | **40.2°** (ff / worst-case sheet / −40 °C / 3.6 V / no load) | 45° min | ❌ |
+| **PSRR at 1 kHz** | **35.0 dB** | 40 dB | ❌ |
+| **Load-step droop, 1 → 20 mA** | **325.8 mV** | 120 mV max | ❌ |
+| **Load-release overshoot, 20 → 1 mA** | **to the 3.3 V rail** | 120 mV max | ❌ |
+| Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
-| Current limit trip | 62.5 mA | 60 mA |
-| Standby current, disabled | 3.19 µA | — |
+⚠️ **Four specifications are not met and are documented with numbers rather than omitted.**
+The three large-signal figures are all the same limitation — 20 pF of on-chip output
+capacitance cannot hold a 19 mA step for the microsecond the loop needs, which is a charge
+problem before it is a loop problem. The phase-margin gap is about 1° at one corner once a
+PDK resistor-corner fix already on upstream `main` is accounted for. Both are worked
+through in [`doc/implementation.md`](doc/implementation.md).
 
 Enable, power-good and current limit are implemented and exercised; see
 [`doc/implementation.md`](doc/implementation.md). The block needs a 1.2 V control-bus

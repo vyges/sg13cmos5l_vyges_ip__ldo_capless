@@ -39,7 +39,10 @@ Vt4 vtrim4 0 1.2
   alter Ven dc = 1.2
   alter Iload dc = 1m
   echo "=== load sweep 0 to 120 mA: OC and fold-back ==="
-  dc Iload 0 120m 5m
+* 1 mA steps, not 5 mA. The trip point is a published specification and a 5 mA grid
+* cannot resolve it -- OC read low at 40 mA and high at 60 mA, which is consistent with
+* any trip in between, and two different figures were published off that same curve.
+  dc Iload 0 120m 1m
   meas dc vo_010 FIND v(vout) AT=10m
   meas dc vo_040 FIND v(vout) AT=40m
   meas dc vo_060 FIND v(vout) AT=60m
@@ -48,6 +51,9 @@ Vt4 vtrim4 0 1.2
   meas dc oc_040 FIND v(oc) AT=40m
   meas dc oc_060 FIND v(oc) AT=60m
   meas dc oc_100 FIND v(oc) AT=100m
+* The trip current itself, derived by the simulator rather than read off the sweep by
+* hand. Declared in report.py so it cannot silently stop being taken.
+  meas dc i_trip WHEN v(oc)=0.6
   echo "=== ILIM_EN low: limiter disabled, OC must stay low ==="
   alter Vilim dc = 0
   alter Iload dc = 100m
