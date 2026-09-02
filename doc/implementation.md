@@ -254,7 +254,7 @@ the other rows are kept for the comparison they make, not as current figures.
 
 | `M5`/`M6` | Load sweep, tt/27 | Corners at no load | Corners × load | Dropout | Iq |
 | --- | --- | --- | --- | --- | --- |
-| **10 µm / 2 µm** | **57.3°** | **40.4°** | **40.4°** | **149 mV** | **35.7 µA** |
+| **10 µm / 2 µm** | **57.3°** | **40.4°** | **40.4°** | **149 mV** | **35.8 µA** |
 | 15 µm / 3 µm | 53.9° | — | 34.5° | 149 mV | — |
 | 20 µm / 4 µm | 51.0° | 43.8° | 22.8° | 149 mV | ~40 µA |
 | 25 µm / 5 µm | 46.3° | 45.0° | 12.1° | 149 mV | ~43 µA |
@@ -292,7 +292,7 @@ most of the margin. Sweeping it over all 27 corners:
 The relationship is not monotonic: too little preload leaves the output pole near
 crossover, too much raises crossover into the *next* pole. 20 µm is the interior optimum,
 worth 14.6° over the original 2 µm, and it is where the design sits. It costs 10 µA of a
-35.7 µA total, against a 60 µA maximum.
+35.8 µA total, against a 60 µA maximum.
 
 Two other knobs were swept the same way and both moved the wrong direction, which is worth
 recording so they are not retried: increasing the nulling resistor `Rz` (35.2 µm → 140 µm)
@@ -310,7 +310,7 @@ at 102.0 dB of loop gain and 58.6° of phase margin.
 
 | | measured | specification |
 | --- | --- | --- |
-| Range | 1.0007 V (code 0) – 1.7992 V (code 31) | 1.0 – 1.8 V |
+| Range | 1.0000 V (code 0) – 1.7979 V (code 31) | 1.0 – 1.8 V |
 | Default, code 16 | 1.2100 V | 1.2 V nominal |
 | Monotonicity | monotonic across all 32 codes | required |
 | Step size | 8.8 mV at the bottom, 73.0 mV at the top | — |
@@ -607,7 +607,7 @@ rather than 10.
 | | |
 | --- | --- |
 | Load | up to 50 mA through the slot switch |
-| Quiescent, enabled | 35.7 µA |
+| Quiescent, enabled | 35.8 µA |
 | Quiescent, disabled | 3.19 µA |
 
 Quiescent current is **above the proposal's 30 µA typical** and comfortably inside its
@@ -658,7 +658,7 @@ neither caused nor fixed either one. `Cout` is the variable.
 | Dropout at 50 mA | **149 mV** | 573 mV | 250 mV max |
 | Load-step droop | 325 mV | 324 mV | 120 mV max |
 | Load-release overshoot | rail | rail | 120 mV max |
-| Quiescent current | **35.7 µA** | 45.6 µA | 60 µA max |
+| Quiescent current | **35.8 µA** | 45.6 µA | 60 µA max |
 
 Measured on the same crossed sweep for both, which is the comparison that matters: the
 driver is worse on every line. It was removed.
@@ -680,7 +680,7 @@ so there was no trade to make: it is worse on every line in the table above.
 ⛔ **The gate driver is therefore NOT in this revision — it was removed in `7944583`.**
 This paragraph previously said it was kept, which contradicted both the section above it
 and the 149.3 mV dropout the benches produce. **The block ships without it**: dropout
-passes at 149.3 mV, quiescent current at 35.7 µA, and the remaining gap is small-signal
+passes at 149.3 mV, quiescent current at 35.8 µA, and the remaining gap is small-signal
 margin, which the re-pin to `dev@ab1510c` closed outright: 45.6° against 45°, no corner
 below specification.
 
@@ -732,7 +732,7 @@ in an instructive way.
 The two ingredients, both measured rather than assumed: the `rhigh` corner re-alignment
 described above, worth **+5.4°** at the binding corner; and holding `Cm` at 48 pF through
 the capacitor-model recalibration, which cost area but no margin. Dropout 149 mV against
-250 max, quiescent 35.7 µA against 60 max, and output accuracy inside ±3 % trimmed are
+250 max, quiescent 35.8 µA against 60 max, and output accuracy inside ±3 % trimmed are
 unchanged.
 
 **What it is:** capless LDO on IHP SG13G2, 3.3 V in, 1.0–1.8 V trimmed out (1.2 V nominal),

@@ -26,12 +26,12 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Parameter | Measured | Specification | |
 | --- | --- | --- | --- |
 | Input | 3.0 – 3.6 V | 3.3 V nominal | |
-| Output, trimmed | 1.0007 – 1.7992 V, 32 monotonic codes | 1.0 – 1.8 V | ✅ |
+| Output, trimmed | 1.0000 – 1.7979 V, 32 monotonic codes | 1.0 – 1.8 V | ✅ |
 | Load | 0 – 50 mA | up to 50 mA | ✅ |
 | Line regulation | 0.38 mV/V | 5 mV/V max | ✅ |
 | Load regulation, 0→48 mA | 0.26 mV | 20 mV max | ✅ |
 | Dropout at 50 mA | 149.3 mV | 250 mV max | ✅ |
-| Quiescent current, enabled | 35.7 µA | 60 µA max | ✅ |
+| Quiescent current, enabled | 35.8 µA | 60 µA max | ✅ |
 | Standby current, disabled | 3.19 µA | — | |
 | Current limit trip | 58.5 mA | 60 mA | ✅ |
 | Phase margin, worst over load | 58.2° (at 10 µA) | 45° min | ✅ |
