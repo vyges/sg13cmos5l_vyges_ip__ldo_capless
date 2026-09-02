@@ -16,6 +16,7 @@
 | PSRR at 1 kHz | dB | 40.000 dB | 35.067 dB | 35.067 dB | any | 35.067 dB | Fail ❌ |
 | Load-step droop, 1-20 mA | mV | any | 338.120 mV | 338.120 mV | 120.000 mV | 338.120 mV | Fail ❌ |
 | Load-release overshoot | mV | any | 2083.310 mV | 2083.310 mV | 120.000 mV | 2083.310 mV | Fail ❌ |
+| Load step meeting ±120 mV | mA | 1.000 mA | 3.000 mA | 3.000 mA | any | 3.000 mA | Pass ✅ |
 | Area | um2 | any | ​ | ​ | 164300.000 um2 | ​ | Skip 🟧 |
 | Magic DRC | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |
 | Netgen LVS | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |
@@ -43,6 +44,10 @@
 ### Power-supply rejection against frequency
 
 ![Power-supply rejection against frequency](ldo_capless_psrr.svg)
+
+### Droop and overshoot against load-step size — where the promise can be set
+
+![Droop and overshoot against load-step size — where the promise can be set](ldo_capless_step_profile.svg)
 
 ---
 

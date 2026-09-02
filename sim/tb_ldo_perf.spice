@@ -72,5 +72,36 @@ Vt4 vtrim4 0 1.2
   * the output is out of regulation, and "to the 3.3 V rail" says nothing about how sharp
   * the excursion is. A reader scoping the block needs to see them.
   wrdata step.csv v(vout)
+
+  * Droop and overshoot against STEP SIZE. The 120 mV target these are judged against came
+  * from our own proposal, not from a requirement -- the 2026-09-01 review confirmed the
+  * load step and its droop are OURS TO SPECIFY. A specification written from one step size
+  * is a guess; this sweeps four so the promise can be "up to N mA" with a number behind it.
+  * Same .meas definitions and the same windows as the 1 -> 20 mA case above.
+  alter @Iload[pulse] = [ 1m 2m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vp_02 FIND v(vout) AT=19u
+  meas tran vd_02 MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_02 MAX  v(vout) FROM=40u TO=50u
+  alter @Iload[pulse] = [ 1m 5m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vp_05 FIND v(vout) AT=19u
+  meas tran vd_05 MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_05 MAX  v(vout) FROM=40u TO=50u
+  alter @Iload[pulse] = [ 1m 10m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vp_10 FIND v(vout) AT=19u
+  meas tran vd_10 MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_10 MAX  v(vout) FROM=40u TO=50u
+  alter @Iload[pulse] = [ 1m 3m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vp_03 FIND v(vout) AT=19u
+  meas tran vd_03 MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_03 MAX  v(vout) FROM=40u TO=50u
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vp_07 FIND v(vout) AT=19u
+  meas tran vd_07 MIN  v(vout) FROM=20u TO=30u
+  meas tran vo_07 MAX  v(vout) FROM=40u TO=50u
 .endc
 .end

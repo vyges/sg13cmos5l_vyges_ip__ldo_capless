@@ -39,12 +39,23 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | **PSRR at 1 kHz** | **35.1 dB** | 40 dB | ❌ |
 | **Load-step droop, 1 → 20 mA** | **338.1 mV** | 120 mV max | ❌ |
 | **Load-release overshoot, 20 → 1 mA** | **to the 3.3 V rail** | 120 mV max | ❌ |
+| Load step meeting ±120 mV | **3 mA** (droop 90.2 mV, overshoot 119.7 mV) | — | |
 | Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
 ⚠️ **Three specifications are not met and are documented with numbers rather than
 omitted.** They are all the same limitation — 20 pF of on-chip output capacitance cannot
 hold a 19 mA step for the microsecond the loop needs, which is a charge problem before it
 is a loop problem.
+
+🔑 **But the step size is ours to specify, so it is now specified.** The 120 mV target came
+from this block's own proposal, not from a requirement. Sweeping step size says what the
+block actually holds: **both excursions stay inside ±120 mV up to a 1 → 3 mA step**
+(droop 90.2 mV, overshoot 119.7 mV). See `doc/datasheet/ldo_capless_step_profile.svg`.
+
+⛔ **And the release overshoot is a cliff, not a slope — which no single-step measurement
+shows.** It tracks the droop up to a 5 mA release (231 mV) and then runs to the supply rail
+by 7 mA (2066 mV). That is an over-voltage on thin-oxide devices above a threshold between
+5 and 7 mA, and it is the block's primary open defect: bounded now, but not fixed.
 
 ✅ **Phase margin over PVT now passes**, at 45.6° with no corner below specification. It was
 40.2°. **No device changed value**: the block was re-pinned to IHP-Open-PDK

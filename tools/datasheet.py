@@ -125,6 +125,38 @@ def _pvt_phase_margins():
     return out
 
 
+STEP_SWEEP = [(2e-3, "02"), (3e-3, "03"), (5e-3, "05"), (7e-3, "07"), (10e-3, "10")]
+
+
+def step_profile():
+    """[(step amps, droop V, overshoot V)] from the load-step size sweep."""
+    out = []
+    for amps, tag in STEP_SWEEP:
+        try:
+            pre = _meas("tb_ldo_perf.spice", f"vp_{tag}")
+            out.append((amps, pre - _meas("tb_ldo_perf.spice", f"vd_{tag}"),
+                        _meas("tb_ldo_perf.spice", f"vo_{tag}") - pre))
+        except SystemExit:
+            continue
+    # the original 1 -> 20 mA condition, from the named statements in the same bench
+    pre = _meas("tb_ldo_perf.spice", "vo_pre")
+    out.append((20e-3, pre - _meas("tb_ldo_perf.spice", "vo_droop"),
+                _meas("tb_ldo_perf.spice", "vo_over") - pre))
+    return sorted(out)
+
+
+def step_limit(tol=120e-3):
+    """Largest swept load step for which BOTH droop and overshoot stay inside `tol`.
+
+    ⛔ The largest step MEASURED to pass, never interpolated. The overshoot is not a slope:
+    231 mV at a 5 mA release, 2066 mV at 7 mA, because above some threshold the output runs
+    to the supply rail. Interpolating across that would invent a number on the wrong side
+    of a cliff.
+    """
+    ok = [a for a, d, o in step_profile() if d <= tol and o <= tol]
+    return max(ok) if ok else 0.0
+
+
 # ---------------------------------------------------------------- the specification
 #
 # Limits are the published specification. They live HERE, in the thing that also produces
@@ -174,6 +206,11 @@ def rows():
          one(_meas("tb_ldo_perf.spice", "vo_pre") - _meas("tb_ldo_perf.spice", "vo_droop"))),
         ("Load-release overshoot", "mV", None, 120e-3,
          one(_meas("tb_ldo_perf.spice", "vo_over") - _meas("tb_ldo_perf.spice", "vo_settle"))),
+        # The 120 mV target came from our own proposal, and the 2026-09-01 review confirmed
+        # the load step and its droop are OURS to specify. So the row that matters is not
+        # "does it pass at 20 mA" -- it does not -- but "what step DOES it hold", which is a
+        # number the sweep answers instead of a promise someone has to guess at.
+        ("Load step meeting ±120 mV", "mA", 1e-3, None, one(step_limit())),
     ]
 
 
@@ -190,7 +227,7 @@ PHYSICAL = [
     ("Antenna violations", "", None, 0),
 ]
 
-SCALE = {"V": 1, "mV": 1e3, "uA": 1e6, "mA": 1e3, "mV/V": 1e3, "dB": 1, "deg": 1,
+SCALE = {"V": 1, "mV": 1e3, "mA": 1e3, "uA": 1e6, "mA": 1e3, "mV/V": 1e3, "dB": 1, "deg": 1,
          "um2": 1e12, "": 1}
 
 
@@ -598,11 +635,44 @@ def plot_psrr():
     return _svg(650, 380, body, "Power-supply rejection")
 
 
+def plot_step_profile():
+    """Droop and release overshoot against load-step size, with the ±120 mV band.
+
+    🔑 This is the plot that answers "what step can the block promise". The droop line is a
+    slope and crosses the band around 3 mA. The overshoot line is NOT a slope: it sits with
+    the droop up to a 5 mA release and then jumps to the supply rail by 7 mA. That cliff is
+    the block's primary defect, and it is invisible in any single-step measurement.
+    """
+    prof = step_profile()
+    if len(prof) < 3:
+        return None
+    xs = [a * 1e3 for a, _, _ in prof]
+    body, px, py = _axes(70, 30, 620, 330, 0, max(xs), 0, 2400,
+                         "load step (mA)", "excursion from nominal (mV)",
+                         "{:.0f}", "{:.0f}")
+    body += _limit_line(120, px, py, 70, 620, "±120 mV")
+    body += _series([(a * 1e3, d * 1e3) for a, d, _ in prof], px, py, "#2563eb")
+    body += _series([(a * 1e3, o * 1e3) for a, _, o in prof], px, py, "#dc2626")
+    for a, d, o in prof:
+        body += (f'<circle cx="{px(a*1e3):.1f}" cy="{py(d*1e3):.1f}" r="3" fill="#2563eb"/>\n'
+                 f'<circle cx="{px(a*1e3):.1f}" cy="{py(o*1e3):.1f}" r="3" fill="#dc2626"/>\n')
+    lim = step_limit() * 1e3
+    body += (f'<line x1="{px(lim):.1f}" y1="30" x2="{px(lim):.1f}" y2="330" stroke="#16a34a" '
+             f'stroke-width="1.5" stroke-dasharray="4 3"/>\n'
+             f'<text x="{px(lim)+6:.1f}" y="46" fill="#16a34a">{lim:.0f} mA — both inside ±120 mV</text>\n')
+    for lab, col, y in (("droop", "#2563eb", 62), ("release overshoot", "#dc2626", 78)):
+        body += (f'<line x1="470" y1="{y-4}" x2="494" y2="{y-4}" stroke="{col}" stroke-width="2"/>'
+                 f'<text x="500" y="{y}" fill="#334155">{lab}</text>\n')
+    return _svg(650, 380, body, "Load step profile")
+
+
 PLOTS = [("bode", plot_bode, "Loop gain and phase at the binding load"),
          ("pm_vs_load", plot_pm_vs_load, "Phase margin across the load range"),
          ("pm_pvt", plot_pm_pvt, "Phase margin over 243 PVT corners"),
          ("load_step", plot_load_step, "Load-step response — where both failures live"),
-         ("psrr", plot_psrr, "Power-supply rejection against frequency")]
+         ("psrr", plot_psrr, "Power-supply rejection against frequency"),
+         ("step_profile", plot_step_profile,
+          "Droop and overshoot against load-step size — where the promise can be set")]
 
 
 def footer():

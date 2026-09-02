@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="650" height="380" viewBox="0 0 650 380" font-family="sans-serif" font-size="12">
+<title>Load step profile</title>
+<rect width="650" height="380" fill="#ffffff"/>
+<rect x="70" y="30" width="550" height="300" fill="none" stroke="#334155" stroke-width="1"/>
+<line x1="70.0" y1="330" x2="70.0" y2="334" stroke="#334155"/>
+<text x="70.0" y="348" text-anchor="middle" fill="#334155">0</text>
+<line x1="180.0" y1="330" x2="180.0" y2="334" stroke="#334155"/>
+<text x="180.0" y="348" text-anchor="middle" fill="#334155">4</text>
+<line x1="180.0" y1="30" x2="180.0" y2="330" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="290.0" y1="330" x2="290.0" y2="334" stroke="#334155"/>
+<text x="290.0" y="348" text-anchor="middle" fill="#334155">8</text>
+<line x1="290.0" y1="30" x2="290.0" y2="330" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="400.0" y1="330" x2="400.0" y2="334" stroke="#334155"/>
+<text x="400.0" y="348" text-anchor="middle" fill="#334155">12</text>
+<line x1="400.0" y1="30" x2="400.0" y2="330" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="510.0" y1="330" x2="510.0" y2="334" stroke="#334155"/>
+<text x="510.0" y="348" text-anchor="middle" fill="#334155">16</text>
+<line x1="510.0" y1="30" x2="510.0" y2="330" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="620.0" y1="330" x2="620.0" y2="334" stroke="#334155"/>
+<text x="620.0" y="348" text-anchor="middle" fill="#334155">20</text>
+<line x1="620.0" y1="30" x2="620.0" y2="330" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="66" y1="330.0" x2="70" y2="330.0" stroke="#334155"/>
+<text x="62" y="334.0" text-anchor="end" fill="#334155">0</text>
+<line x1="66" y1="270.0" x2="70" y2="270.0" stroke="#334155"/>
+<text x="62" y="274.0" text-anchor="end" fill="#334155">480</text>
+<line x1="70" y1="270.0" x2="620" y2="270.0" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="66" y1="210.0" x2="70" y2="210.0" stroke="#334155"/>
+<text x="62" y="214.0" text-anchor="end" fill="#334155">960</text>
+<line x1="70" y1="210.0" x2="620" y2="210.0" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="66" y1="150.0" x2="70" y2="150.0" stroke="#334155"/>
+<text x="62" y="154.0" text-anchor="end" fill="#334155">1440</text>
+<line x1="70" y1="150.0" x2="620" y2="150.0" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="66" y1="90.0" x2="70" y2="90.0" stroke="#334155"/>
+<text x="62" y="94.0" text-anchor="end" fill="#334155">1920</text>
+<line x1="70" y1="90.0" x2="620" y2="90.0" stroke="#e2e8f0" stroke-width="1"/>
+<line x1="66" y1="30.0" x2="70" y2="30.0" stroke="#334155"/>
+<text x="62" y="34.0" text-anchor="end" fill="#334155">2400</text>
+<line x1="70" y1="30.0" x2="620" y2="30.0" stroke="#e2e8f0" stroke-width="1"/>
+<text x="345" y="368" text-anchor="middle" fill="#0f172a">load step (mA)</text>
+<text x="18" y="180" text-anchor="middle" fill="#0f172a" transform="rotate(-90 18 180)">excursion from nominal (mV)</text>
+<line x1="70" y1="315.0" x2="620" y2="315.0" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="616" y="310.0" text-anchor="end" fill="#dc2626">±120 mV</text>
+<path d="M125.0,323.1 L152.5,318.7 L207.5,312.4 L262.5,307.7 L345.0,302.1 L620.0,287.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+<path d="M125.0,321.9 L152.5,315.0 L207.5,301.1 L262.5,71.7 L345.0,70.4 L620.0,69.6" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="125.0" cy="323.1" r="3" fill="#2563eb"/>
+<circle cx="125.0" cy="321.9" r="3" fill="#dc2626"/>
+<circle cx="152.5" cy="318.7" r="3" fill="#2563eb"/>
+<circle cx="152.5" cy="315.0" r="3" fill="#dc2626"/>
+<circle cx="207.5" cy="312.4" r="3" fill="#2563eb"/>
+<circle cx="207.5" cy="301.1" r="3" fill="#dc2626"/>
+<circle cx="262.5" cy="307.7" r="3" fill="#2563eb"/>
+<circle cx="262.5" cy="71.7" r="3" fill="#dc2626"/>
+<circle cx="345.0" cy="302.1" r="3" fill="#2563eb"/>
+<circle cx="345.0" cy="70.4" r="3" fill="#dc2626"/>
+<circle cx="620.0" cy="287.7" r="3" fill="#2563eb"/>
+<circle cx="620.0" cy="69.6" r="3" fill="#dc2626"/>
+<line x1="152.5" y1="30" x2="152.5" y2="330" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="158.5" y="46" fill="#16a34a">3 mA — both inside ±120 mV</text>
+<line x1="470" y1="58" x2="494" y2="58" stroke="#2563eb" stroke-width="2"/><text x="500" y="62" fill="#334155">droop</text>
+<line x1="470" y1="74" x2="494" y2="74" stroke="#dc2626" stroke-width="2"/><text x="500" y="78" fill="#334155">release overshoot</text>
+</svg>
