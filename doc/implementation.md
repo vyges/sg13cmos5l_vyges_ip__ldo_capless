@@ -190,7 +190,7 @@ than as an opinion.
 | Output at mid trim code | 1.199 V | 1.2100 V | 1.0–1.8 V trimmed |
 | Internal reference | — | 0.6000 V | — |
 | Line regulation | ~0.04 mV/V | 0.38 mV/V | 5 mV/V max |
-| Load regulation, 0→48 mA | ~15 mV | **0.38 mV** | 20 mV max |
+| Load regulation, 0→48 mA | ~15 mV | **0.26 mV** | 20 mV max |
 
 The loop closes with `vfb` at 0.5997 V against `vref` at 0.6000 V.
 
