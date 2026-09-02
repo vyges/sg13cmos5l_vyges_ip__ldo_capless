@@ -804,36 +804,76 @@ numbers in a model file is a useful bound, not a substitute for the pin.
 
 ### The questions
 
-1. **Should this design be re-pinned to `main` for the resistor corners?** The fix is not in
-   a release, and the same window carries other resistor work — the `r3_cmc` model, a
-   contact double-count fix, a bulk node on `rhigh` — that has not been assessed here. The
-   test above isolates the sheet-resistance numbers only.
-2. **Is roughly 1° at ff / worst-case sheet / −40 °C worth spending design effort on**, or is
-   it inside the noise of a schematic-stage estimate? For reference, everything swept to
-   close it — nulling resistor, both Miller capacitors, input-pair width, second-stage
-   current, and a source-follower gate driver — either moved the wrong way or cost a
-   different specification. The preload was the one interior optimum, worth 14.6°.
-3. **Is 45° the right target for a capless LDO with 20 pF of on-chip output capacitance**, or
-   does `Cout` have to be much larger anyway — in which case the load-transient numbers
-   force the same conclusion and the stability question changes shape.
+⛔ **Two of these three were overtaken by the re-pin on 2026-09-01.** Kept with their
+outcomes, because the reasoning that produced them is still how the block should be argued
+about.
+
+1. ✅ **Should this design be re-pinned for the resistor corners?** — **done, and it was the
+   right call.** The block is on IHP-Open-PDK `dev@ab1510c`, which carries the `rhigh` fix
+   `4b7d7422` (±25 % → ±14.7 %). ⚠️ But the reasoning here was only half right: the estimate
+   made by editing sheet numbers in `cornerRES.lib` was wrong in **both** directions —
+   −2.4° hot, +1.7° cold — because the real commit also removed a −0.04 µm width correction
+   that the estimate did not model. **Editing a model file bounds a PDK change; it does not
+   substitute for the pin.**
+2. ✅ **Is roughly 1° at ff / worst-case sheet / −40 °C worth spending design effort on?** —
+   **moot: the gap is closed.** Worst-case phase margin over PVT is now **45.6°, with 0 of
+   243 corners below specification**, up from 40.2°. No device changed value. The `rhigh`
+   fix was worth +5.4° at the binding corner, and the capacitor model's recalibration
+   (2.320 → 1.287 fF/µm²) accounts for the rest — the compensation capacitors were re-drawn
+   ×1.80 in area to hold the same 48 pF and 20 pF they always specified.
+3. **Is 45° the right target for a capless LDO with 20 pF of on-chip output capacitance?**
+   — **still open**, and now sharper: the load-transient specifications are missed, so if
+   `Cout` has to grow for them, it grows for stability too and this question is answered by
+   that decision rather than on its own. Carried into the open list below.
 
 Everything above is reproducible from this repository: `sim/run_pvt.sh` for the corner ×
 load sweep, `sim/tb_ldo_ac.spice` for the loop-gain measurement.
 
 ## Questions that need answers before layout
 
-These block work rather than merely informing it.
+⛔ **All four were answered at the 2026-09-01 design review.** They are kept with their
+answers rather than deleted: what was blocking, and what the answer turned out to be, is the
+part a reader coming to this block later actually needs.
 
-1. **Is a 1.2 V rail distributed to the pallets, or is 3.3 V the only supply?** The
-   enable inverter, the power-good comparator and the OC reporting path all run from
-   `vddd` at 1.2 V. If the slot supplies only 3.3 V, those three need rebuilding in
-   thick-oxide devices, and the block has to generate its own low rail. Everything else
-   in the block is already 3.3 V-native. This is the single largest unknown.
-2. **What load step must the block survive, and at what droop?** See item 2 above. The
-   answer sets `Cout`, which is the block's second-largest area consumer.
-3. **What bias currents does a pallet actually receive?** The design assumes a 1 µA
-   source and multiplies it by ten internally. The harness names `ibias1_250n`,
-   `ibias1u_*` and `ibias2_1u` suggest 250 nA and 1 µA are both available; confirmation
-   would let the internal multiplication be dropped.
-4. **Is derating maximum load acceptable** if the dropout trade in item 1 goes that way,
-   and to what current?
+1. ✅ **Is a 1.2 V rail distributed to the pallets, or is 3.3 V the only supply?** — *the
+   single largest unknown, and the answer is yes.* Every slot sits beside **two pMOS power
+   switches, 3.3 V and 1.2 V**. The enable inverter, the power-good comparator and the OC
+   reporting path keep their 1.2 V `vddd` supply; nothing needs rebuilding in thick-oxide
+   devices. This also closes the same question for the PLL, where it was design-breaking.
+2. ✅ **What load step must the block survive, and at what droop?** — **ours to specify.**
+   That converts the question into an obligation: the numbers below are what the block does,
+   and we now have to state what it promises. See the open items.
+3. ✅ **What bias currents does a pallet actually receive?** — a **5-bit IDAC, 250 nA unit,
+   about 8 µA full scale**, with a 15 nA fine mode, and **sourced rather than sunk**. The
+   design's assumption of a 1 µA source multiplied by ten internally is compatible; the
+   multiplication can be dropped if the IDAC is programmed to supply the current directly.
+4. ✅ **Is derating maximum load acceptable?** — **yes, if we announce it.**
+
+⚠️ **One answer changed a design input rather than resolving a question:** the slot is
+**≈530 × 310 µm**, not the 520 × 250 µm `doc/proposal.md` was written against — SG13CMOS5L
+has no thick top metal, so the core was widened for power distribution. Every area figure in
+this document already uses the larger slot; the proposal has not been rewritten because it
+is the historical record of what was proposed.
+
+## What is actually open
+
+These are the block's real remaining work, and all three are the same limitation seen from
+different directions — 20 pF of on-chip output capacitance cannot hold a 19 mA step for the
+microsecond the loop needs.
+
+1. ⛔ **Load-release overshoot reaches the 3.3 V rail**, and the reviewer's words were *"that
+   needs fixing"* — it is an over-voltage on thin-oxide devices, not a settling wobble. This
+   is the most serious of the three. See `doc/datasheet/ldo_capless_load_step.svg`.
+2. ⛔ **Load-step droop is 338 mV.** Because question 2 above came back as *ours to specify*,
+   this is now a promise to write rather than a target to hit — but 338 mV is a large number
+   to promise, and it is charge, not loop bandwidth, that sets it.
+3. ⛔ **PSRR at 1 kHz is 35.1 dB against 40.** The curve in
+   `doc/datasheet/ldo_capless_psrr.svg` shows where rejection collapses.
+4. **Is 45° the right phase-margin target for a capless LDO with 20 pF of output
+   capacitance**, or does `Cout` have to grow for the transient specifications anyway — in
+   which case the stability question changes shape and is answered by the same decision that
+   answers 1 and 2. This is the one genuinely open design-judgement question left.
+
+Everything above is reproducible from this repository: `sim/run.sh` and `sim/run_pvt.sh`
+produce the results, and `python3 tools/datasheet.py --check` fails if any published figure
+has drifted from the simulation behind it.
