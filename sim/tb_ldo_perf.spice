@@ -54,6 +54,11 @@ Vt4 vtrim4 0 1.2
   meas ac psrr_10k  FIND psrr_db AT=10k
   meas ac psrr_100k FIND psrr_db AT=100k
   meas ac psrr_1m   FIND psrr_db AT=1meg
+  * The four .meas points above are the published specification points; this writes the
+  * whole sweep so the datasheet can DRAW the curve instead of four dots. Relative path:
+  * the runner invokes ngspice with sim/ as the working directory, and an absolute one
+  * silently wrote nothing under our own documented invocation once already.
+  wrdata psrr.csv psrr_db
 
   * ---- load transient: 1 -> 20 mA with a 1 us edge, as the specification states
   alter @Iload[pulse] = [ 1m 20m 20u 1u 1u 20u 60u ]
@@ -62,5 +67,10 @@ Vt4 vtrim4 0 1.2
   meas tran vo_droop  MIN  v(vout) FROM=20u TO=30u
   meas tran vo_over   MAX  v(vout) FROM=40u TO=50u
   meas tran vo_settle FIND v(vout) AT=39u
+  * Write the waveform. The droop and the release overshoot are this block's two headline
+  * misses and both are shapes, not scalars -- 338 mV of droop says nothing about how long
+  * the output is out of regulation, and "to the 3.3 V rail" says nothing about how sharp
+  * the excursion is. A reader scoping the block needs to see them.
+  wrdata step.csv v(vout)
 .endc
 .end

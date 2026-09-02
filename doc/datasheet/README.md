@@ -50,9 +50,18 @@ Hand-written SVG, not matplotlib: the block's tooling is stdlib-only, an SVG dif
 reviews like the rest of the repository, and no plotting library's version can quietly
 change what a published figure looks like.
 
-⏳ Not yet plotted: the load-step transient, which would show the droop and overshoot
-misses directly. `tb_ldo_perf.spice` measures them but writes no waveform, so that needs a
-`wrdata` added to the bench first — the figure should not exist before the data does.
+- **`ldo_capless_load_step.svg`** — the step, which is where both failures actually live.
+  Each is a shape the table cannot carry: *338 mV of droop* says nothing about how long the
+  output is out of regulation, and *to the 3.3 V rail* says nothing about how sharp the
+  release excursion is or that it is an over-voltage on thin-oxide devices.
+- **`ldo_capless_psrr.svg`** — rejection against frequency, with the four specification
+  points marked. Supply noise does not arrive at one frequency; the curve shows where
+  rejection collapses.
+
+⛔ The annotations on the step plot use **the bench's own measurement windows** (`FROM=20u
+TO=30u` for droop, `40u`–`50u` for overshoot). A global extremum instead labelled the droop
+1808 mV against a published 338 — a plot that disagrees with the table above it is worse
+than no plot.
 
 ## The check is the point
 

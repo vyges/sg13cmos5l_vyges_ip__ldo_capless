@@ -509,9 +509,100 @@ def plot_pm_pvt():
     return _svg(650, 380, body, "Phase margin over PVT")
 
 
+def _two_col(path):
+    rows = []
+    for line in open(path):
+        f = line.split()
+        if len(f) >= 2:
+            try:
+                rows.append((float(f[0]), float(f[1])))
+            except ValueError:
+                pass
+    return rows or None
+
+
+def plot_load_step():
+    """The load step, which is where this block's two failures actually live.
+
+    ⛔ Both misses are shapes, not scalars, and the table cannot carry either. "338 mV of
+    droop" says nothing about how long the output is out of regulation; "to the 3.3 V rail"
+    says nothing about how sharp the release excursion is or that it is an over-voltage on
+    thin-oxide devices rather than a settling wobble. A reader scoping this block into a
+    slot needs to see them.
+    """
+    p = os.path.join(ROOT, "sim", "step.csv")
+    if not os.path.isfile(p):
+        return None
+    rows = _two_col(p)
+    if not rows:
+        return None
+    pre = _meas("tb_ldo_perf.spice", "vo_pre")
+    tol = 120e-3
+    xs = [t * 1e6 for t, _ in rows]
+    body, px, py = _axes(70, 30, 620, 330, min(xs), max(xs), 0.6, 3.5,
+                         "time (µs)", "output voltage (V)", "{:.0f}", "{:.1f}")
+    # The specification is a band around the pre-step output, not a single line.
+    y_hi, y_lo = py(pre + tol), py(pre - tol)
+    body += (f'<rect x="70" y="{y_hi:.1f}" width="550" height="{y_lo-y_hi:.1f}" '
+             f'fill="#16a34a" opacity="0.10"/>\n'
+             f'<text x="76" y="{y_hi-5:.1f}" fill="#16a34a">±120 mV specified band</text>\n')
+    body += _series([(t * 1e6, v) for t, v in rows], px, py, "#2563eb", 1.5)
+    # ⛔ The SAME windows the bench measures over: `meas tran vo_droop MIN ... FROM=20u
+    # TO=30u` and `vo_over MAX ... FROM=40u TO=50u`. Taking a global extremum instead
+    # annotated the droop as 1808 mV against a published 338, because the trace dips
+    # elsewhere -- a plot that disagrees with the table it sits under is worse than none.
+    def _extreme(t0, t1, fn):
+        w = [(t, v) for t, v in rows if t0 <= t <= t1]
+        return min(w, key=lambda r: r[1]) if fn is min else max(w, key=lambda r: r[1])
+
+    t_lo, lo = _extreme(20e-6, 30e-6, min)
+    t_hi, hi = _extreme(40e-6, 50e-6, max)
+    t_lo *= 1e6
+    t_hi *= 1e6
+    for t, v, lab, col in ((t_lo, lo, f"droop {(pre-lo)*1e3:.0f} mV", "#dc2626"),
+                           (t_hi, hi, f"overshoot to {hi:.2f} V", "#dc2626")):
+        body += (f'<circle cx="{px(t):.1f}" cy="{py(v):.1f}" r="3.5" fill="{col}"/>\n'
+                 f'<text x="{px(t)+7:.1f}" y="{py(v)+4:.1f}" fill="{col}">{lab}</text>\n')
+    body += ('<text x="620" y="24" text-anchor="end" fill="#0f172a">'
+             '1 → 20 mA step at 20 µs, release at 40 µs</text>\n')
+    return _svg(650, 380, body, "Load-step response")
+
+
+def plot_psrr():
+    """Power-supply rejection against frequency, with the four specification points marked.
+
+    The single published figure is rejection at 1 kHz, but supply noise does not arrive at
+    one frequency. The curve shows where rejection actually collapses.
+    """
+    p = os.path.join(ROOT, "sim", "psrr.csv")
+    if not os.path.isfile(p):
+        return None
+    rows = _two_col(p)
+    if not rows:
+        return None
+    # psrr_db is db(v(vout)) for a 1 V supply perturbation, so rejection is its negation.
+    pts = [(math.log10(f), -d) for f, d in rows if f > 0]
+    body, px, py = _axes(70, 30, 620, 330, pts[0][0], pts[-1][0], 0, 80,
+                         "frequency (Hz)", "rejection (dB)", "1e{:.0f}", "{:.0f}")
+    body += _limit_line(40.0, px, py, 70, 620, "40 dB specified")
+    body += _series(pts, px, py, "#2563eb")
+    for key, f in (("psrr_1k", 1e3), ("psrr_10k", 1e4), ("psrr_100k", 1e5), ("psrr_1m", 1e6)):
+        try:
+            v = abs(_meas("tb_ldo_perf.spice", key))
+        except SystemExit:
+            continue
+        col = "#16a34a" if v >= 40 else "#dc2626"
+        body += f'<circle cx="{px(math.log10(f)):.1f}" cy="{py(v):.1f}" r="3.5" fill="{col}"/>\n'
+    body += ('<text x="620" y="24" text-anchor="end" fill="#0f172a">'
+             'marked points are the specification frequencies</text>\n')
+    return _svg(650, 380, body, "Power-supply rejection")
+
+
 PLOTS = [("bode", plot_bode, "Loop gain and phase at the binding load"),
          ("pm_vs_load", plot_pm_vs_load, "Phase margin across the load range"),
-         ("pm_pvt", plot_pm_pvt, "Phase margin over 243 PVT corners")]
+         ("pm_pvt", plot_pm_pvt, "Phase margin over 243 PVT corners"),
+         ("load_step", plot_load_step, "Load-step response — where both failures live"),
+         ("psrr", plot_psrr, "Power-supply rejection against frequency")]
 
 
 def footer():
