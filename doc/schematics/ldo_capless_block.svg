@@ -10,7 +10,7 @@
 <title>ldo_capless</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-281 993.74,-281 993.74,4 -4,4"/>
 <text xml:space="preserve" text-anchor="start" x="8" y="-263.55" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="11.00">Capless LDO — 3.3 V in, 1.0–1.8 V trimmed out</text>
-<text xml:space="preserve" text-anchor="start" x="8" y="-254.45" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#555555">All&#45;CMOS, internally compensated, no external capacitor. Slot budget ~520 × 250 µm.</text>
+<text xml:space="preserve" text-anchor="start" x="8" y="-254.45" font-family="Helvetica,sans-Serif" font-size="9.00" fill="#555555">All&#45;CMOS, internally compensated, no external capacitor. Slot budget ~530 × 310 µm.</text>
 <g id="clust1" class="cluster">
 <title>cluster_harness</title>
 <path fill="#fbfbfc" stroke="#9aa6b2" stroke-dasharray="5,2" d="M20,-8C20,-8 117.54,-8 117.54,-8 123.54,-8 129.54,-14 129.54,-20 129.54,-20 129.54,-229 129.54,-229 129.54,-235 123.54,-241 117.54,-241 117.54,-241 20,-241 20,-241 14,-241 8,-235 8,-229 8,-229 8,-20 8,-20 8,-14 14,-8 20,-8"/>
