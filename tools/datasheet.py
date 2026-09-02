@@ -311,6 +311,209 @@ def check():
     return 0
 
 
+# ---------------------------------------------------------------- plots
+#
+# Plots are emitted as SVG by hand rather than through matplotlib. The block's tooling is
+# stdlib-only and staying that way matters more than the extra features would: an SVG is
+# text, so it diffs and reviews like the rest of the repository, and there is no plotting
+# library whose version can change what a published figure looks like.
+
+def _svg(w, h, body, title):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+            f'viewBox="0 0 {w} {h}" font-family="sans-serif" font-size="12">\n'
+            f'<title>{title}</title>\n'
+            f'<rect width="{w}" height="{h}" fill="#ffffff"/>\n' + body + '</svg>\n')
+
+
+def _axes(x0, y0, x1, y1, xlo, xhi, ylo, yhi, xlabel, ylabel, xfmt="{:g}", yfmt="{:g}"):
+    """Frame, ticks and labels. Returns (svg, project) where project maps data -> pixels."""
+    def px(x):
+        return x0 + (x - xlo) / (xhi - xlo) * (x1 - x0)
+
+    def py(y):
+        return y1 - (y - ylo) / (yhi - ylo) * (y1 - y0)
+
+    s = [f'<rect x="{x0}" y="{y0}" width="{x1-x0}" height="{y1-y0}" fill="none" '
+         f'stroke="#334155" stroke-width="1"/>']
+    for i in range(6):
+        v = xlo + (xhi - xlo) * i / 5
+        s.append(f'<line x1="{px(v):.1f}" y1="{y1}" x2="{px(v):.1f}" y2="{y1+4}" stroke="#334155"/>')
+        s.append(f'<text x="{px(v):.1f}" y="{y1+18}" text-anchor="middle" fill="#334155">'
+                 f'{xfmt.format(v)}</text>')
+        if i:
+            s.append(f'<line x1="{px(v):.1f}" y1="{y0}" x2="{px(v):.1f}" y2="{y1}" '
+                     f'stroke="#e2e8f0" stroke-width="1"/>')
+    for i in range(6):
+        v = ylo + (yhi - ylo) * i / 5
+        s.append(f'<line x1="{x0-4}" y1="{py(v):.1f}" x2="{x0}" y2="{py(v):.1f}" stroke="#334155"/>')
+        s.append(f'<text x="{x0-8}" y="{py(v)+4:.1f}" text-anchor="end" fill="#334155">'
+                 f'{yfmt.format(v)}</text>')
+        if i:
+            s.append(f'<line x1="{x0}" y1="{py(v):.1f}" x2="{x1}" y2="{py(v):.1f}" '
+                     f'stroke="#e2e8f0" stroke-width="1"/>')
+    s.append(f'<text x="{(x0+x1)/2:.0f}" y="{y1+38}" text-anchor="middle" fill="#0f172a">{xlabel}</text>')
+    s.append(f'<text x="18" y="{(y0+y1)/2:.0f}" text-anchor="middle" fill="#0f172a" '
+             f'transform="rotate(-90 18 {(y0+y1)/2:.0f})">{ylabel}</text>')
+    return "\n".join(s) + "\n", px, py
+
+
+def _series(pts, px, py, colour, width=2):
+    d = " ".join(f"{'M' if i == 0 else 'L'}{px(x):.1f},{py(y):.1f}" for i, (x, y) in enumerate(pts))
+    return (f'<path d="{d}" fill="none" stroke="{colour}" stroke-width="{width}" '
+            f'stroke-linejoin="round"/>\n')
+
+
+def _limit_line(val, px, py, x0, x1, label, colour="#dc2626"):
+    """A specification limit, drawn so a reader can see the margin rather than compute it."""
+    y = py(val)
+    return (f'<line x1="{x0}" y1="{y:.1f}" x2="{x1}" y2="{y:.1f}" stroke="{colour}" '
+            f'stroke-width="1.5" stroke-dasharray="6 4"/>\n'
+            f'<text x="{x1-4}" y="{y-5:.1f}" text-anchor="end" fill="{colour}">{label}</text>\n')
+
+
+
+
+def plots_section(written):
+    """The figures, under the table. A table states a number; a plot shows the margin around
+    it, which is what a reader deciding whether to use the block actually needs."""
+    if not written:
+        return ""
+    out = ["", "## Plots", ""]
+    for slug, caption in written:
+        out += [f"### {caption}", "", f"![{caption}]({NAME}_{slug}.svg)", ""]
+    return "\n".join(out)
+
+
+
+LOADS = [("000u", 0.0), ("010u", 10e-6), ("030u", 30e-6), ("100u", 100e-6),
+         ("300u", 300e-6), ("001m", 1e-3), ("010m", 10e-3), ("050m", 50e-3)]
+
+
+def _loop_csv(tag):
+    p = os.path.join(ROOT, "sim", f"loop_{tag}.csv")
+    if not os.path.isfile(p):
+        return None
+    rows = []
+    for line in open(p):
+        f = line.split()
+        if len(f) >= 4:
+            try:
+                rows.append((float(f[0]), float(f[1]), float(f[3])))
+            except ValueError:
+                pass
+    return rows or None
+
+
+def plot_bode():
+    """Loop gain and phase at the load where the margin is thinnest.
+
+    An LDO's stability is not one number: the pass device's gm moves with load, so the
+    output pole moves with it. This is the binding load, and the plot shows the crossing
+    the phase margin is measured at rather than asserting the result.
+    """
+    worst, rows = None, None
+    for tag, _ in LOADS:
+        r = _loop_csv(tag)
+        if not r:
+            continue
+        pm = phase_margin(os.path.join(ROOT, "sim", f"loop_{tag}.csv"))
+        if pm and (worst is None or pm[1] < worst[1]):
+            worst, rows = (tag, pm[1], pm[0]), r
+    if not rows:
+        return None
+    tag, pm, fu = worst
+    lo, hi = math.log10(rows[0][0]), math.log10(rows[-1][0])
+    body, px, py = _axes(70, 30, 620, 210, lo, hi, -40, 130,
+                         "", "loop gain (dB)", "1e{:.0f}", "{:.0f}")
+    body += _limit_line(0, px, py, 70, 620, "0 dB", "#64748b")
+    body += _series([(math.log10(f), d) for f, d, _ in rows], px, py, "#2563eb")
+    body += (f'<line x1="{px(math.log10(fu)):.1f}" y1="30" x2="{px(math.log10(fu)):.1f}" '
+             f'y2="330" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 3"/>\n')
+    b2, px2, py2 = _axes(70, 250, 620, 330, lo, hi, -180, 0,
+                         "frequency (Hz)", "phase (deg)", "1e{:.0f}", "{:.0f}")
+    body += b2
+    body += _series([(math.log10(f), p) for f, _, p in rows], px2, py2, "#7c3aed")
+    body += (f'<text x="620" y="24" text-anchor="end" fill="#0f172a">'
+             f'{tag} load — crossover {fu/1e3:.0f} kHz, phase margin {pm:.1f}°</text>\n')
+    return _svg(650, 380, body, "Loop gain and phase")
+
+
+def plot_pm_vs_load():
+    """Phase margin across the load range.
+
+    ⛔ A no-load sweep does not bound this. The margin dips in the microamp decade and
+    recovers at milliamps, so the worst case sits in the middle of the range -- which is
+    why the corner sweep crosses load with process rather than stacking them.
+    """
+    pts = []
+    for tag, amps in LOADS:
+        p = os.path.join(ROOT, "sim", f"loop_{tag}.csv")
+        if os.path.isfile(p):
+            r = phase_margin(p)
+            if r:
+                pts.append((math.log10(max(amps, 1e-6)), r[1]))
+    if len(pts) < 2:
+        return None
+    body, px, py = _axes(70, 30, 620, 330, -6, -1.3, 40, 90,
+                         "load current (A)", "phase margin (deg)", "1e{:.1f}", "{:.0f}")
+    body += _limit_line(45.0, px, py, 70, 620, "45° specified")
+    body += _series(sorted(pts), px, py, "#2563eb")
+    for x, y in pts:
+        body += f'<circle cx="{px(x):.1f}" cy="{py(y):.1f}" r="3" fill="#2563eb"/>\n'
+    lo = min(p[1] for p in pts)
+    body += (f'<text x="620" y="24" text-anchor="end" fill="#0f172a">'
+             f'worst {lo:.1f}° in the microamp decade, not at no load</text>\n')
+    return _svg(650, 380, body, "Phase margin against load")
+
+
+def plot_pm_pvt():
+    """Every PVT corner's phase margin, as a distribution against the specification.
+
+    243 corners is too many to tabulate and the worst one is the only number that matters,
+    but a reader deciding whether to use the block wants to see how much of the population
+    sits near the limit rather than only how far the tail reaches.
+    """
+    d = os.path.join(ROOT, "sim", "pvt")
+    if not os.path.isdir(d):
+        return None
+    pms = []
+    for f in sorted(os.listdir(d)):
+        if f.endswith(".csv"):
+            r = phase_margin(os.path.join(d, f))
+            if r:
+                pms.append(r[1])
+    if not pms:
+        return None
+    lo, hi = 40, 90
+    nb = 25
+    bins = [0] * nb
+    for v in pms:
+        i = min(nb - 1, max(0, int((v - lo) / (hi - lo) * nb)))
+        bins[i] += 1
+    body, px, py = _axes(70, 30, 620, 330, lo, hi, 0, max(bins) * 1.15,
+                         "phase margin (deg)", "corners", "{:.0f}", "{:.0f}")
+    w = (620 - 70) / nb
+    for i, c in enumerate(bins):
+        if not c:
+            continue
+        x = 70 + i * w
+        colour = "#dc2626" if lo + (i + 1) * (hi - lo) / nb <= 45 else "#2563eb"
+        body += (f'<rect x="{x+1:.1f}" y="{py(c):.1f}" width="{w-2:.1f}" '
+                 f'height="{330-py(c):.1f}" fill="{colour}" opacity="0.75"/>\n')
+    body += _limit_line(0, px, py, 70, 620, "", "#ffffff")
+    body += (f'<line x1="{px(45):.1f}" y1="30" x2="{px(45):.1f}" y2="330" '
+             f'stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>\n'
+             f'<text x="{px(45)+6:.1f}" y="46" fill="#dc2626">45° specified</text>\n')
+    body += (f'<text x="620" y="24" text-anchor="end" fill="#0f172a">'
+             f'{len(pms)} corners — worst {min(pms):.1f}°, none below specification</text>\n')
+    return _svg(650, 380, body, "Phase margin over PVT")
+
+
+PLOTS = [("bode", plot_bode, "Loop gain and phase at the binding load"),
+         ("pm_vs_load", plot_pm_vs_load, "Phase margin across the load range"),
+         ("pm_pvt", plot_pm_pvt, "Phase margin over 243 PVT corners")]
+
+
 def footer():
     """Attribution line for the generated sheet.
 
@@ -331,11 +534,21 @@ def main():
         return check()
     d = os.path.join(ROOT, "doc", "datasheet")
     os.makedirs(d, exist_ok=True)
+    written = []
+    for slug, fn, caption in PLOTS:
+        svg = fn()
+        if svg is None:
+            print(f"skipped plot {slug}: its inputs are absent")
+            continue
+        q = os.path.join(d, f"{NAME}_{slug}.svg")
+        open(q, "w").write(svg)
+        written.append((slug, caption))
+        print(f"wrote {os.path.relpath(q, ROOT)}")
     # Only `schematic` exists today. layout/pex/rcx appear here as soon as there is a
     # layout to extract, with the same rows and the physical ones no longer Skipped.
     for source in ("schematic",):
         p = os.path.join(d, f"{NAME}_{source}.md")
-        open(p, "w").write(table(source) + footer())
+        open(p, "w").write(table(source) + plots_section(written) + footer())
         print(f"wrote {os.path.relpath(p, ROOT)}")
     return 0
 

@@ -32,6 +32,28 @@ schematic/symbol SVGs. Neither pays off before there is a layout, and the physic
 come from the Loom engines when there is one — `vacuous` maps to Skip, a violation count to
 the value.
 
+## Plots
+
+Three, each showing something the table cannot:
+
+- **`ldo_capless_bode.svg`** — loop gain and phase at the load where the margin is
+  thinnest, so the crossing the phase margin is measured at is visible rather than asserted.
+- **`ldo_capless_pm_vs_load.svg`** — margin across the load range. ⛔ A no-load sweep does
+  not bound this: the margin dips in the microamp decade and recovers at milliamps, so the
+  worst case sits in the middle. That is why the corner sweep crosses load with process
+  rather than stacking them.
+- **`ldo_capless_pm_pvt.svg`** — all 243 corners as a distribution against the 45° line.
+  The worst corner is the only number that matters, but a reader deciding whether to use
+  the block wants to see how much of the population sits near the limit.
+
+Hand-written SVG, not matplotlib: the block's tooling is stdlib-only, an SVG diffs and
+reviews like the rest of the repository, and no plotting library's version can quietly
+change what a published figure looks like.
+
+⏳ Not yet plotted: the load-step transient, which would show the droop and overshoot
+misses directly. `tb_ldo_perf.spice` measures them but writes no waveform, so that needs a
+`wrdata` added to the bench first — the figure should not exist before the data does.
+
 ## The check is the point
 
 🔑 **Every figure is derived, never transcribed.** `--check` parses the table in `README.md`
