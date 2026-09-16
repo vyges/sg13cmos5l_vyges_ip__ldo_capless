@@ -753,12 +753,29 @@ Stated here rather than left to be discovered:
 1. **Close the last degree of phase margin** — see the open question below. Dropout,
    quiescent current and output accuracy all pass; this is the only remaining
    small-signal gap and everything cheap has been tried.
-2. **Size `Cout` against the load-step DROOP rather than against area.** 20 pF was chosen
-   as 6.6 % of the slot, and droop genuinely is a charge problem: a 1 µs, 19 mA step is
-   19 nC against 20 pF. This needs a number from the review — what step must be survived,
-   and at what droop. ⛔ It does **not** answer the release overshoot, which the sweep above
-   shows is a rate threshold in the gate pull-up; sizing `Cout` for droop would leave the
-   over-voltage exactly where it is.
+2. ⛔ **`Cout` DOES NOT FIX THE DROOP — measured, and this item used to say it would.**
+   The premise here was that droop "genuinely is a charge problem: a 1 µs, 19 mA step is
+   19 nC against 20 pF", so growing `Cout` would buy it back. Sweeping `Cout` says otherwise:
+
+   | `Cout` | area | droop | release overshoot | PM, no load |
+   | --- | --- | --- | --- | --- |
+   | 125 µm (20 pF, today) | 15 625 µm² | 338.2 mV | 235.5 mV | 58.98° |
+   | 150 µm (×1.44) | 22 500 µm² | 338.3 mV | 237.1 mV | 60.11° |
+   | 177 µm (×2.01) | 31 329 µm² | 338.4 mV | 246.4 mV | 60.96° |
+   | 210 µm (×2.82) | 44 100 µm² | **338.5 mV** | 262.2 mV | 61.26° |
+
+   **Nearly tripling the output capacitor moves the droop by 0.3 mV — in the wrong
+   direction** — while costing 17 % of the slot. ✅ The same netlist edit moved the release
+   overshoot by 27 mV and the no-load phase margin by 2.3°, so the substitution demonstrably
+   took effect; droop is simply insensitive to it. That is the internal control that makes
+   this a result rather than a failed experiment.
+
+   ⟹ Droop is **not** charge-limited, and it needs the same treatment the release overshoot
+   got: find the mechanism before proposing a fix. The one thing now known is that the fix is
+   not more `Cout`, and 17 % of the slot does not have to be reserved for it.
+
+   ⚠️ The review question — what step must actually be survived, and at what droop — still
+   stands, and is now the ONLY lever on this row until a mechanism is found.
 3. **Re-run PVT once 1 and 2 are settled** — both change the operating point, and the
    corner sweep is the only thing that has caught a regression here so far.
 4. **Monte-Carlo the trim divider and the reference**, which no run has covered yet.
