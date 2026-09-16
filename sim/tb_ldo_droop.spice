@@ -1,0 +1,128 @@
+* tb_ldo_droop -- DIAGNOSTIC. Find the mechanism behind the 338 mV load-step droop.
+*
+* WHAT IS ALREADY KNOWN, and it is mostly what the droop is NOT.
+*
+*   ⛔ It is not charge into Cout. Sweeping Cout from 20 pF to 56 pF -- nearly tripling it,
+*   17 % more of the slot -- moves the droop from 338.2 mV to 338.5 mV. The wrong direction,
+*   by 0.3 mV. The same netlist edit moved the release overshoot by 27 mV and the no-load
+*   phase margin by 2.3 deg, so the substitution took effect and the droop is simply
+*   insensitive to it. That kills the account the design documents carried for months.
+*
+*   ✅ The RELEASE was a dI/dt threshold in the gate PULL-UP: XM6 sourcing ~5 uA into ~50 pF
+*   of XCm plus 6400 um of pass-device gate, 0.10-0.13 V/us. The droop is that story's mirror
+*   image -- the loop has to pull eout DOWN instead -- and the obvious guess is that the same
+*   asymmetry limits it. ⚠️ But pulling eout down is XM5, an nMOS common-source stage that can
+*   sink far more than 5 uA, so the guess predicts a droop much SMALLER than 338 mV. Two
+*   plausible hand calculations disagree with each other by two orders of magnitude here,
+*   which is exactly why this is a bench and not an argument.
+*
+* WHAT THIS MEASURES. The load edge runs 20->21 us and vo_droop is taken at its end, so every
+* window below is inside that microsecond:
+*
+*   eo_dn_*   eout slew while the load ramps on      -- the pull-DOWN rate, the thing in doubt
+*   eo1_max   does the first stage saturate          -- if eout1 rails, the amp is slewing
+*   vfb_min   how far the feedback node is driven    -- >50 mV of error means the input pair
+*                                                       is fully steered, i.e. slew not gain
+*   ip_*      pass-device current against time       -- does it track the load or lag it
+*
+* 🔑 THE DISCRIMINATOR. If the droop is slew-limited, eout's down-rate is roughly constant
+* while the output falls and the pass current ramps LINEARLY, lagging the load. If instead it
+* is a gain or bandwidth limit, eout tracks the error continuously and the pass current
+* follows the load shape rather than a ramp. The two look completely different on ip(t) and
+* that is what the CSV is for.
+*
+* ============================ WHAT THIS BENCH FOUND ============================
+*
+* ✅ ESTABLISHED, and it is a lever nobody had: droop falls with the ERROR AMPLIFIER's tail
+* current, and Cout has nothing to do with it.
+*
+*   XMtail   tail    droop     release overshoot   Iq
+*   4u       10 uA   338.2 mV  235.5 mV            41.5 uA   <- as drawn
+*   6u       15 uA   264.8 mV  221.6 mV            46.4 uA
+*   8u       20 uA   226.3 mV  212.7 mV            51.2 uA
+*   12u      30 uA   183.8 mV  203.1 mV            60.8 uA   <- over the 60 uA budget
+*
+* ⛔ So the 120 mV target is NOT reachable this way. The 60 uA quiescent budget caps the tail
+* at about 8u, which buys 226 mV, and the curve is flattening -- 338, 265, 226, 184 for
+* 10, 15, 20, 30 uA. Useful, quantified, and not sufficient on its own.
+*
+* ⛔ AND THE MECHANISM IS NOT THE ONE THIS HEADER ORIGINALLY GUESSED. The arithmetic for
+* "droop is eout slewing into Cm at I_tail/Cm" closed almost perfectly: 0.2525 V/us x 47.9 pF
+* = 12.1 uA against a ~10 uA tail, and the release's 0.115 V/us x 47.9 pF = 5.5 uA against
+* XM6's ~5 uA, with a measured ratio of 2.20 against a predicted 2.0. It is still wrong.
+*
+* Comparing the eout TRAJECTORY at 4u and 12u kills it -- the slopes are identical at every
+* point through the load edge (0.329/0.331, 0.241/0.242, 0.198/0.198, 0.172/0.172 V/us) and
+* eout lands within 0.6 mV of the same place at 21 us -- while vout droops 0.8706 V against
+* 1.0301 V. Same gate waveform, 160 mV of extra droop. Whatever sets the droop, it is not the
+* rate at which eout moves.
+*
+* 🔑 The clue that makes that less paradoxical than it sounds: with only 20 pF on the output,
+* vout is the INTEGRAL of the difference between two large, nearly equal currents. A 0.5 mA
+* imbalance sustained for a microsecond is 25 V across 20 pF. So the output can differ hugely
+* while the gate that controls it looks unchanged, and a mechanism story told in terms of
+* eout's waveform is looking at the wrong signal.
+*
+* ⏸️ NOT EXPLAINED, and deliberately left that way rather than written up as a story that
+* happens to fit. The next probe should measure the pass-device CURRENT directly against the
+* load current, not the gate voltage -- the deficit between them is the thing that integrates
+* into the droop, and it is the one quantity nothing here has looked at.
+*
+* Run: cd sim && ngspice -b tb_ldo_droop.spice
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 DC 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+* Limiter OFF, as in tb_ldo_perf: with it on, XMlim is a second pull-up on eout and the
+* measurement stops being about the amplifier.
+Vilim   ilim_en 0 0
+Ibias   0       ibias DC 1u
+Iload   vout    0 PULSE(1m 20m 20u 1u 1u 20u 60u)
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  * 1 ns steps: the whole event is one microsecond and the published bench samples at 20 ns,
+  * which is too coarse to read a slew rate off.
+  tran 1n 30u
+
+  meas tran vo_pre   FIND v(vout) AT=19u
+  meas tran vo_min   MIN  v(vout) FROM=20u TO=30u
+  meas tran eo_pre   FIND v(eout) AT=19u
+  meas tran eo_end   FIND v(eout) AT=21u
+  meas tran eo_min   MIN  v(eout) FROM=20u TO=30u
+
+  * eout's down-slew, sampled across the middle of the load edge where it should be steepest.
+  meas tran eo_d1 FIND v(eout) AT=20.2u
+  meas tran eo_d2 FIND v(eout) AT=20.7u
+  let eo_slew_dn = (eo_d1 - eo_d2) / 0.5
+  print eo_slew_dn
+
+  * First stage: if eout1 is driven to a rail the amplifier is slewing, not amplifying.
+  meas tran eo1_pre FIND v(x_amp.eout1) AT=19u
+  meas tran eo1_max MAX  v(x_amp.eout1) FROM=20u TO=22u
+  meas tran vfb_min MIN  v(vfb) FROM=20u TO=22u
+  meas tran vref_v  FIND v(vref) AT=19u
+
+  * How long after the load settles does the output take to come back.
+  meas tran t_rec WHEN v(vout)=1.2 RISE=1
+  print vo_pre vo_min eo_pre eo_end eo_min eo1_pre eo1_max vfb_min vref_v t_rec
+
+  * The shape is the discriminator, so write it. ip is the pass-device current: everything
+  * Iload does not take out of Cout has to come through the pass device.
+  wrdata droop.csv v(vout) v(eout) v(x_amp.eout1) v(vfb) i(Vin)
+.endc
+.end
