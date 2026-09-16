@@ -1,0 +1,118 @@
+* tb_ldo_ovboost -- PROTOTYPE evaluation of the OVER-VOLTAGE slew boost (ldo_ovboost.tpl).
+*
+* Same rows as tb_ldo_boost so the two are directly comparable, against the same no-boost
+* control. The netlist it reads is the variant with the vref divider tapped -- see ovboost.sh.
+*
+* Judges a candidate sizing on everything it could break, in one run, because the previous
+* intervention passed the transient and failed the loop:
+*
+*   iq      quiescent current            published 35.8 uA against a 60 uA budget
+*   ov7..20 release overshoot            the defect being fixed
+*   vd20    load-step droop              must not get worse; the boost is one-directional
+*   psrr_1k supply rejection at 1 kHz    already a miss at 35.1 dB against 40
+*   vstart  output after an enable ramp  ⛔ the boost senses dv/dt on vout, and startup IS
+*                                        a dv/dt on vout -- if it fires there it fights the
+*                                        block coming up, and nothing else in this bench
+*                                        would notice
+*
+* Phase margin is NOT here: it needs the loop broken at the feedback node, which is a
+* different netlist. tb_ldo_ac_boost.spice does that, and no sizing counts until both agree.
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless_ov.spice
+.include ldo_boost.spice
+
+Vin     vin     0 DC 3.3 AC 1
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+* en is declared as a PULSE that is CONSTANT at 1.2 V, so every analysis below runs
+* enabled, and the startup case alters the low level to 0 rather than redeclaring the
+* source. Declaring it DC and altering it later cannot work: `alter @Ven[pulse]` needs the
+* pulse parameters to exist on the instance.
+Ven     en      0 PULSE(1.2 1.2 20u 1u 1u 200u 400u)
+Vilim   ilim_en 0 0
+Ibias   0       ibias DC 1u
+Iload   vout    0 PULSE(1m 7m 20u 1u 1u 20u 60u)
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  alter @Iload[pulse] = [ 0 0 20u 1u 1u 20u 60u ]
+  op
+  let iq = -i(Vin)
+  print iq
+  print v(vout)
+  * The boost's own DC state, printed so a sizing that is quietly conducting at the
+  * operating point is visible as a number rather than as an unexplained iq.
+  * The comparator's DC state. ⛔ The whole design rests on XMpb being OFF here: nx must sit
+  * near vin, and vfb must sit BELOW vref_ov by the designed offset. If either is untrue the
+  * boost is contributing gm to the loop at the operating point, which is exactly what a
+  * wider XM6 did and why it failed the corner sweep.
+  print v(nx) v(ng) v(eout) v(vfb) v(vref) v(vref_ov) v(nbd) v(ptb)
+
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre FIND v(vout) AT=19u
+  meas tran ov7  MAX  v(vout) FROM=41u TO=52u
+  meas tran vd7  MIN  v(vout) FROM=20u TO=30u
+  * Peak excursion of the boost node itself: says whether it fired at all. A sizing that
+  * does nothing and a sizing that works both leave ov7 looking plausible on some steps.
+  meas tran nxmax MAX v(nx) FROM=41u TO=52u
+  meas tran ngmin MIN v(ng) FROM=41u TO=52u
+  meas tran vfbmax MAX v(vfb) FROM=41u TO=52u
+  * ⛔ And that it stays off through the DROOP, which is the failure that killed the previous
+  * version. Here that means ng must NOT dip while the output is below nominal and recovering.
+  meas tran ngdroop MIN v(ng) FROM=20u TO=40u
+
+  alter @Iload[pulse] = [ 1m 10m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran ov10 MAX v(vout) FROM=41u TO=52u
+
+  alter @Iload[pulse] = [ 1m 14m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran ov14 MAX v(vout) FROM=41u TO=52u
+
+  alter @Iload[pulse] = [ 1m 20m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran ov20 MAX v(vout) FROM=41u TO=52u
+  meas tran vd20 MIN v(vout) FROM=20u TO=30u
+  wrdata ovboost_step.csv v(vout) v(eout) v(nx) v(ng) v(vfb)
+
+  alter @Iload[pulse] = [ 1m 1m 20u 1u 1u 20u 60u ]
+  ac dec 20 10 100meg
+  let psrr_db = db(v(vout))
+  meas ac psrr_1k  FIND psrr_db AT=1k
+  meas ac psrr_10k FIND psrr_db AT=10k
+
+  * ---- STARTUP. ⛔ THE CHECK THIS BLOCK MAKES NECESSARY. The boost fires on dv/dt at
+  * vout, and bringing the block up IS a dv/dt at vout -- a boost that cannot tell the two
+  * apart turns the pass device off while the output is trying to rise, and nothing else
+  * in this bench would see it.
+  *
+  * ⚠️ The repository has no startup transient to borrow: tb_ldo_status exercises enable as
+  * two DC operating points, enabled and disabled, which cannot show this at all.
+  *
+  * en steps at 20 us, from a t=0 operating point with the block DISABLED -- so this is a
+  * real cold start, not a settled circuit being nudged. No `uic`: the first attempt used
+  * it and the output integrated to -1.03 V, which is the solver starting from zero with
+  * no operating point, not a circuit failure.
+  alter @Iload[pulse] = [ 1m 1m 0 1u 1u 200u 400u ]
+  alter @Ven[pulse] = [ 0 1.2 20u 1u 1u 200u 400u ]
+  tran 20n 80u
+  meas tran vstart FIND v(vout) AT=75u
+  meas tran vstpk  MAX  v(vout) FROM=20u TO=80u
+  * When the output first reaches regulation. A boost that fights startup shows up here as
+  * a longer time, before it shows up anywhere else.
+  meas tran tstart WHEN v(vout)=1.15 RISE=1
+  print vstart vstpk tstart
+.endc
+.end
