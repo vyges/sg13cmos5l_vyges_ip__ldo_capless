@@ -40,14 +40,14 @@
 <text x="18" y="180" text-anchor="middle" fill="#0f172a" transform="rotate(-90 18 180)">phase margin (deg)</text>
 <line x1="70" y1="300.0" x2="620" y2="300.0" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="616" y="295.0" text-anchor="end" fill="#dc2626">45° specified</text>
-<path d="M70.0,214.9 L187.0,220.7 L242.9,211.1 L304.0,173.6 L359.9,136.9 L421.1,113.4 L538.1,97.1 L619.9,92.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
-<circle cx="70.0" cy="214.9" r="3" fill="#2563eb"/>
-<circle cx="187.0" cy="220.7" r="3" fill="#2563eb"/>
-<circle cx="242.9" cy="211.1" r="3" fill="#2563eb"/>
-<circle cx="304.0" cy="173.6" r="3" fill="#2563eb"/>
-<circle cx="359.9" cy="136.9" r="3" fill="#2563eb"/>
-<circle cx="421.1" cy="113.4" r="3" fill="#2563eb"/>
-<circle cx="538.1" cy="97.1" r="3" fill="#2563eb"/>
-<circle cx="619.9" cy="92.7" r="3" fill="#2563eb"/>
-<text x="620" y="24" text-anchor="end" fill="#0f172a">worst 58.2° in the microamp decade, not at no load</text>
+<path d="M70.0,216.1 L187.0,222.7 L242.9,213.8 L304.0,176.8 L359.9,140.1 L421.1,116.5 L538.1,100.1 L619.9,95.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+<circle cx="70.0" cy="216.1" r="3" fill="#2563eb"/>
+<circle cx="187.0" cy="222.7" r="3" fill="#2563eb"/>
+<circle cx="242.9" cy="213.8" r="3" fill="#2563eb"/>
+<circle cx="304.0" cy="176.8" r="3" fill="#2563eb"/>
+<circle cx="359.9" cy="140.1" r="3" fill="#2563eb"/>
+<circle cx="421.1" cy="116.5" r="3" fill="#2563eb"/>
+<circle cx="538.1" cy="100.1" r="3" fill="#2563eb"/>
+<circle cx="619.9" cy="95.7" r="3" fill="#2563eb"/>
+<text x="620" y="24" text-anchor="end" fill="#0f172a">worst 57.9° in the microamp decade, not at no load</text>
 </svg>

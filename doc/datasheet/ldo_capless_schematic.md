@@ -4,19 +4,19 @@
 
 | Parameter | Unit | Min Limit | Min Value | Typ Value | Max Limit | Max Value | Status |
 | :-------- | :--- | --------: | --------: | --------: | --------: | --------: | :----: |
-| Output voltage, mid code | V | 1.100 V | 1.209 V | 1.209 V | 1.300 V | 1.215 V | Pass ✅ |
+| Output voltage, mid code | V | 1.100 V | 1.208 V | 1.209 V | 1.300 V | 1.214 V | Pass ✅ |
 | Output trim range, low code | V | any | 1.000 V | 1.000 V | 1.050 V | 1.000 V | Pass ✅ |
-| Output trim range, high code | V | 1.750 V | 1.798 V | 1.798 V | any | 1.798 V | Pass ✅ |
+| Output trim range, high code | V | 1.750 V | 1.797 V | 1.797 V | any | 1.797 V | Pass ✅ |
 | Line regulation | mV/V | any | 0.382 mV/V | 0.382 mV/V | 5.000 mV/V | 0.382 mV/V | Pass ✅ |
-| Load regulation, 0-48 mA | mV | any | 0.260 mV | 0.260 mV | 20.000 mV | 0.260 mV | Pass ✅ |
-| Dropout at 50 mA | mV | any | 149.329 mV | 149.329 mV | 250.000 mV | 149.329 mV | Pass ✅ |
-| Quiescent current, enabled | uA | any | 31.853 uA | 35.806 uA | 60.000 uA | 38.876 uA | Pass ✅ |
+| Load regulation, 0-48 mA | mV | any | 0.270 mV | 0.270 mV | 20.000 mV | 0.270 mV | Pass ✅ |
+| Dropout at 50 mA | mV | any | 149.736 mV | 149.736 mV | 250.000 mV | 149.736 mV | Pass ✅ |
+| Quiescent current, enabled | uA | any | 37.080 uA | 41.533 uA | 60.000 uA | 44.837 uA | Pass ✅ |
 | Current limit trip | mA | any | 58.499 mA | 58.499 mA | 60.000 mA | 58.499 mA | Pass ✅ |
-| Phase margin over PVT | deg | 45.000 deg | 45.617 deg | 65.390 deg | any | 75.097 deg | Pass ✅ |
+| Phase margin over PVT | deg | 45.000 deg | 45.097 deg | 64.842 deg | any | 74.716 deg | Pass ✅ |
 | PSRR at 1 kHz | dB | 40.000 dB | 35.067 dB | 35.067 dB | any | 35.067 dB | Fail ❌ |
-| Load-step droop, 1-20 mA | mV | any | 338.120 mV | 338.120 mV | 120.000 mV | 338.120 mV | Fail ❌ |
-| Load-release overshoot | mV | any | 2083.310 mV | 2083.310 mV | 120.000 mV | 2083.310 mV | Fail ❌ |
-| Load step meeting ±120 mV | mA | 1.000 mA | 3.000 mA | 3.000 mA | any | 3.000 mA | Pass ✅ |
+| Load-step droop, 1-20 mA | mV | any | 338.241 mV | 338.241 mV | 120.000 mV | 338.241 mV | Fail ❌ |
+| Load-release overshoot | mV | any | 235.610 mV | 235.610 mV | 120.000 mV | 235.610 mV | Fail ❌ |
+| Load step meeting ±120 mV | mA | 1.000 mA | 2.000 mA | 2.000 mA | any | 2.000 mA | Pass ✅ |
 | Area | um2 | any | ​ | ​ | 164300.000 um2 | ​ | Skip 🟧 |
 | Magic DRC | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |
 | Netgen LVS | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |

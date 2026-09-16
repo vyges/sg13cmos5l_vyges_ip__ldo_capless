@@ -290,6 +290,13 @@ PUBLISHED_AS = {
     "Phase margin over PVT": ("Phase margin, worst over PVT", 0),
     "PSRR at 1 kHz": ("**PSRR at 1 kHz**", 0),
     "Load-step droop, 1-20 mA": ("**Load-step droop, 1 \u2192 20 mA**", 0),
+    # ⛔ These two were computed by rows() and emitted into the datasheet, but were NOT in
+    # this map -- so README could say anything about them and the build stayed green. The
+    # release overshoot is the figure this block's whole open defect is about, and for
+    # months it read "to the 3.3 V rail", which has no number in it for a checker to compare
+    # against. It could not be guarded until the boost gave it a value. Guarded now.
+    "Load-release overshoot": ("**Load-release overshoot, 20 \u2192 1 mA**", 0),
+    "Load step meeting \u00b1120 mV": ("Load step meeting \u00b1120 mV", 0),
 }
 
 NUM = re.compile(r"[-+]?\d+\.?\d*")

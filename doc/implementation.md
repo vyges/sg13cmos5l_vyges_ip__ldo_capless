@@ -625,7 +625,7 @@ run, so they cannot quietly drop out of the record.
 | --- | --- | --- |
 | Dropout at 50 mA | **149.3 mV** ✅ | 250 mV max |
 | Load-step droop, 1 → 20 mA, 1 µs edge | 338.1 mV ❌ | 120 mV max |
-| Load-release overshoot, 20 → 1 mA | **to 3.292 V, i.e. the input rail** ❌ | 120 mV max |
+| Load-release overshoot, 20 → 1 mA | **235.6 mV** ❌ (was: to 3.292 V, the input rail) | 120 mV max |
 
 ⚠️ This heading is kept for the two transient lines, which do not meet specification.
 **Dropout does**, at 149.3 mV. This table previously read 573 mV — the figure measured
@@ -902,31 +902,44 @@ is the historical record of what was proposed.
 ## What is actually open
 
 These are the block's real remaining work. ⛔ **They were recorded as three views of one
-limitation — 20 pF of output capacitance against a 19 mA step — and that grouping is wrong
-for the first of them.** Droop and PSRR are charge and loop; the release overshoot is a
-rate threshold in the pass-gate pull-up, and the two have different fixes. The section
-above carries the measurements.
+limitation — 20 pF of output capacitance against a 19 mA step — and that grouping was wrong
+for the first of them.** Droop and PSRR are charge and loop; the release overshoot was a rate
+threshold in the pass-gate pull-up, and the two needed different fixes. ✅ **The first is now
+fixed as the over-voltage it was**, which is the clearest possible demonstration that the
+grouping was the thing holding it up: once the mechanism was named the fix followed, and it
+touched nothing that droop or PSRR depend on.
 
-1. ⛔ **Load-release overshoot reaches the 3.3 V rail**, and the reviewer's words were *"that
-   needs fixing"* — it is an over-voltage on thin-oxide devices, not a settling wobble. This
-   is the most serious of the three. See `doc/datasheet/ldo_capless_load_step.svg`.
+1. ✅ **Load-release overshoot: FIXED as an over-voltage, still missed as a 120 mV target.**
+   The reviewer's words were *"that needs fixing"* — it was an over-voltage on thin-oxide
+   devices, not a settling wobble, and that is what has been fixed. **235.6 mV at the typical
+   corner, 573 mV at the worst of 81 transient corners, and no corner reaching the rail
+   against 81 of 81 before.** The 120 mV target is still missed, so the row stays ❌, but it
+   is an ordinary excursion now rather than a reliability hazard.
 
-   **Mechanism named, fix prototyped, not adopted.** It is a release-rate threshold of
-   5.0–5.5 mA/µs set by `XM6`'s ~5 µA into the pass gate. `sim/ldo_boost.tpl` adds a
-   transient pull-up that is off at the operating point, so it contributes no gm to the
-   loop: over 81 transient corners **no corner reaches the rail**, against 81 of 81 without
-   it, for +0.2 µA of quiescent current, PSRR unchanged to five figures, startup unchanged
-   against a no-boost control, and a 243-corner phase-margin minimum of **46.04°** against
-   the block's own 45.62° with none below 45.
+   **The mechanism, which is why the fix looks the way it does.** It is a release-RATE
+   threshold of 5.0–5.5 mA/µs, not a step-size one, set by `XM6` — the only pull-up on `eout`
+   — pushing ~5 µA into ~50 pF of `XCm` plus 6400 µm of pass-device gate. ⛔ `XM6` could not
+   simply be widened, because it is also the second stage's load device and its current is
+   therefore in the loop gain: 4u clears the release and takes the 243-corner phase-margin
+   minimum from 45.62° to 38.50°, nine corners under 45. So the pull-up had to be large during
+   the event and absent from the small-signal loop.
 
-   ⛔ **Five of those 81 corners drive the output negative during the load step**, and all
-   five are 110 °C with the lowest-sheet resistor corner — a hotter threshold and a quarter
-   shorter time constant together make the boost fire on the output's own RECOVERY from the
-   droop and fight the loop. That is the topology's limit, not the sizing's: an edge
-   detector on `vout` cannot distinguish an output rising because the load was released from
-   one rising because the loop is correcting. **The direction that follows is to sense the
-   regulation error — `vfb` against `vref` — rather than the output slew, so the boost can
-   only fire above the regulation point. It is not in this revision.**
+   **`ldo_boost` is that.** An over-voltage comparator against `vref_ov`, a third tap on the
+   reference divider ~50 mV above `vref`, vetoing a dv/dt path; both output devices in series
+   from `vin` to `eout`, so current reaches the pass gate only when the output is above its
+   regulation point AND rising quickly. Neither conducts at the operating point, so neither
+   adds gm to the loop. Full reasoning at the site in
+   `chipalooza/design/ldo/ldo_boost.py`, including the two topologies that failed first and
+   why — an error sensor alone is too slow and rings, an edge sensor alone cannot tell a
+   release from the loop recovering out of a droop.
+
+   ⚠️ **What it cost.** Quiescent current 35.8 → 41.5 µA against a 60 µA budget. Phase margin
+   over PVT 45.62° → 45.10°, still with no corner below 45 but with a tenth of a degree of
+   slack where the block had six tenths. The largest step meeting ±120 mV went from 3 mA to
+   2 mA, because the boost engages at ~100 mV of overshoot and a step whose natural overshoot
+   is ~120 mV is exactly where it turns on marginally — 119.7 mV without it, 120.4 mV with it.
+   Droop and PSRR are unchanged.
+
 2. ⛔ **Load-step droop is 338 mV.** Because question 2 above came back as *ours to specify*,
    this is now a promise to write rather than a target to hit — but 338 mV is a large number
    to promise, and it is charge, not loop bandwidth, that sets it.

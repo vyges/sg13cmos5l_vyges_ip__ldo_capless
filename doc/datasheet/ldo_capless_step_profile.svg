@@ -40,22 +40,22 @@
 <text x="18" y="180" text-anchor="middle" fill="#0f172a" transform="rotate(-90 18 180)">excursion from nominal (mV)</text>
 <line x1="70" y1="315.0" x2="620" y2="315.0" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>
 <text x="616" y="310.0" text-anchor="end" fill="#dc2626">±120 mV</text>
-<path d="M125.0,323.1 L152.5,318.7 L207.5,312.4 L262.5,307.7 L345.0,302.1 L620.0,287.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
-<path d="M125.0,321.9 L152.5,315.0 L207.5,301.1 L262.5,71.7 L345.0,70.4 L620.0,69.6" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
+<path d="M125.0,323.1 L152.5,318.7 L207.5,312.4 L262.5,307.7 L345.0,302.0 L620.0,287.7" fill="none" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/>
+<path d="M125.0,321.9 L152.5,314.9 L207.5,309.9 L262.5,307.9 L345.0,306.0 L620.0,300.6" fill="none" stroke="#dc2626" stroke-width="2" stroke-linejoin="round"/>
 <circle cx="125.0" cy="323.1" r="3" fill="#2563eb"/>
 <circle cx="125.0" cy="321.9" r="3" fill="#dc2626"/>
 <circle cx="152.5" cy="318.7" r="3" fill="#2563eb"/>
-<circle cx="152.5" cy="315.0" r="3" fill="#dc2626"/>
+<circle cx="152.5" cy="314.9" r="3" fill="#dc2626"/>
 <circle cx="207.5" cy="312.4" r="3" fill="#2563eb"/>
-<circle cx="207.5" cy="301.1" r="3" fill="#dc2626"/>
+<circle cx="207.5" cy="309.9" r="3" fill="#dc2626"/>
 <circle cx="262.5" cy="307.7" r="3" fill="#2563eb"/>
-<circle cx="262.5" cy="71.7" r="3" fill="#dc2626"/>
-<circle cx="345.0" cy="302.1" r="3" fill="#2563eb"/>
-<circle cx="345.0" cy="70.4" r="3" fill="#dc2626"/>
+<circle cx="262.5" cy="307.9" r="3" fill="#dc2626"/>
+<circle cx="345.0" cy="302.0" r="3" fill="#2563eb"/>
+<circle cx="345.0" cy="306.0" r="3" fill="#dc2626"/>
 <circle cx="620.0" cy="287.7" r="3" fill="#2563eb"/>
-<circle cx="620.0" cy="69.6" r="3" fill="#dc2626"/>
-<line x1="152.5" y1="30" x2="152.5" y2="330" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 3"/>
-<text x="158.5" y="46" fill="#16a34a">3 mA — both inside ±120 mV</text>
+<circle cx="620.0" cy="300.6" r="3" fill="#dc2626"/>
+<line x1="125.0" y1="30" x2="125.0" y2="330" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="131.0" y="46" fill="#16a34a">2 mA — both inside ±120 mV</text>
 <line x1="470" y1="58" x2="494" y2="58" stroke="#2563eb" stroke-width="2"/><text x="500" y="62" fill="#334155">droop</text>
 <line x1="470" y1="74" x2="494" y2="74" stroke="#dc2626" stroke-width="2"/><text x="500" y="78" fill="#334155">release overshoot</text>
 </svg>
