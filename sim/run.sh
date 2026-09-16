@@ -59,7 +59,7 @@ mkdir -p sim/netlist
 # ⛔ All EIGHT cells, not five. ldo_enable, ldo_pgood and ldo_ilim were missing here while
 # the private runner netlisted them, so this script could not have produced the enable,
 # power-good or current-limit numbers this repository publishes.
-for cell in ldo_vref ldo_erramp ldo_pass ldo_fbtrim ldo_enable ldo_pgood ldo_ilim ldo_capless; do
+for cell in ldo_vref ldo_erramp ldo_pass ldo_fbtrim ldo_enable ldo_pgood ldo_ilim ldo_boost ldo_capless; do
   echo "netlist: $cell"
   (cd xschem && xschem --rcfile ./xschemrc -n -q -s "$cell.sch" >/dev/null 2>&1)
   if [ ! -s "sim/netlist/$cell.spice" ]; then

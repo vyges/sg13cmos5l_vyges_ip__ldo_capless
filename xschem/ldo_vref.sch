@@ -5,11 +5,16 @@ V {}
 S {}
 E {}
 T {ldo_vref -- reference divider, 1.2 V bandgap -> 0.6 V} -300 -280 0 0 0.4 0.4 {}
-C {sg13cmos5l_pr/rhigh.sym} 0 -200 0 0 {name=R1 w=1u l=212u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
-N 0 -230 0 -270 {lab=vref_bg}
-C {devices/lab_pin.sym} 0 -270 0 0 {name=l_R1_P sig_type=std_logic lab=vref_bg}
+C {sg13cmos5l_pr/rhigh.sym} 0 -350 0 0 {name=R1a w=1u l=194.4u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
+N 0 -380 0 -420 {lab=vref_bg}
+C {devices/lab_pin.sym} 0 -420 0 0 {name=l_R1a_P sig_type=std_logic lab=vref_bg}
+N 0 -320 0 -280 {lab=vref_ov}
+C {devices/lab_pin.sym} 0 -280 0 0 {name=l_R1a_M sig_type=std_logic lab=vref_ov}
+C {sg13cmos5l_pr/rhigh.sym} 0 -200 0 0 {name=R1b w=1u l=17.6u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
+N 0 -230 0 -270 {lab=vref_ov}
+C {devices/lab_pin.sym} 0 -270 0 0 {name=l_R1b_P sig_type=std_logic lab=vref_ov}
 N 0 -170 0 -130 {lab=vref}
-C {devices/lab_pin.sym} 0 -130 0 0 {name=l_R1_M sig_type=std_logic lab=vref}
+C {devices/lab_pin.sym} 0 -130 0 0 {name=l_R1b_M sig_type=std_logic lab=vref}
 C {sg13cmos5l_pr/rhigh.sym} 0 -50 0 0 {name=R2a w=1u l=21.1u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
 N 0 -80 0 -120 {lab=vref}
 C {devices/lab_pin.sym} 0 -120 0 0 {name=l_R2a_P sig_type=std_logic lab=vref}
@@ -22,11 +27,12 @@ N 0 190 0 230 {lab=vss}
 C {devices/lab_pin.sym} 0 230 0 0 {name=l_R2b_M sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/cap_cmomf.sym} 240 -50 0 0 {name=Cf model=cap_cmomf w=10u l=10u mmin=1 mmax=4 spiceprefix=X}
 N 240 -80 240 -120 {lab=vref}
-C {devices/lab_pin.sym} 240 -120 0 0 {name=l_Cf_c1 sig_type=std_logic lab=vref}
+C {devices/lab_pin.sym} 240 -120 0 0 {name=l_Cf_c0 sig_type=std_logic lab=vref}
 N 240 -20 240 20 {lab=vss}
-C {devices/lab_pin.sym} 240 20 0 0 {name=l_Cf_c2 sig_type=std_logic lab=vss}
-N 0 -230 0 -270 {lab=vref_bg}
-C {devices/ipin.sym} 0 -270 0 0 {name=p_vref_bg lab=vref_bg}
+C {devices/lab_pin.sym} 240 20 0 0 {name=l_Cf_c1 sig_type=std_logic lab=vss}
+N 0 -380 0 -420 {lab=vref_bg}
+C {devices/ipin.sym} 0 -420 0 0 {name=p_vref_bg lab=vref_bg}
 C {devices/opin.sym} -400 -160 0 0 {name=p_vref lab=vref}
 C {devices/opin.sym} -400 -100 0 0 {name=p_vref_pg lab=vref_pg}
 C {devices/iopin.sym} -400 -40 0 0 {name=p_vss lab=vss}
+C {devices/opin.sym} -400 20 0 0 {name=p_vref_ov lab=vref_ov}

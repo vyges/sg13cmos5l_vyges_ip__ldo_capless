@@ -121,7 +121,7 @@ N 470 -350 540 -350 {lab=vin}
 C {devices/lab_pin.sym} 540 -350 0 0 {name=l_M6_B sig_type=std_logic lab=vin}
 C {sg13cmos5l_pr/cap_cmomf.sym} 760 -200 0 0 {name=Cm model=cap_cmomf w=193u l=193u mmin=1 mmax=4 spiceprefix=X}
 N 760 -230 760 -270 {lab=eout}
-C {devices/lab_pin.sym} 760 -270 0 0 {name=l_Cm_c1 sig_type=std_logic lab=eout}
+C {devices/lab_pin.sym} 760 -270 0 0 {name=l_Cm_c0 sig_type=std_logic lab=eout}
 C {sg13cmos5l_pr/rhigh.sym} 760 40 0 0 {name=Rz w=1u l=35.2u model=rhigh body=sub! b=0 m=1 mm_ok=1 spiceprefix=X}
 N 760 70 760 110 {lab=eout1}
 C {devices/lab_pin.sym} 760 110 0 0 {name=l_Rz_M sig_type=std_logic lab=eout1}

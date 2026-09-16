@@ -44,13 +44,22 @@ Vt4 vtrim4 0 1.2
 * the cells -- this bench silently stopped elaborating when ldo_vref, ldo_erramp and
 * ldo_enable gained ports, and ngspice then reported "too few parameters" and produced no
 * output at all, leaving stale CSVs on disk to be read as if they were results.
-x_vref vref_bg vref vss vref_pg ldo_vref
+* ⛔ PORT ORDER IS THE SYM EDGE ORDER -- left, right, top, bottom -- NOT the order in
+* the cell spec's `ports` list, and NOT alphabetical. ldo_vref is
+*   vref_bg vref vref_ov vss vref_pg
+* because vref_ov sits on the top edge. Writing it in the `ports` order instead tied
+* the new tap to vss, and the whole block stopped regulating -- vout came out at
+* 0.97 mV and the 243-corner sweep then reported 61 deg of phase margin on a dead
+* circuit, which looked like a 15 deg IMPROVEMENT. Read the .subckt line; do not
+* reconstruct it.
+x_vref vref_bg vref vref_ov vss vref_pg ldo_vref
 x_amp  vref vfb ibias en_n eout vin vss ldo_erramp
 x_pass eout vout vin ldo_pass
 x_fb   vtrim0 vtrim1 vtrim2 vtrim3 vtrim4 vfbd vout vss ldo_fbtrim
 x_en   en ibias eout en_n vin vddd vss ldo_enable
 x_pg   vfb vref_pg ibias pgood vddd vss ldo_pgood
 x_il   ibias ilim_en vout eout oc vin vddd vss ldo_ilim
+x_boost vout vfb vref_ov ibias eout vin vss ldo_boost
 
 * Loop break. A DC-0 / AC-1 source alone is the whole mechanism: a short at DC, so the
 * operating point is the real closed-loop one, and a 1 V injection at AC. An earlier

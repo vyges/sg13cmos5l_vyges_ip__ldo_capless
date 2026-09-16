@@ -48,6 +48,8 @@ N -520 -110 -520 -70 {lab=vref_pg}
 C {devices/lab_pin.sym} -520 -70 0 0 {name=l_x_vref_vref_pg sig_type=std_logic lab=vref_pg}
 N -600 -110 -600 -70 {lab=vss}
 C {devices/lab_pin.sym} -600 -70 0 0 {name=l_x_vref_vss sig_type=std_logic lab=vss}
+N -560 -290 -560 -330 {lab=vref_ov}
+C {devices/lab_pin.sym} -560 -330 0 0 {name=l_x_vref_vref_ov sig_type=std_logic lab=vref_ov}
 C {ldo_erramp.sym} -220 -120 0 0 {name=x_amp }
 N -380 -80 -380 -40 {lab=ibias}
 C {devices/lab_pin.sym} -380 -40 0 0 {name=l_x_amp_ibias sig_type=std_logic lab=ibias}
@@ -74,6 +76,21 @@ C {devices/lab_pin.sym} 40 380 0 0 {name=l_x_fb_vtrim3 sig_type=std_logic lab=vt
 N 40 420 40 460 {lab=vtrim4}
 C {devices/lab_pin.sym} 40 460 0 0 {name=l_x_fb_vtrim4 sig_type=std_logic lab=vtrim4}
 C {sg13cmos5l_pr/cap_cmomf.sym} -40 -480 0 0 {name=Cc model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=40u l=40u}
+C {ldo_boost.sym} 620 -540 0 0 {name=x_boost }
+N 475 -660 475 -700 {lab=vout}
+C {devices/lab_pin.sym} 475 -700 0 0 {name=l_x_boost_vout sig_type=std_logic lab=vout}
+N 475 -580 475 -620 {lab=vfb}
+C {devices/lab_pin.sym} 475 -620 0 0 {name=l_x_boost_vfb sig_type=std_logic lab=vfb}
+N 475 -500 475 -460 {lab=vref_ov}
+C {devices/lab_pin.sym} 475 -460 0 0 {name=l_x_boost_vref_ov sig_type=std_logic lab=vref_ov}
+N 475 -420 475 -380 {lab=ibias}
+C {devices/lab_pin.sym} 475 -380 0 0 {name=l_x_boost_ibias sig_type=std_logic lab=ibias}
+N 765 -540 835 -540 {lab=eout}
+C {devices/lab_pin.sym} 835 -540 0 0 {name=l_x_boost_eout sig_type=std_logic lab=eout}
+N 620 -750 620 -790 {lab=vin}
+C {devices/lab_pin.sym} 620 -790 0 0 {name=l_x_boost_vin sig_type=std_logic lab=vin}
+N 620 -330 620 -290 {lab=vss}
+C {devices/lab_pin.sym} 620 -290 0 0 {name=l_x_boost_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/sg13_hv_nmos.sym} 700 120 0 0 {name=Mpre l=1u w=20u ng=1 m=1 model=sg13_hv_nmos spiceprefix=X}
 N 720 90 720 50 {lab=vout}
 C {devices/lab_pin.sym} 720 50 0 0 {name=l_Mpre_D sig_type=std_logic lab=vout}
@@ -130,7 +147,7 @@ N 420 1150 420 1190 {lab=vss}
 C {devices/lab_pin.sym} 420 1190 0 0 {name=l_x_il_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/cap_cmomf.sym} 520 -60 0 0 {name=Cout model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=125u l=125u}
 N 520 -30 520 10 {lab=vss}
-C {devices/lab_pin.sym} 520 10 0 0 {name=l_Cout_c2 sig_type=std_logic lab=vss}
+C {devices/lab_pin.sym} 520 10 0 0 {name=l_Cout_c1 sig_type=std_logic lab=vss}
 C {devices/iopin.sym} -640 -300 0 0 {name=p_vin lab=vin}
 C {devices/iopin.sym} -640 -240 0 0 {name=p_vout lab=vout}
 C {devices/ipin.sym} -640 -180 0 0 {name=p_vref_bg lab=vref_bg}
