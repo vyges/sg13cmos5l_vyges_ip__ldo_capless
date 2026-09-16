@@ -47,9 +47,23 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Footprints. Measured ones come from tools/area_budget.py; snaked ones are computed below
 # from the drawn length at a stated pitch, because a 2941 um resistor has no bounding box
 # worth placing.
-RES_PITCH = 2.5      # um between folded resistor columns: 1.4 um drawn width + spacing
-                     # ⚠️ ASSUMED, not read from the DRC deck. It is the one number here that
-                     # is not measured, and the long resistors scale directly with it.
+# ✅ CONFIRMED AGAINST THE DRC DECK, 2026-09-16. This was assumed at 2.5 um and it is 1.18.
+# Four rhigh PyCells were placed side by side at descending pitches and the full FEOL deck run
+# on each:
+#
+#   GatPoly gap   0.05   0.10   0.15   0.18   0.20   um
+#   violations       6      6      6      0      0
+#
+# The threshold sits exactly on Gat_b = 0.18 um, the minimum GatPoly space, so the floor is
+# 1.0 um of resistor body + 0.18 = 1.18 um. The test resistors carried their end contacts, so
+# that is included. ⛔ The check was falsified before it was believed: three tighter pitches
+# report six violations each, which is what makes the two zeros mean something.
+#
+# ⚠️ The pitch adopted here is 1.2 um, a hair above the floor and on grid. What is NOT
+# verified is the metal strapping between folds: the DRC run above had BEOL rules disabled
+# and the test layout has no straps. Straps land at ALTERNATING ends so adjacent ones are far
+# apart, which is why this is a note rather than a risk -- but it is unverified.
+RES_PITCH = 1.2
 
 
 def snake(length_um, height_um, pitch=RES_PITCH):
@@ -91,9 +105,9 @@ BLOCKS = [
     # is short and wide; the boost's long resistors fold into the space beneath it.
     ("Cout 125x125.5",    366, 178, 125,   125.5, "out"),
     ("Rb snake",          366, 6,   RB_W,  RB_H,  "boost"),
-    ("Rnx snake",         420, 6,   RNX_W, RNX_H, "boost"),
-    ("Cb 28x28.5",        442, 6,   28,    28.5,  "boost"),
-    ("boost devices",     442, 40,  40,    116,   "boost"),
+    ("Rnx snake",         396, 6,   RNX_W, RNX_H, "boost"),
+    ("Cb 28x28.5",        412, 6,   28,    28.5,  "boost"),
+    ("boost devices",     412, 40,  40,    116,   "boost"),
 ]
 
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",
