@@ -87,27 +87,30 @@ RLS_W, RLS_H = snake(701.2, 120.0)     # ldo_enable XRls
 # the slot is 310: there is no arrangement where Cm and Cout share a column. That single fact
 # fixes the shape of everything else.
 BLOCKS = [
-    # --- C1: reference and amplifier. Highest-impedance nets in the block, furthest from
-    # the pass device's switching edge and from the 3.3 V input rail.
+    # --- C1 x 6..199: reference and amplifier, at the CORE-facing edge.
     ("Cm  193x193.5",     6,   112, 193,   193.5, "amp"),
     ("erramp devices",    6,   6,   95,    100,   "amp"),
     ("vref divider",      106, 6,   40,    100,   "ref"),
 
-    # --- C2: the pass device sits between the gate that drives it and the output it feeds.
-    ("pass array 64x",    205, 6,   153.6, 101.2, "pass"),
-    ("fbtrim ladder",     205, 113, 60,    192,   "fb"),
-    ("Cc 40x40.5",        270, 113, 40,    40.5,  "amp"),
-    ("ilim",              270, 158, 45,    42,    "stat"),
-    ("pgood",             270, 205, 45,    42,    "stat"),
-    ("enable + Rls",      320, 113, 40,    RLS_H, "stat"),
+    # --- C2 x 205..360: feedback ladder, boost, status blocks.
+    ("fbtrim ladder",     205, 6,   60,    192,   "fb"),
+    ("Rb snake",          272, 6,   RB_W,  RB_H,  "boost"),
+    ("Rnx snake",         300, 6,   RNX_W, RNX_H, "boost"),
+    ("Cb 28x28.5",        313, 6,   28,    28.5,  "boost"),
+    ("boost devices",     313, 40,  40,    116,   "boost"),
+    ("ilim",              205, 205, 45,    42,    "stat"),
+    ("pgood",             255, 205, 45,    42,    "stat"),
+    ("enable + Rls",      305, 165, 40,    RLS_H, "stat"),
 
-    # --- C3: output node. Cout sits directly across from the pass array so the 50 mA path
-    # is short and wide; the boost's long resistors fold into the space beneath it.
-    ("Cout 125x125.5",    366, 178, 125,   125.5, "out"),
-    ("Rb snake",          366, 6,   RB_W,  RB_H,  "boost"),
-    ("Rnx snake",         396, 6,   RNX_W, RNX_H, "boost"),
-    ("Cb 28x28.5",        412, 6,   28,    28.5,  "boost"),
-    ("boost devices",     412, 40,  40,    116,   "boost"),
+    # --- C3 x 366..525: the output, hard against the PADFRAME-facing edge.
+    # ⛔ Tim confirmed 2026-09-16 that every wrapper has padframe-facing pins on the RIGHT and
+    # core-facing pins on the left. vout therefore exits right, and the pass array - 153.6 um
+    # of device carrying up to 50 mA - is placed against that edge rather than in the middle.
+    # On-slot metal resistance at 50 mA lands in the same budget as the 20 mV load-regulation
+    # specification, so every micron of that path is spent, not free.
+    ("pass array 64x",    370, 6,   153.6, 101.2, "pass"),
+    ("Cout 125x125.5",    395, 115, 125,   125.5, "out"),
+    ("Cc 40x40.5",        370, 250, 40,    40.5,  "amp"),
 ]
 
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",

@@ -770,9 +770,19 @@ Stated here rather than left to be discovered:
    took effect; droop is simply insensitive to it. That is the internal control that makes
    this a result rather than a failed experiment.
 
-   ⟹ Droop is **not** charge-limited, and it needs the same treatment the release overshoot
-   got: find the mechanism before proposing a fix. The one thing now known is that the fix is
-   not more `Cout`, and 17 % of the slot does not have to be reserved for it.
+   ✅ **The mechanism is now known: droop is a RAMP-TRACKING ERROR set by the loop's
+   transconductance.** Found by measuring the pass current rather than the gate that controls
+   it — at the end of the load edge the pass device delivers 20.0063 mA against a 20.000 mA
+   load, tracking a 19 mA ramp to within 6.3 µA. The 338.2 mV droop is 6.76 pC across 20 pF,
+   an average deficit of 6.76 µA: the loop tracks to three parts in ten thousand and that
+   residue is the whole droop. `Cout` does nothing because a tracking error is not an
+   integration.
+
+   The lever is the error amplifier's tail current, and droop goes as 1/√I_tail — predicted
+   against measured within 6 % at 10, 15, 20 and 30 µA. ⛔ **But it does not reach 120 mV**:
+   that needs 7.9× the tail, about 79 µA, putting Iq near 110 µA against a 60 µA budget. At
+   fixed current gm goes as √(W/L), so 7.9× would need 62× the input-pair width. Within the
+   Iq budget the best is ~20 µA of tail for 226 mV.
 
    ⚠️ The review question — what step must actually be survived, and at what droop — still
    stands, and is now the ONLY lever on this row until a mechanism is found.

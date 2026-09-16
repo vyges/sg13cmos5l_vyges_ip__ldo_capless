@@ -63,10 +63,38 @@
 * while the gate that controls it looks unchanged, and a mechanism story told in terms of
 * eout's waveform is looking at the wrong signal.
 *
-* ⏸️ NOT EXPLAINED, and deliberately left that way rather than written up as a story that
-* happens to fit. The next probe should measure the pass-device CURRENT directly against the
-* load current, not the gate voltage -- the deficit between them is the thing that integrates
-* into the droop, and it is the one quantity nothing here has looked at.
+* ✅ MECHANISM FOUND, by measuring the pass current instead of the gate that controls it.
+* THE DROOP IS A RAMP-TRACKING ERROR SET BY THE LOOP'S TRANSCONDUCTANCE.
+*
+* At the end of the load edge the pass device is delivering 20.0063 mA against a 20.000 mA
+* load -- it tracks a 19 mA ramp to within 6.3 uA. Expressed as charge, the 338.2 mV droop is
+* 6.76 pC across 20 pF, an average deficit of 6.76 uA over the microsecond. The loop tracks
+* the ramp to THREE PARTS IN TEN THOUSAND and that residue is the entire droop.
+*
+* Every previously puzzling observation follows from it:
+*   - Cout does nothing, because a steady tracking error during a ramp is not an integration
+*     and does not depend on the output capacitor.
+*   - eout's trajectory does not change with tail current, because eout must arrive at the
+*     same place either way -- the pass device needs the same Vsg to carry 20 mA. The tracking
+*     error is a small offset, not a different waveform.
+*   - The droop scales as 1/gm, and gm goes as sqrt(I) in saturation:
+*
+*       tail    10 uA    15 uA    20 uA    30 uA
+*       pred   338.2    276.1    239.1    195.3  mV
+*       meas   338.2    264.8    226.3    183.8  mV
+*       err       --     -4.1     -5.4     -5.9  %
+*
+*     Within 6 % across a 3x current range, always slightly BETTER than predicted, which is
+*     what moderate rather than strong inversion would give. Three independent points on one
+*     law is the evidence; the single closing arithmetic that fooled this bench earlier was
+*     not.
+*
+* ⛔ WHAT THAT MEANS FOR THE 120 mV TARGET: it is out of reach. droop goes as 1/sqrt(I_tail),
+* so 338 -> 120 mV needs (338/120)^2 = 7.9x the tail, about 79 uA, putting Iq near 110 uA
+* against a 60 uA budget. Nor can gm be bought with geometry instead: at fixed current it goes
+* as sqrt(W/L), so 7.9x would need 62x the input-pair width. ⟹ The lever is real and
+* quantified, and it does not reach. What reaches is a specification change, which the
+* 2026-09-01 review already confirmed is ours to make.
 *
 * Run: cd sim && ngspice -b tb_ldo_droop.spice
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
@@ -123,6 +151,21 @@ Vt4 vtrim4 0 1.2
 
   * The shape is the discriminator, so write it. ip is the pass-device current: everything
   * Iload does not take out of Cout has to come through the pass device.
-  wrdata droop.csv v(vout) v(eout) v(x_amp.eout1) v(vfb) i(Vin)
+  * ⛔ THE PASS CURRENT ITSELF, which is the quantity every previous probe missed. vout is the
+  * integral of (I_pass - I_load) over Cout, so the DEFICIT between them is the droop's actual
+  * cause -- watching eout is watching a control signal two steps upstream of it.
+  * i(Vin) is everything the block draws from the supply; the pass device carries all of it
+  * but the ~40 uA of quiescent, so at these currents i(Vin) IS the pass current to better
+  * than a quarter of a percent.
+  wrdata droop.csv v(vout) v(eout) v(vfb) i(Vin)
+  * And the same deficit as a number, so it does not have to be read off a plot: charge the
+  * loop fails to deliver, integrated across the load edge.
+  meas tran ip_at20  FIND i(Vin) AT=20u
+  meas tran ip_at205 FIND i(Vin) AT=20.5u
+  meas tran ip_at21  FIND i(Vin) AT=21u
+  meas tran ip_at215 FIND i(Vin) AT=21.5u
+  meas tran ip_at22  FIND i(Vin) AT=22u
+  meas tran ip_max   MAX  i(Vin) FROM=20u TO=26u
+  print ip_at20 ip_at205 ip_at21 ip_at215 ip_at22 ip_max
 .endc
 .end
