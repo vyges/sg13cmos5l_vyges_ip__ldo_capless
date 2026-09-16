@@ -8,8 +8,8 @@
 - Designer: Vyges
 - License: Apache 2.0
 - Company: None
-- Created: None
-- Last modified: None
+- Created: 2026-09-02
+- Last modified: 2026-09-16
 
 ## Pins
 
@@ -20,7 +20,11 @@
   + Vmin: 3.0
   + Vmax: 3.6
 - vout
-  + Description: Regulated output (Kelvin sensed)
+  + Description: Regulated output. One dedicated low-resistance pad, carrying the full load
+    up to 50 mA -- a shared mux path would not do, because at 50 mA a 1 ohm switch drops
+    50 mV, more than the entire load-regulation specification. There is NO Kelvin sense pin
+    in this revision: the proposal asked for a muxable vout_sense and the block brings out a
+    single vout. Adding it is a wire, not a circuit, but it needs a pad.
   + Type: signal
   + Direction: output
 - vss
