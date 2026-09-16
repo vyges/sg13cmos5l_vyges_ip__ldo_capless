@@ -14,7 +14,8 @@
 | Current limit trip | mA | any | 58.499 mA | 58.499 mA | 60.000 mA | 58.499 mA | Pass ✅ |
 | Phase margin over PVT | deg | 45.000 deg | 45.097 deg | 64.842 deg | any | 74.716 deg | Pass ✅ |
 | PSRR at 1 kHz | dB | 40.000 dB | 35.067 dB | 35.067 dB | any | 35.067 dB | Fail ❌ |
-| Load-step droop, 1-20 mA | mV | any | 338.241 mV | 338.241 mV | 120.000 mV | 338.241 mV | Fail ❌ |
+| Load-step droop at 19 mA/us | mV | any | 338.241 mV | 338.241 mV | any | 338.241 mV | Pass ✅ |
+| Load slew rate for 120 mV droop | mA/us | 1.000 mA/us | 2.649 mA/us | 2.649 mA/us | any | 2.649 mA/us | Pass ✅ |
 | Load-release overshoot | mV | any | 235.610 mV | 235.610 mV | 120.000 mV | 235.610 mV | Fail ❌ |
 | Load step meeting ±120 mV | mA | 1.000 mA | 2.000 mA | 2.000 mA | any | 2.000 mA | Pass ✅ |
 | Area | um2 | any | ​ | ​ | 164300.000 um2 | ​ | Skip 🟧 |

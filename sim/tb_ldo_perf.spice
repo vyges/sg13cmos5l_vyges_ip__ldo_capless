@@ -103,5 +103,29 @@ Vt4 vtrim4 0 1.2
   meas tran vp_07 FIND v(vout) AT=19u
   meas tran vd_07 MIN  v(vout) FROM=20u TO=30u
   meas tran vo_07 MAX  v(vout) FROM=40u TO=50u
+
+  * ---- DROOP AGAINST LOAD SLEW RATE. The droop is a ramp-tracking error -- the loop follows
+  * the load ramp to about three parts in ten thousand and that residue IS the droop -- so it
+  * is a function of dI/dt and not of step size. A specification written as "120 mV at a 20 mA
+  * step" therefore names no condition the block can be held to; one written as a RATE does.
+  * Same 1 -> 20 mA step throughout, only the edge changes.
+  alter @Iload[pulse] = [ 1m 20m 20u 1u 1u 20u 60u ]
+  tran 20n 60u
+  meas tran vdr_19 MIN v(vout) FROM=20u TO=32u
+  alter @Iload[pulse] = [ 1m 20m 20u 2u 2u 20u 60u ]
+  tran 20n 60u
+  meas tran vdr_95 MIN v(vout) FROM=20u TO=34u
+  alter @Iload[pulse] = [ 1m 20m 20u 4u 4u 20u 60u ]
+  tran 20n 60u
+  meas tran vdr_48 MIN v(vout) FROM=20u TO=38u
+  alter @Iload[pulse] = [ 1m 20m 20u 6.5u 6.5u 20u 60u ]
+  tran 20n 60u
+  meas tran vdr_29 MIN v(vout) FROM=20u TO=43u
+  alter @Iload[pulse] = [ 1m 20m 20u 10u 10u 20u 60u ]
+  tran 20n 60u
+  meas tran vdr_19d MIN v(vout) FROM=20u TO=50u
+  alter @Iload[pulse] = [ 1m 20m 20u 20u 20u 20u 60u ]
+  tran 20n 80u
+  meas tran vdr_095 MIN v(vout) FROM=20u TO=60u
 .endc
 .end

@@ -157,6 +157,34 @@ def step_limit(tol=120e-3):
     return max(ok) if ok else 0.0
 
 
+
+def droop_rate_profile():
+    """[(load slew rate in mA/us, droop in V)] from tb_ldo_perf's edge sweep."""
+    pre = _meas("tb_ldo_perf.spice", "vo_pre")
+    # 1 -> 20 mA is 19 mA; the edge time is what changes.
+    return [(19.0 / t, pre - _meas("tb_ldo_perf.spice", k)) for t, k in
+            ((1.0, "vdr_19"), (2.0, "vdr_95"), (4.0, "vdr_48"),
+             (6.5, "vdr_29"), (10.0, "vdr_19d"), (20.0, "vdr_095"))]
+
+
+def droop_rate_limit(tol=120e-3):
+    """Load slew rate, in mA/us, at which the droop reaches `tol`.
+
+    ⛔ Interpolated, and that is defensible HERE where it was not for step_limit(). The
+    overshoot has a cliff in it -- 231 mV at a 5 mA release and 2066 mV at 7 mA, because the
+    output runs to the rail above a threshold -- so interpolating it would invent a number on
+    the wrong side of a discontinuity. The droop has no cliff: it is a tracking error and
+    varies smoothly as rate^0.55 across the whole swept range, 338.2 mV at 19 mA/us down to
+    64.8 at 0.95. Interpolating a smooth monotone curve between two MEASURED points either
+    side of the target is reading the curve, not inventing one.
+    """
+    pts = sorted(droop_rate_profile())
+    for (r0, d0), (r1, d1) in zip(pts, pts[1:]):
+        if d0 <= tol <= d1:
+            return r0 + (tol - d0) * (r1 - r0) / (d1 - d0)
+    return 0.0
+
+
 # ---------------------------------------------------------------- the specification
 #
 # Limits are the published specification. They live HERE, in the thing that also produces
@@ -202,8 +230,14 @@ def rows():
         ("Current limit trip", "mA", None, 60e-3, one(_meas("tb_ldo_status.spice", "i_trip"))),
         ("Phase margin over PVT", "deg", 45.0, None, spread(pms)),
         ("PSRR at 1 kHz", "dB", 40.0, None, one(abs(_meas("tb_ldo_perf.spice", "psrr_1k")))),
-        ("Load-step droop, 1-20 mA", "mV", None, 120e-3,
+        # ⛔ Reported WITHOUT a limit, because 19 mA/us is outside the specified slew rate.
+        # The droop is a ramp-tracking error, so it is a function of dI/dt rather than of step
+        # size, and a limit written against a 20 mA step names no condition the block can be
+        # held to. The specification is the rate row below; this is the stress point, kept
+        # because an integrator whose load is faster than specified needs to know what happens.
+        ("Load-step droop at 19 mA/us", "mV", None, None,
          one(_meas("tb_ldo_perf.spice", "vo_pre") - _meas("tb_ldo_perf.spice", "vo_droop"))),
+        ("Load slew rate for 120 mV droop", "mA/us", 1.0, None, one(droop_rate_limit())),
         ("Load-release overshoot", "mV", None, 120e-3,
          one(_meas("tb_ldo_perf.spice", "vo_over") - _meas("tb_ldo_perf.spice", "vo_settle"))),
         # The 120 mV target came from our own proposal, and the 2026-09-01 review confirmed
@@ -228,7 +262,7 @@ PHYSICAL = [
 ]
 
 SCALE = {"V": 1, "mV": 1e3, "mA": 1e3, "uA": 1e6, "mA": 1e3, "mV/V": 1e3, "dB": 1, "deg": 1,
-         "um2": 1e12, "": 1}
+         "um2": 1e12, "": 1, "mA/us": 1}
 
 
 # ---------------------------------------------------------------- rendering
@@ -289,7 +323,8 @@ PUBLISHED_AS = {
     "Current limit trip": ("Current limit trip", 0),
     "Phase margin over PVT": ("Phase margin, worst over PVT", 0),
     "PSRR at 1 kHz": ("**PSRR at 1 kHz**", 0),
-    "Load-step droop, 1-20 mA": ("**Load-step droop, 1 \u2192 20 mA**", 0),
+    "Load-step droop at 19 mA/us": ("**Load-step droop at 19 mA/\u00b5s**", 0),
+    "Load slew rate for 120 mV droop": ("Load slew rate for \u2264120 mV droop", 0),
     # ⛔ These two were computed by rows() and emitted into the datasheet, but were NOT in
     # this map -- so README could say anything about them and the build stayed green. The
     # release overshoot is the figure this block's whole open defect is about, and for

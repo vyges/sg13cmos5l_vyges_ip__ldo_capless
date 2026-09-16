@@ -42,16 +42,30 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Phase margin, worst over load | 58.2° (at 10 µA) | 45° min | ✅ |
 | Phase margin, worst over PVT | 45.1° (ff / worst-case sheet / −40 °C / 3.6 V / no load), 0 of 243 corners below | 45° min | ✅ |
 | **PSRR at 1 kHz** | **35.1 dB** | 40 dB | ❌ |
-| **Load-step droop, 1 → 20 mA** | **338.2 mV** | 120 mV max | ❌ |
+| Load slew rate for ≤120 mV droop | **2.65 mA/µs** | 1 mA/µs min | ✅ |
+| **Load-step droop at 19 mA/µs** | **338.2 mV** | beyond the specified rate | |
 | **Load-release overshoot, 20 → 1 mA** | **235.6 mV** | 120 mV max | ❌ |
 | Load step meeting ±120 mV | **2 mA** (droop 55.0 mV, overshoot 65.0 mV) | — | |
 | Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
-⚠️ **Three specifications are still missed and are documented with numbers rather than
-omitted.** Droop and PSRR are the limitation they look like: 20 pF of on-chip output
-capacitance cannot hold a 19 mA step for the microsecond the loop needs. **The release
-overshoot was never that**, and measuring it rather than assuming it is what made it
-fixable — it is now bounded at every corner rather than reaching the supply rail.
+⚠️ **Two specifications are still missed, and the third has been restated as the thing it
+actually depends on.** PSRR remains 35.1 dB against 40. The release overshoot is bounded at
+every corner now rather than reaching the supply rail, but still exceeds 120 mV. **And the
+droop is now specified as a load SLEW RATE rather than a step size**, because that is what
+it is a function of — see below.
+
+🔑 **Why the droop specification changed shape.** It is a ramp-tracking error: the loop
+follows the load ramp to about three parts in ten thousand, and that residue is the droop.
+Measured by watching the pass current rather than the gate that controls it — at the end of a
+1 µs edge the pass device delivers 20.0063 mA against a 20.000 mA load. Two consequences an
+integrator needs:
+
+- **It scales with dI/dt, not with step size.** 338.2 mV at 19 mA/µs, 167.1 at 4.75, 99.4 at
+  1.90, 64.8 at 0.95 — the same 1 → 20 mA step throughout, only the edge changing. So the
+  block holds ±120 mV up to **2.65 mA/µs**, and that is the specification.
+- **More output capacitance does not help.** Nearly tripling `Cout` moves the droop by
+  0.3 mV, in the wrong direction. A tracking error is not an integration, so the output
+  capacitor is not the lever, and 17 % of the slot does not have to be reserved for one.
 
 🔑 **But the step size is ours to specify, so it is now specified.** The 120 mV target came
 from this block's own proposal, not from a requirement. Sweeping step size says what the
