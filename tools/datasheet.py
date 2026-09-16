@@ -326,6 +326,105 @@ def _readme_figures():
     return out
 
 
+
+# ---------------------------------------------------------------- the pin list
+
+# ⛔ WHY THIS CHECK EXISTS. doc/datasheet/<NAME>.md is HAND-WRITTEN -- this script only ever
+# generates <NAME>_<source>.md -- so its `## Pins` block is a second copy of the port list
+# that nothing compared against the schematic. It is exactly the shape of thing this file was
+# built to catch for figures: a human-maintained fact that goes stale silently. It had already
+# gone stale once, describing vout as "Kelvin sensed" when no sense pin was ever built, and it
+# survived a correction to the same claim on the README front page because nothing linked
+# them. `ldo_vref` gaining a port in a single afternoon is how a set of fifteen names
+# desynchronises without anyone noticing.
+
+# xschem writes the direction as a comment per port. iopin is a DRAWING choice as much as an
+# electrical one -- supplies and bidirectional analog nodes both use it -- so it is accepted
+# against any declared direction. ipin and opin are unambiguous and are held to it.
+_DIR_OK = {
+    "ipin": {"input"},
+    "opin": {"output"},
+    "iopin": {"inout", "input", "output", "power", "ground"},
+}
+
+
+def _netlist_ports():
+    """{port: xschem pin kind} from the top-level netlist.
+
+    xschem comments out the TOP cell's .subckt line, so the ports live on `**.subckt` and the
+    directions on `*.ipin` / `*.opin` / `*.iopin` lines beneath it.
+    """
+    path = os.path.join(ROOT, "sim", "netlist", f"{NAME}.spice")
+    if not os.path.isfile(path):
+        raise SystemExit(f"no netlist: {path}\nrun sim/run.sh first")
+    order, kinds = [], {}
+    for line in open(path, encoding="utf-8"):
+        if line.startswith(f"**.subckt {NAME} "):
+            order = line.split()[2:]
+        m = re.match(r"\*\.(i|o|io)pin\s+(\S+)", line)
+        if m:
+            kinds[m.group(2)] = m.group(1) + "pin"
+        if line.startswith("**.ends"):
+            break
+    if not order:
+        raise SystemExit(f"{path}: no '**.subckt {NAME}' line -- the netlist is not the top cell")
+    return order, kinds
+
+
+def _datasheet_pins():
+    """[(pin, declared direction)] from the hand-written datasheet's ## Pins block."""
+    path = os.path.join(ROOT, "doc", "datasheet", f"{NAME}.md")
+    if not os.path.isfile(path):
+        raise SystemExit(f"no datasheet header: {path}")
+    out, cur, insec = [], None, False
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("## "):
+            insec = line.strip() == "## Pins"
+            continue
+        if not insec:
+            continue
+        m = re.match(r"- (\S+)\s*$", line)
+        if m:
+            cur = m.group(1)
+            out.append([cur, None])
+        elif out:
+            d = re.match(r"\s+\+ Direction:\s*(\S+)", line)
+            if d:
+                out[-1][1] = d.group(1).lower()
+    return [(a, b) for a, b in out]
+
+
+def check_pins():
+    """Compare the datasheet's pin list against the schematic's actual ports."""
+    order, kinds = _netlist_ports()
+    declared = _datasheet_pins()
+    bad = []
+    dnames = [p for p, _ in declared]
+
+    missing = [p for p in order if p not in dnames]
+    extra = [p for p in dnames if p not in order]
+    for p in missing:
+        bad.append(f"port {p!r} is on the schematic and absent from the datasheet")
+    for p in extra:
+        bad.append(f"pin {p!r} is in the datasheet and is not a port of the schematic")
+
+    for pin, direction in declared:
+        kind = kinds.get(pin)
+        if kind is None or direction is None or pin not in order:
+            continue
+        if direction not in _DIR_OK[kind]:
+            bad.append(f"pin {pin!r}: datasheet says {direction}, schematic draws it as {kind}")
+
+    print(f"\npins: {len(order)} on the schematic, {len(dnames)} in the datasheet")
+    if bad:
+        print(f"{len(bad)} pin discrepancy(ies):")
+        for b in bad:
+            print(f"  {b}")
+        return 1
+    print("every port of the schematic is documented, with a consistent direction")
+    return 0
+
+
 def check():
     """Compare every figure README.md publishes against the value derived here."""
     by_name = {r[0]: r for r in rows()}
@@ -346,13 +445,18 @@ def check():
         if not ok:
             bad.append(name)
         print(f"{name:<32} {literal:>10} {derived:>10.6g}   {'ok' if ok else 'DRIFTED'}")
+    rc = 0
     if bad:
         print(f"\n{len(bad)} published figure(s) no longer match the simulations:")
         for n in bad:
             print(f"  {n}")
-        return 1
-    print("\nevery figure README.md publishes still matches the simulation behind it")
-    return 0
+        rc = 1
+    else:
+        print("\nevery figure README.md publishes still matches the simulation behind it")
+    # ⛔ Runs even when the figures failed, and its status is OR-ed in: reporting only the
+    # first failing category means the second one is found on the next run instead of this
+    # one, which is how a two-line fix becomes two review cycles.
+    return check_pins() | rc
 
 
 # ---------------------------------------------------------------- plots
