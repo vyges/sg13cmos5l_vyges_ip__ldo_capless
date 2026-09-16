@@ -25,10 +25,26 @@
 *   droop recovery   comparator says no  -> the five-corner failure cannot occur
 *   load release     both say yes        -> full dv/dt response, instantly
 *
-* ⚠️ What this does NOT remove is XCb coupling the startup ramp into the ibias node through
-* XRb. That was measured at 3.0 V of startup overshoot when the gate was moved out of the nb
-* clamp, and it is independent of what gates the output. If startup misbehaves here, that is
-* the cause and nb needs a bias that is not the shared reference.
+* ⛔ WHAT THIS DOES NOT FIX, AND IT IS THE REMAINING DEFECT. XCb couples vout onto nb, and
+* nb is biased at the shared ibias node through XRb -- so every large excursion at vout pulls
+* current through XRb and perturbs the 1 uA reference. The veto cannot help: it gates
+* INJECTION INTO eout, while this is a disturbance of the BIAS, upstream of everything.
+*
+* Measured, over 81 transient corners: no corner reaches the rail, against 81 of 81 without
+* the boost -- but four still drive the output negative during the load STEP, all at 110 C
+* with res_bcs. Three separate results say it is this coupling and not the output drive:
+*
+*   - weakening XMve/XMpb fivefold changes those corners by under a millivolt (-0.591 V
+*     against -0.591 V), so the boost is not slamming the output down
+*   - the same corner with the vref split but NO boost returns 0.4322296 V, bit-identical to
+*     the untouched control, so the divider split is innocent
+*   - res_bcs is the lowest sheet, which makes XRb ~25 % smaller and the current it steals
+*     ~25 % larger, and 110 C is where the amplifier can least afford to lose bias
+*
+* ⟹ NEXT: give nb a LOCAL threshold reference instead of the shared ibias node -- a
+* diode-connected replica off the XMbn/XMbp leg that already exists here. The disturbance
+* then lands on a local node that nothing else depends on. Until that is done this topology
+* is not adoptable, however good the typical corner looks.
 *
 * Substituted and verified by sim/hybboost.sh.
 * --------------------------------------------------------------------------------------
