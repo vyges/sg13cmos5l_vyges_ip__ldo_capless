@@ -25,26 +25,39 @@
 *   droop recovery   comparator says no  -> the five-corner failure cannot occur
 *   load release     both say yes        -> full dv/dt response, instantly
 *
-* ⛔ WHAT THIS DOES NOT FIX, AND IT IS THE REMAINING DEFECT. XCb couples vout onto nb, and
-* nb is biased at the shared ibias node through XRb -- so every large excursion at vout pulls
-* current through XRb and perturbs the 1 uA reference. The veto cannot help: it gates
-* INJECTION INTO eout, while this is a disturbance of the BIAS, upstream of everything.
+* ⛔ THE DEFECT THIS USED TO HAVE, AND WHAT FIXED IT. XRb originally returned to the shared
+* ibias node, so every large excursion at vout pulled current through it and stole from the
+* 1 uA reference. Over 81 transient corners that showed up as four driving the output
+* NEGATIVE during the load STEP, all at 110 C with res_bcs -- the lowest sheet, which makes
+* XRb smaller and the theft larger, at the temperature where the amplifier can least afford
+* it. The veto could never have fixed it: it gates injection into eout, while this was a
+* disturbance of the bias, upstream of everything.
 *
-* Measured, over 81 transient corners: no corner reaches the rail, against 81 of 81 without
-* the boost -- but four still drive the output negative during the load STEP, all at 110 C
-* with res_bcs. Three separate results say it is this coupling and not the output drive:
+* ⛔ It also is not the output drive, which is what it looked like. Weakening XMve/XMpb
+* fivefold moved those corners by under a millivolt (-0.591 V against -0.591 V), and the same
+* corner with the vref split but no boost at all returned 0.4322296 V, bit-identical to the
+* untouched control. Both had to be ruled out before the bias was.
 *
-*   - weakening XMve/XMpb fivefold changes those corners by under a millivolt (-0.591 V
-*     against -0.591 V), so the boost is not slamming the output down
-*   - the same corner with the vref split but NO boost returns 0.4322296 V, bit-identical to
-*     the untouched control, so the divider split is innocent
-*   - res_bcs is the lowest sheet, which makes XRb ~25 % smaller and the current it steals
-*     ~25 % larger, and 110 C is where the amplifier can least afford to lose bias
+* ✅ XMpl/XMrb give nb a LOCAL replica of that threshold, so the injected charge lands on a
+* node nothing else reads. Measured over the same 81 corners:
 *
-* ⟹ NEXT: give nb a LOCAL threshold reference instead of the shared ibias node -- a
-* diode-connected replica off the XMbn/XMbp leg that already exists here. The disturbance
-* then lands on a local node that nothing else depends on. Until that is done this topology
-* is not adoptable, however good the typical corner looks.
+*   at the rail        0, against 81 of 81 with no boost
+*   negative droop     0, against 4 with the shared reference and 5 with dv/dt alone
+*   worst overshoot    573 mV, at ss/res_bcs/110 C/3.0 V
+*   droop at the corners that used to fail   0.4321 V against the control's 0.4322 -- the
+*                                            boost no longer perturbs the load step at all
+*
+* And at the typical corner it is better than every predecessor on every row: 1 to 20 mA
+* release at 234 mV against 2083 mV, droop 338.2 mV against the block's own 338.1, PSRR
+* unchanged to five figures, startup settling at exactly its final value with no overshoot
+* and no gate, Iq 41.5 uA against a 60 uA budget.
+*
+* ⚠️ THE ONE THING TO WATCH IS PHASE MARGIN, and it is not comfortable. The 243-corner
+* minimum is 45.10 deg against a 45 deg specification -- it passes, with no corner below, but
+* the block's own margin was 45.62 and each addition has spent some: 46.04 with dv/dt alone,
+* 45.49 with the shared reference, 45.10 now. **0.10 deg of slack is not a margin**, and
+* anything further added to this node needs to be paid for out of the compensation rather
+* than out of what is left here.
 *
 * Substituted and verified by sim/hybboost.sh.
 * --------------------------------------------------------------------------------------
@@ -59,8 +72,17 @@ XMc5 ng   nx    vss vss sg13_hv_nmos w=@WC5@ l=1u ng=1 m=1 mm_ok=1
 XMc6 ng   nbd   vin vin sg13_hv_pmos w=@WC6@ l=1u ng=1 m=1 mm_ok=1
 
 * dv/dt front end, unchanged from ldo_boost.tpl -- the sizing that cleared all 81 corners.
+* Local threshold reference. ⛔ XRb used to return to the shared ibias node, which is what
+* made every large excursion at vout steal from the 1 uA reference -- the four-corner defect
+* above. XMrb is a diode-connected replica of the reference device fed by its own mirror leg
+* off nbd, so it sits at the same ~0.68 V and XMnb is biased at the same point, but the
+* charge XCb pushes through XRb now lands on a node NOTHING ELSE READS.
+* ⚠️ It has to be a diode, not a resistor divider: the point is a low impedance that absorbs
+* the injected current with a small voltage shift, which a divider would not.
+XMpl nbl  nbd   vin vin sg13_hv_pmos w=@WPL@ l=1u ng=1 m=1 mm_ok=1
+XMrb nbl  nbl   vss vss sg13_hv_nmos w=@WRB@ l=1u ng=1 m=1 mm_ok=1
 XCb  vout nb    cap_cmomf w=@CB@ l=@CB@ mmin=1 mmax=4 subblock=0 m=1 mm_ok=1
-XRb  nb   ibias sub! rhigh w=1u l=@RB@ m=1 b=0 mm_ok=1
+XRb  nb   nbl   sub! rhigh w=1u l=@RB@ m=1 b=0 mm_ok=1
 XMnb nx2  nb    vss vss sg13_hv_nmos w=@WNB@ l=@LNB@ ng=1 m=1 mm_ok=1
 XRnx vin  nx2   sub! rhigh w=1u l=@RNX@ m=1 b=0 mm_ok=1
 * Output stack: BOTH must conduct. XMve is the veto (over-voltage), XMpb the drive (edge).

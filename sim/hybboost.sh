@@ -21,6 +21,8 @@ ROV=${1:-17.6}; WBN=${2:-4u}; WBP=${3:-4u}; WCT=${4:-4u}
 WCI=${5:-5u}; WCM=${6:-10u}; WPB=${7:-20u}; WC5=${8:-10u}; WC6=${9:-2u}
 # dv/dt front end: the sizing that cleared all 81 corners in ldo_boost.tpl.
 CB=${10:-28u}; RB=${11:-2940u}; WNB=${12:-1u}; LNB=${13:-4u}; RNX=${14:-735u}; WVE=${15:-40u}
+# Local threshold reference leg -- see ldo_hybboost.tpl.
+WPL=${16:-2u}; WRB=${17:-2u}
 SRC=netlist/ldo_capless.spice
 VAR=netlist/ldo_capless_ov.spice
 [ -f ldo_hybboost.tpl ] || { echo "FAILED: no ldo_hybboost.tpl" >&2; exit 2; }
@@ -36,12 +38,13 @@ sed -e "s|@ROV@|$ROV|g" -e "s|@WBN@|$WBN|g" -e "s|@WBP@|$WBP|g" -e "s|@WCT@|$WCT
     -e "s|@WCI@|$WCI|g" -e "s|@WCM@|$WCM|g" -e "s|@WPB@|$WPB|g" \
     -e "s|@WC5@|$WC5|g" -e "s|@WC6@|$WC6|g" \
     -e "s|@CB@|$CB|g" -e "s|@RB@|$RB|g" -e "s|@WNB@|$WNB|g" -e "s|@LNB@|$LNB|g" \
-    -e "s|@RNX@|$RNX|g" -e "s|@WVE@|$WVE|g" ldo_hybboost.tpl > ldo_boost.spice
+    -e "s|@RNX@|$RNX|g" -e "s|@WVE@|$WVE|g" \
+    -e "s|@WPL@|$WPL|g" -e "s|@WRB@|$WRB|g" ldo_hybboost.tpl > ldo_boost.spice
 if grep -q '@[A-Z]*@' ldo_boost.spice; then
   echo "FAILED: unsubstituted token in ldo_boost.spice" >&2; grep -n '@[A-Z]*@' ldo_boost.spice >&2; exit 2
 fi
 n=$(grep -c '^X' ldo_boost.spice)
-[ "$n" = 15 ] || { echo "FAILED: ldo_boost.spice has $n devices, expected 15" >&2; exit 2; }
+[ "$n" = 17 ] || { echo "FAILED: ldo_boost.spice has $n devices, expected 17" >&2; exit 2; }
 
 # --- 2. the divider tap, all three edits
 sed -e "s|^\.subckt ldo_vref vref_bg vref vss vref_pg\$|.subckt ldo_vref vref_bg vref vss vref_pg vref_ov|" \

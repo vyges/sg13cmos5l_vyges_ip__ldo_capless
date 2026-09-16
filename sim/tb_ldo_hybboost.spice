@@ -57,7 +57,7 @@ Vt4 vtrim4 0 1.2
   * near vin, and vfb must sit BELOW vref_ov by the designed offset. If either is untrue the
   * boost is contributing gm to the loop at the operating point, which is exactly what a
   * wider XM6 did and why it failed the corner sweep.
-  print v(nx) v(ng) v(eout) v(vfb) v(vref) v(vref_ov) v(nbd) v(ptb)
+  print v(nx) v(ng) v(eout) v(vfb) v(vref) v(vref_ov) v(nbd) v(nbl) v(nb)
 
   alter @Iload[pulse] = [ 1m 7m 20u 1u 1u 20u 60u ]
   tran 5n 60u
