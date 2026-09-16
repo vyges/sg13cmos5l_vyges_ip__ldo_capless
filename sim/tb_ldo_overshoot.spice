@@ -1,0 +1,154 @@
+* tb_ldo_overshoot -- DIAGNOSTIC. Not a specification bench: it exists to name the
+* mechanism behind the load-release cliff that tb_ldo_perf measures as a scalar.
+*
+* What tb_ldo_perf established: release overshoot is 119.7 mV at 1->3 mA, 231.0 mV at
+* 1->5 mA and 2066 mV -- the rail -- at 1->7 mA. A ~9x jump across a 2 mA gap is a
+* threshold being crossed, not a slope, and the scalar cannot say which.
+*
+* The candidate this bench is built to confirm or kill, read off the schematic:
+*
+*   ldo_erramp's second stage is SINGLE-ENDED AND ASYMMETRIC. eout is pulled DOWN by
+*   XM5, a w=10u nMOS common-source driven by eout1, and pulled UP only by XM6, a
+*   w=2u/l=1u pMOS current source off pbias -- a fixed ~5 uA against Mp0's ~10 uA
+*   reference. eout drives XMpass, m=64 of w=100u/l=0.5u hv pMOS (6400 um of gate),
+*   and carries XCm, 193x193 um of cap_cmomf. Turning the pass device ON is a
+*   transconductor discharging that node; turning it OFF is 5 uA charging it.
+*
+* So the prediction is an ASYMMETRY, and it is falsifiable: eout should fall quickly
+* during the load step and rise at a rate that is flat in the step size after release,
+* set by I/C and not by the loop. If instead eout recovers at a rate that scales with
+* the step, the cause is elsewhere and this bench has done its job by saying so.
+*
+* Every sweep point measures BOTH directions so the comparison is in one table:
+*   eo_on_*   how far eout was dragged down to source the load
+*   sr_dn_*   eout slew while the load is applied      (V/us, the strong direction)
+*   sr_up_*   eout slew after release                  (V/us, the 5 uA direction)
+*   ov_*      output overshoot above its pre-step value
+*   trec_*    when vout comes back inside +/-120 mV of nominal
+*
+* Run (from the repository root, inside an environment with the PDK -- see sim/run.sh):
+*   cd sim && ngspice -b tb_ldo_overshoot.spice
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 DC 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+* Limiter OFF, as in tb_ldo_perf: with it on, XMlim (w=20u pMOS onto eout) is a second
+* pull-up on the node under study and the measurement stops being about the amplifier.
+* ⚠️ That also means the limiter is NOT available as the explanation for anything seen
+* here -- it is not connected to eout in this configuration beyond XMsense's gate load.
+Vilim   ilim_en 0 0
+Ibias   0       ibias DC 1u
+Iload   vout    0 PULSE(1m 20m 20u 1u 1u 20u 60u)
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  * Pulse geometry, fixed for every point below and quoted here because every .meas
+  * window depends on it: 1 us edges, load applied 20u..41u, released at 41u.
+  *   t = 19 us   settled, light load          (pre-step reference)
+  *   t = 20 us   load step begins
+  *   t = 40 us   settled, heavy load          (pre-release reference)
+  *   t = 41 us   load release begins
+  * The release windows start at 41u, NOT 40u: a window opening before the edge lets
+  * MAX find the settled heavy-load value when the overshoot is small, which reads as
+  * an overshoot of zero and hides exactly the small-step cases this bench compares.
+
+  * ---- 1 -> 3 mA: below the cliff, published at 119.7 mV
+  alter @Iload[pulse] = [ 1m 3m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre_03  FIND v(vout) AT=19u
+  meas tran eo_off_03 FIND v(eout) AT=19u
+  meas tran eo_on_03 FIND v(eout) AT=40u
+  meas tran ov_03    MAX  v(vout) FROM=41u TO=50u
+  meas tran eo_t1_03 FIND v(eout) AT=41.2u
+  meas tran eo_t2_03 FIND v(eout) AT=42.2u
+  let sr_up_03 = (eo_t1_03 - eo_t2_03) * -1
+  print sr_up_03
+  meas tran eo_d1_03 FIND v(eout) AT=20.2u
+  meas tran eo_d2_03 FIND v(eout) AT=21.2u
+  let sr_dn_03 = eo_d1_03 - eo_d2_03
+  print sr_dn_03
+
+  * ---- 1 -> 5 mA: the last point still below, published at 231.0 mV
+  alter @Iload[pulse] = [ 1m 5m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre_05  FIND v(vout) AT=19u
+  meas tran eo_off_05 FIND v(eout) AT=19u
+  meas tran eo_on_05 FIND v(eout) AT=40u
+  meas tran ov_05    MAX  v(vout) FROM=41u TO=50u
+  meas tran eo_t1_05 FIND v(eout) AT=41.2u
+  meas tran eo_t2_05 FIND v(eout) AT=42.2u
+  let sr_up_05 = (eo_t1_05 - eo_t2_05) * -1
+  print sr_up_05
+  meas tran eo_d1_05 FIND v(eout) AT=20.2u
+  meas tran eo_d2_05 FIND v(eout) AT=21.2u
+  let sr_dn_05 = eo_d1_05 - eo_d2_05
+  print sr_dn_05
+  * Waveforms for the two sides of the cliff. eout is the node the prediction is about;
+  * eout1 says whether the first stage saturated; vfb says what the loop actually saw.
+  wrdata overshoot_05.csv v(vout) v(eout) v(x_amp.eout1) v(vfb)
+
+  * ---- 1 -> 6 mA: NARROWING THE BRACKET. The handoff's action was to find where in
+  * the 5..7 mA gap the behaviour changes; without this point "between 5 and 7" is all
+  * that can be said.
+  alter @Iload[pulse] = [ 1m 6m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre_06  FIND v(vout) AT=19u
+  meas tran eo_off_06 FIND v(eout) AT=19u
+  meas tran eo_on_06 FIND v(eout) AT=40u
+  meas tran ov_06    MAX  v(vout) FROM=41u TO=50u
+  meas tran eo_t1_06 FIND v(eout) AT=41.2u
+  meas tran eo_t2_06 FIND v(eout) AT=42.2u
+  let sr_up_06 = (eo_t1_06 - eo_t2_06) * -1
+  print sr_up_06
+
+  * ---- 1 -> 6.5 mA
+  alter @Iload[pulse] = [ 1m 6.5m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre_65  FIND v(vout) AT=19u
+  meas tran eo_on_65 FIND v(eout) AT=40u
+  meas tran ov_65    MAX  v(vout) FROM=41u TO=50u
+  meas tran eo_t1_65 FIND v(eout) AT=41.2u
+  meas tran eo_t2_65 FIND v(eout) AT=42.2u
+  let sr_up_65 = (eo_t1_65 - eo_t2_65) * -1
+  print sr_up_65
+
+  * ---- 1 -> 7 mA: above the cliff, published at the rail
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran vpre_07  FIND v(vout) AT=19u
+  meas tran eo_off_07 FIND v(eout) AT=19u
+  meas tran eo_on_07 FIND v(eout) AT=40u
+  meas tran ov_07    MAX  v(vout) FROM=41u TO=50u
+  meas tran eo_t1_07 FIND v(eout) AT=41.2u
+  meas tran eo_t2_07 FIND v(eout) AT=42.2u
+  let sr_up_07 = (eo_t1_07 - eo_t2_07) * -1
+  print sr_up_07
+  meas tran eo_d1_07 FIND v(eout) AT=20.2u
+  meas tran eo_d2_07 FIND v(eout) AT=21.2u
+  let sr_dn_07 = eo_d1_07 - eo_d2_07
+  print sr_dn_07
+  wrdata overshoot_07.csv v(vout) v(eout) v(x_amp.eout1) v(vfb)
+
+  * ---- The pull-up current itself, measured rather than inferred from device widths.
+  * XM6's drain current at the operating point is the ceiling on how fast eout can rise,
+  * and it is the number the whole prediction rests on. Taken with the load applied,
+  * which is the state eout has to recover FROM.
+  alter @Iload[pulse] = [ 7m 7m 20u 1u 1u 20u 60u ]
+  op
+  print v(eout) v(x_amp.eout1) v(x_amp.ptail) v(x_amp.pbias) v(vfb) v(vref)
+.endc
+.end

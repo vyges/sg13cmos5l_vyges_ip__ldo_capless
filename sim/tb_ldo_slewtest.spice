@@ -1,0 +1,100 @@
+* tb_ldo_slewtest -- DIAGNOSTIC. Decides between the two explanations of the load-release
+* cliff that tb_ldo_overshoot brackets to 6.0 .. 6.5 mA.
+*
+* CHARGE: 20 pF of Cout cannot absorb the charge the pass device delivers before the loop
+*         responds. The cliff is then a property of the STEP SIZE, and the fix is a bigger
+*         Cout -- which costs slot area this block does not have.
+*
+* RATE:   eout is pulled up only by XM6, a ~5 uA current source, against XCm (193x193 um,
+*         ~48 pF) plus 6400 um of pass-device gate. That fixes how fast the pass device can
+*         be turned OFF, in A/s. The cliff is then a property of dI/dt of the RELEASE, and
+*         the fix is in the amplifier, not the output capacitor.
+*
+* They are separable because they disagree about a case neither was derived from:
+*
+*   a SMALL step with a FAST edge -- 1 -> 3.5 mA released in 0.5 us.
+*
+* 3.5 mA is far below the 6 mA cliff, so CHARGE predicts a clean recovery. dI/dt is
+* 7 mA/us, identical to the 1 -> 7 mA case that rails, so RATE predicts it rails. One run
+* falsifies one of them. The complementary case -- a LARGE step with a SLOW edge, 1 -> 14 mA
+* released over 2 us -- is included for the same reason from the other side: double the
+* charge of the failing case at the same dI/dt.
+*
+* ⚠️ Every window below is written against the release, which moves with TF: the release
+* starts at TD+TR+PW = 41 us and ends at 41 us + TF. A window that does not move reports
+* the settled value instead of the excursion, which reads as SUCCESS and would make this
+* bench say what it was built to test.
+*
+* Run: cd sim && ngspice -b tb_ldo_slewtest.spice
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+Vin     vin     0 DC 3.3
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+Vilim   ilim_en 0 0
+Ibias   0       ibias DC 1u
+Iload   vout    0 PULSE(1m 7m 20u 1u 1u 20u 60u)
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  * ---- reference: the failing case, 6 mA released in 1 us = 6 mA/us
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 1u 20u 60u ]
+  tran 5n 60u
+  meas tran ovA MAX v(vout) FROM=41u TO=52u
+  print ovA
+
+  * ---- same step, slower release. 6 mA over 2 us = 3 mA/us, and over 4 us = 1.5 mA/us.
+  * CHARGE says these still rail: the charge delivered is the same. RATE says they recover.
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 2u 20u 60u ]
+  tran 5n 60u
+  meas tran ovB MAX v(vout) FROM=41u TO=53u
+  print ovB
+
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 4u 20u 60u ]
+  tran 5n 60u
+  meas tran ovC MAX v(vout) FROM=41u TO=55u
+  print ovC
+
+  alter @Iload[pulse] = [ 1m 7m 20u 1u 10u 20u 60u ]
+  tran 5n 60u
+  meas tran ovD MAX v(vout) FROM=41u TO=59u
+  print ovD
+
+  * ---- THE DECIDING CASE: small step, fast edge. 2.5 mA over 0.5 us = 5 mA/us.
+  * The step is well under the 6 mA cliff; the rate is that of the failing case.
+  alter @Iload[pulse] = [ 1m 3.5m 20u 1u 0.5u 20u 60u ]
+  tran 5n 60u
+  meas tran ovE MAX v(vout) FROM=41u TO=52u
+  print ovE
+  wrdata slew_small_fast.csv v(vout) v(eout) v(x_amp.eout1)
+
+  * ---- and its complement: large step, slow edge. 13 mA over 2 us = 6.5 mA/us.
+  alter @Iload[pulse] = [ 1m 14m 20u 1u 2u 20u 60u ]
+  tran 5n 60u
+  meas tran ovF MAX v(vout) FROM=41u TO=53u
+  print ovF
+
+  * ---- The intervention this result points at is NOT tested here.
+  * It was, in the first revision of this bench, with `alter` on XM6's width -- which
+  * ngspice rejected as "no such device or model name" and then carried on, running the
+  * unmodified circuit and reporting it as the fixed one. It was caught only because the
+  * quiescent current came back bit-for-bit unchanged at 3.580622e-05.
+  * ⛔ Do not reintroduce it. The width sweep lives in tb_ldo_m6sweep.spice, driven by
+  * m6sweep.sh, which substitutes the width into the netlist and VERIFIES the substitution
+  * before each run -- so a modification that does not land fails the run instead of
+  * quietly reporting the baseline as a result.
+.endc
+.end
