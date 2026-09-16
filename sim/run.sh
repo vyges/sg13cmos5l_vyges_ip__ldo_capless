@@ -85,12 +85,48 @@ echo "cells:   $(grep -c '^\.subckt' sim/ldo_cells.spice) subcircuits -> sim/ldo
 
 # Run every bench and report a verdict for each. ⚠️ Stopping at the first failure hides the
 # state of all the others.
-rc=0
+# ⛔ Each bench's output is KEPT, as sim/_report_<bench>.log, because tools/datasheet.py
+# reads those logs -- it derives every published figure from them rather than transcribing
+# any. Without them `python3 tools/datasheet.py --check` cannot run at all: it stops at
+# "no such bench log ... run sim/run.sh first", which is exactly what this script had just
+# done. The documented sequence in doc/datasheet/README.md was therefore broken from a
+# clean clone, and the drift guard the repository relies on could not be exercised by
+# anyone who had not already produced those logs some other way.
+# ⚠️ Redirect rather than `tee`: a pipe would report the exit status of tee, and this
+# script's verdict is its exit status.
+# ⛔ The bench set is NAMED, not globbed. `sim/tb_*.spice` used to be the set, and adding
+# diagnostic benches to sim/ silently enrolled them here -- three of them read an input
+# that only their own driver generates (m6sweep.sh, m6ac.sh, boost.sh), so from a clean
+# clone this script would have run them, failed, and returned a non-zero verdict on a
+# design that is fine.
+#
+# PUBLISHED is what this repository publishes numbers from, and rc is the verdict on those.
+# DIAGNOSTIC exists so that a bench cannot be added to sim/ and quietly belong to neither
+# list: the guard below fails if one appears that is not accounted for, which is the only
+# way a named set stays honest as the directory grows.
+PUBLISHED="tb_ldo_ac tb_ldo_dc tb_ldo_ilim_lowvin tb_ldo_perf tb_ldo_status tb_ldo_trim"
+DIAGNOSTIC="tb_ldo_overshoot tb_ldo_slewtest tb_ldo_m6sweep tb_ldo_ac_m6 tb_ldo_boost"
 for tb in sim/tb_*.spice; do
-  echo "=== $(basename "$tb") ==="
-  if (cd sim && ngspice -b "$(basename "$tb")"); then :; else
-    echo "FAILED: $(basename "$tb")" >&2
+  n=$(basename "$tb" .spice)
+  case " $PUBLISHED $DIAGNOSTIC " in
+    *" $n "*) ;;
+    *) echo "FAILED: sim/$n.spice is in neither PUBLISHED nor DIAGNOSTIC in run.sh." >&2
+       echo "        Add it to one: silently skipping a bench is how a suite stops" >&2
+       echo "        covering what it appears to cover." >&2
+       exit 2 ;;
+  esac
+done
+echo "benches:  $(echo $PUBLISHED | wc -w) published, $(echo $DIAGNOSTIC | wc -w) diagnostic (run by their own drivers)"
+
+rc=0
+for n in $PUBLISHED; do
+  tb="sim/$n.spice"
+  b=$(basename "$tb")
+  echo "=== $b ==="
+  if (cd sim && ngspice -b "$b" > "_report_$b.log" 2>&1); then :; else
+    echo "FAILED: $b" >&2
     rc=1
   fi
+  cat "sim/_report_$b.log"
 done
 exit $rc

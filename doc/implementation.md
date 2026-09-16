@@ -632,19 +632,62 @@ run, so they cannot quietly drop out of the record.
 *with* the source-follower gate driver, which was removed in `7944583`; it was not updated
 with the removal.
 
-### Droop and overshoot are set by `Cout`, not by the loop
+### Droop is set by `Cout`. The release overshoot is set by the gate pull-up, and they are
+### not the same defect
 
 A 19 mA step sustained for the microsecond the loop needs to respond moves 19 nC of
 charge. Across 20 pF of output capacitance that is three orders of magnitude more than the
-120 mV the specification allows — the output reaches the rail on release and 324 mV below
-nominal on application, and no amount of loop gain changes it. Holding 120 mV requires the
-loop to respond within
+120 mV the specification allows — the output falls 324 mV below nominal on application, and
+no amount of loop gain changes it. Holding 120 mV requires the loop to respond within
 
     t = Cout x dV / dI = 20 pF x 120 mV / 19 mA = 126 ns
 
 which is a large-signal slew requirement on the pass gate, not a bandwidth one: turning
 16 pF of gate through half a volt in 126 ns needs about 63 µA of drive, against a
 quiescent budget of 60 µA for the whole block.
+
+⛔ **That last paragraph is the mechanism of the RELEASE overshoot, and this section used
+to draw the wrong conclusion from it — that `Cout` is the variable for both.** It is not.
+The arithmetic above is about gate DRIVE, and the release overshoot follows the drive, not
+the charge. `sim/tb_ldo_slewtest.spice` separates them on a case neither account was
+derived from:
+
+| step | released over | dI/dt | overshoot |
+| --- | --- | --- | --- |
+| 6 mA | 1 µs | 6 mA/µs | **to the rail** |
+| 6 mA | 2 µs | 3 mA/µs | 235 mV |
+| 6 mA | 10 µs | 0.6 mA/µs | 69 mV |
+| 2.5 mA | 0.5 µs | 5 mA/µs | 197 mV |
+| **13 mA** | 2 µs | 6.5 mA/µs | **to the rail** |
+
+The same charge either reaches the rail or does not, depending only on the edge; double the
+charge at the same rate reaches it. **The threshold is a release RATE of 5.0–5.5 mA/µs**,
+and `sim/tb_ldo_overshoot.spice` narrows the step-size bracket from 5–7 mA to 6.0–6.5 mA
+with the same conclusion: nothing in the amplifier does anything discontinuous across the
+cliff — `eout` moves 78 mV in total between a 3 mA and a 7 mA step and its recovery slew is
+smooth — but the PEAK moves from the end of the load edge to three microseconds after it.
+
+🔑 **The rate is `XM6`.** It is the only pull-up on `eout`: a w=2u pMOS mirroring about
+5 µA out of the ~10 µA reference, into roughly 50 pF of `XCm` plus 6400 µm of pass-device
+gate. Pulling `eout` DOWN is a transconductor and is fast; pulling it UP is that current
+into that capacitance. Measured slew is 0.10–0.13 V/µs and the gate sensitivity is
+19.5 mV/mA, which multiplies out to the observed threshold.
+
+⛔ **`XM6` cannot simply be widened, because it is also the second stage's load device and
+its current is therefore in the loop gain.** `sim/tb_ldo_m6sweep.spice` and
+`sim/tb_ldo_ac_m6.spice` price it over the full 243-corner sweep:
+
+| `XM6` | Iq | 1 → 7 mA | 1 → 20 mA | min phase margin / 243 |
+| --- | --- | --- | --- | --- |
+| **2u, as drawn** | 35.8 µA | rail | rail | **45.62°**, none below 45 |
+| 2.5u | 37.0 µA | 285 mV | rail | 45.49°, none below 45 |
+| 3u | 38.2 µA | 252 mV | rail | 43.61° ❌ |
+| 4u | 40.6 µA | 223 mV | 575 mV | 38.50° ❌, nine below 45 |
+
+Covering the specified release needs 4u; holding phase margin allows at most 2.5u. **No
+static pull-up satisfies both**, and at 2.5u the binding corner also moves from no-load to
+the 100 µA mid-load dip. The pull-up has to be large during the event and absent from the
+small-signal loop, which is what `sim/ldo_boost.tpl` prototypes — see below.
 
 **This was measured against the design as it stood before the gate driver, to be sure of
 the attribution:** droop 325 mV and overshoot to the rail, i.e. unchanged. The gate driver
@@ -710,11 +753,12 @@ Stated here rather than left to be discovered:
 1. **Close the last degree of phase margin** — see the open question below. Dropout,
    quiescent current and output accuracy all pass; this is the only remaining
    small-signal gap and everything cheap has been tried.
-2. **Size `Cout` against the load-step specification rather than against area.** 20 pF was
-   chosen as 6.6 % of the slot. The transient specification implies far more, and a
-   capless LDO with a 1 µs, 19 mA step is a charge problem before it is a loop problem.
-   This needs a number from the review: what step must actually be survived, and at what
-   output droop.
+2. **Size `Cout` against the load-step DROOP rather than against area.** 20 pF was chosen
+   as 6.6 % of the slot, and droop genuinely is a charge problem: a 1 µs, 19 mA step is
+   19 nC against 20 pF. This needs a number from the review — what step must be survived,
+   and at what droop. ⛔ It does **not** answer the release overshoot, which the sweep above
+   shows is a rate threshold in the gate pull-up; sizing `Cout` for droop would leave the
+   over-voltage exactly where it is.
 3. **Re-run PVT once 1 and 2 are settled** — both change the operating point, and the
    corner sweep is the only thing that has caught a regression here so far.
 4. **Monte-Carlo the trim divider and the reference**, which no run has covered yet.
@@ -857,13 +901,32 @@ is the historical record of what was proposed.
 
 ## What is actually open
 
-These are the block's real remaining work, and all three are the same limitation seen from
-different directions — 20 pF of on-chip output capacitance cannot hold a 19 mA step for the
-microsecond the loop needs.
+These are the block's real remaining work. ⛔ **They were recorded as three views of one
+limitation — 20 pF of output capacitance against a 19 mA step — and that grouping is wrong
+for the first of them.** Droop and PSRR are charge and loop; the release overshoot is a
+rate threshold in the pass-gate pull-up, and the two have different fixes. The section
+above carries the measurements.
 
 1. ⛔ **Load-release overshoot reaches the 3.3 V rail**, and the reviewer's words were *"that
    needs fixing"* — it is an over-voltage on thin-oxide devices, not a settling wobble. This
    is the most serious of the three. See `doc/datasheet/ldo_capless_load_step.svg`.
+
+   **Mechanism named, fix prototyped, not adopted.** It is a release-rate threshold of
+   5.0–5.5 mA/µs set by `XM6`'s ~5 µA into the pass gate. `sim/ldo_boost.tpl` adds a
+   transient pull-up that is off at the operating point, so it contributes no gm to the
+   loop: over 81 transient corners **no corner reaches the rail**, against 81 of 81 without
+   it, for +0.2 µA of quiescent current, PSRR unchanged to five figures, startup unchanged
+   against a no-boost control, and a 243-corner phase-margin minimum of **46.04°** against
+   the block's own 45.62° with none below 45.
+
+   ⛔ **Five of those 81 corners drive the output negative during the load step**, and all
+   five are 110 °C with the lowest-sheet resistor corner — a hotter threshold and a quarter
+   shorter time constant together make the boost fire on the output's own RECOVERY from the
+   droop and fight the loop. That is the topology's limit, not the sizing's: an edge
+   detector on `vout` cannot distinguish an output rising because the load was released from
+   one rising because the loop is correcting. **The direction that follows is to sense the
+   regulation error — `vfb` against `vref` — rather than the output slew, so the boost can
+   only fire above the regulation point. It is not in this revision.**
 2. ⛔ **Load-step droop is 338 mV.** Because question 2 above came back as *ours to specify*,
    this is now a promise to write rather than a target to hit — but 338 mV is a large number
    to promise, and it is charge, not loop bandwidth, that sets it.
@@ -872,7 +935,8 @@ microsecond the loop needs.
 4. **Is 45° the right phase-margin target for a capless LDO with 20 pF of output
    capacitance**, or does `Cout` have to grow for the transient specifications anyway — in
    which case the stability question changes shape and is answered by the same decision that
-   answers 1 and 2. This is the one genuinely open design-judgement question left.
+   answers 2. ⚠️ This was written as being answered by the same decision as **1** as well;
+   it is not. Item 1 is a gate-drive rate and is settled by the pull-up, not by `Cout`.
 
 Everything above is reproducible from this repository: `sim/run.sh` and `sim/run_pvt.sh`
 produce the results, and `python3 tools/datasheet.py --check` fails if any published figure

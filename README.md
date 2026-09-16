@@ -18,8 +18,13 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 A clean, reusable local-supply regulator for sensitive analog/mixed-signal
 blocks. Designed to drop into one openframe pallet slot: 3.3 V VIN from
 the slot power switch, reference/bias from the harness V/I references, and
-5-bit output trim over the digital control-status bus. A **4-wire (Kelvin) output**
-keeps precision DC measurable through the shared analog mux.
+5-bit output trim over the digital control-status bus. It asks for **one dedicated
+low-resistance pad** for `vout` and no other sole-use analog access.
+
+⚠️ The proposal also asked for a muxable Kelvin `vout_sense` pin, on which mux resistance
+would not matter because a meter sinks no current. **That pin is not in this revision** —
+the block brings out a single `vout`. Adding it is a wire, not a circuit, but it needs a
+pad to be worth adding.
 
 Measured on the schematic hierarchy, tt/27 °C unless noted:
 
@@ -43,19 +48,44 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
 ⚠️ **Three specifications are not met and are documented with numbers rather than
-omitted.** They are all the same limitation — 20 pF of on-chip output capacitance cannot
-hold a 19 mA step for the microsecond the loop needs, which is a charge problem before it
-is a loop problem.
+omitted.** Droop and PSRR are the limitation they look like: 20 pF of on-chip output
+capacitance cannot hold a 19 mA step for the microsecond the loop needs. **The release
+overshoot is not, and measuring it rather than assuming it changed what the fix has to
+be.**
 
 🔑 **But the step size is ours to specify, so it is now specified.** The 120 mV target came
 from this block's own proposal, not from a requirement. Sweeping step size says what the
 block actually holds: **both excursions stay inside ±120 mV up to a 1 → 3 mA step**
 (droop 90.2 mV, overshoot 119.7 mV). See `doc/datasheet/ldo_capless_step_profile.svg`.
 
-⛔ **And the release overshoot is a cliff, not a slope — which no single-step measurement
-shows.** It tracks the droop up to a 5 mA release (231 mV) and then runs to the supply rail
-by 7 mA (2066 mV). That is an over-voltage on thin-oxide devices above a threshold between
-5 and 7 mA, and it is the block's primary open defect: bounded now, but not fixed.
+⛔ **The release overshoot is a threshold in dI/dt, not in step size.** It was recorded as
+a cliff somewhere between a 5 mA and a 7 mA release — it tracks the droop to 231 mV at
+5 mA and reaches the rail at 7 mA. Sweeping the release EDGE as well as the step says it is
+not a property of the step at all. The same 6 mA step runs to the rail released in 1 µs and
+settles within 235 mV released in 2 µs; a 13 mA step, double the charge, rails at the same
+rate. The threshold is a **release rate of 5.0–5.5 mA/µs**, set by the one device that
+pulls the pass gate up — about 5 µA into roughly 50 pF of compensation capacitance plus
+6400 µm of pass-device gate, measured as 0.10–0.13 V/µs against a gate sensitivity of
+19.5 mV/mA. It remains the block's primary open defect, and it is now bounded by a
+mechanism rather than by two samples.
+
+🔑 **Which means the specification this block can hold is a RATE, and by that measure it is
+better than one step size suggests.** A 7 mA release costs 69 mV at 0.6 mA/µs and 141 mV at
+1.5 mA/µs — the same release that reaches the rail at 6 mA/µs. Below roughly 5 mA/µs no
+step size tested produces an over-voltage. An integrator whose load releases more slowly
+than that is not exposed to this defect.
+
+ℹ️ **What the fix cannot be, measured rather than argued.** The pull-up is also the second
+stage's load device, so its current sits in the loop gain: widening it clears the
+1 → 20 mA release and takes the 243-corner phase-margin minimum from 45.6° to 38.5°, with
+nine corners below specification. A prototype transient boost that is off at the operating
+point — contributing no gm to the loop — removes the over-voltage at **every one of 81
+transient corners** for +0.2 µA of quiescent current, unchanged PSRR, unchanged startup and
+a 243-corner phase-margin minimum of 46.0°. Five of those 81, all at 110 °C with the
+lowest-sheet resistor corner, then show it firing on the output's own recovery from the
+droop, because an edge detector cannot tell a release from a recovery. The benches and the
+prototype are in `sim/`. **The direction that follows is to sense the regulation error
+rather than the output slew, which cannot confuse the two; it is not in this revision.**
 
 ✅ **Phase margin over PVT now passes**, at 45.6° with no corner below specification. It was
 40.2°. **No device changed value**: the block was re-pinned to IHP-Open-PDK
