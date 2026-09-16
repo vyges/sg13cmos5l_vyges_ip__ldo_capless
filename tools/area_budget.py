@@ -30,6 +30,8 @@ def um(v):
     return float(v[:-1]) * 1e-6 if v.endswith("u") else float(v)
 
 cache = {}
+dims = {}
+_dim = {}
 def dev_area(model, p):
     """Bounding-box area in um^2 of one drawn device."""
     key = (model, tuple(sorted(p.items())))
@@ -52,6 +54,7 @@ def dev_area(model, p):
             return None
         b = c.bbox()
         a = (b.width() * dbu) * (b.height() * dbu)
+        dims[key] = (b.width() * dbu, b.height() * dbu)
     except Exception as e:
         print("  ! %s %s: %s" % (model, par, str(e)[:70]))
         cache[key] = None
@@ -78,9 +81,12 @@ for line in open(NET):
     m = int(float(p.get("m", 1)))
     a = dev_area(model, p)
     rows.append((cell, t[0], model, p.get("w"), p.get("l"), m, a))
+    k = (model, tuple(sorted(p.items())))
+    if k in dims:
+        _dim[(cell, t[0])] = "%.1f x %.1f" % dims[k]
 
 SLOT = 530.0 * 310.0
-print("%-12s %-8s %-14s %8s %8s %4s %12s" % ("cell", "inst", "model", "w", "l", "m", "area um2"))
+print("%-12s %-8s %-14s %8s %8s %4s %12s %16s" % ("cell", "inst", "model", "w", "l", "m", "area um2", "drawn WxH um"))
 tot = 0.0
 unknown = []
 for cell, inst, model, w, l, m, a in sorted(rows, key=lambda r: -(r[6] or 0) * r[5]):
@@ -89,11 +95,21 @@ for cell, inst, model, w, l, m, a in sorted(rows, key=lambda r: -(r[6] or 0) * r
         continue
     tot += a * m
     if a * m > 200:
-        print("%-12s %-8s %-14s %8s %8s %4d %12.1f" % (cell, inst, model, w, l, m, a * m))
+        d = dims.get((model, tuple(sorted(dict(kv.split("=",1) for kv in [] ).items()))), None)
+        print("%-12s %-8s %-14s %8s %8s %4d %12.1f %16s" % (cell, inst, model, w, l, m, a * m, _dim.get((cell,inst),"")))
 print("-" * 74)
 print("%d devices measured, %d could not be generated" % (len(rows) - len(unknown), len(unknown)))
 for c, i, mo in unknown:
     print("   not generated: %s.%s (%s)" % (c, i, mo))
+percell = {}
+for cell, inst, model, w, l, m, a in rows:
+    if a is not None:
+        percell[cell] = percell.get(cell, 0.0) + a * m
+print()
+print("per cell:")
+for c, a in sorted(percell.items(), key=lambda x: -x[1]):
+    print("  %-14s %9.1f um2   %5.1f %% of slot" % (c, a, 100 * a / SLOT))
+print()
 print("device area total : %10.1f um2" % tot)
 print("slot 530 x 310    : %10.1f um2" % SLOT)
 print("devices occupy    : %9.1f %% of the slot (bounding boxes only, no routing)" % (100 * tot / SLOT))
