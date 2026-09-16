@@ -327,6 +327,99 @@ def _readme_figures():
 
 
 
+
+# ---------------------------------------------------------------- the hand-wired benches
+
+# ⛔ WHY THIS CHECK EXISTS, and it is not hypothetical. tb_ldo_ac and tb_ldo_pvt instantiate
+# the sub-cells BY HAND, because breaking the feedback loop needs a node that does not exist
+# in ldo_capless.sch. So a port added to a cell does not reach them, and the port ORDER in
+# those lines is maintained by a person.
+#
+# ngspice catches the easy half: too few parameters, loudly. It cannot catch the dangerous
+# half. On 2026-09-16 ldo_vref gained vref_ov and the bench line was written in the order of
+# the cell spec's `ports` list rather than the order xschem emits -- the right NUMBER of nets
+# in the wrong sequence. vref_ov was tied to vss, the block stopped regulating at 0.97 mV, and
+# the 243-corner sweep then reported 61 deg of phase margin on a dead circuit. That reads as a
+# 15 degree IMPROVEMENT over the real answer. Nothing in the flow objected.
+#
+# ⚠️ Subcircuit port order is the SYM EDGE order -- left, right, top, bottom -- not the order
+# of the `ports` list in the cell spec, and not alphabetical. It cannot be reconstructed by
+# reasoning; it has to be read off the .subckt line, which is what this does.
+BENCHES = ["tb_ldo_ac.spice", "tb_ldo_pvt.tpl"]
+
+# The benches name every net after the port it drives, which is what makes a positional
+# NAME comparison possible at all. These two differ on purpose:
+_BENCH_REWIRES = {
+    # The loop break itself. x_fb drives vfbd; Vinj injects between vfbd and vfb. If this
+    # ever matched, the loop would not be broken and every phase margin in this repository
+    # would be meaningless.
+    ("x_fb", "vfb"): "vfbd",
+    # The power-good threshold tap is called vref_pg where it is generated and vpg where it
+    # is consumed.
+    ("x_pg", "vpg"): "vref_pg",
+}
+
+
+def _subckt_ports():
+    """{cell: [ports]} from the cells file the benches themselves include."""
+    path = os.path.join(ROOT, "sim", "ldo_cells.spice")
+    if not os.path.isfile(path):
+        raise SystemExit(f"no cells file: {path}\nrun sim/run.sh first")
+    out = {}
+    for line in open(path, encoding="utf-8"):
+        if line.startswith(".subckt "):
+            t = line.split()
+            out[t[1]] = t[2:]
+    return out
+
+
+def check_bench_ports():
+    """Every hand-written sub-cell instantiation, against the real port order."""
+    cells = _subckt_ports()
+    bad, checked = [], 0
+    for bench in BENCHES:
+        path = os.path.join(ROOT, "sim", bench)
+        if not os.path.isfile(path):
+            bad.append(f"{bench}: missing")
+            continue
+        for n, line in enumerate(open(path, encoding="utf-8"), 1):
+            t = line.split()
+            if len(t) < 2 or not t[0].lower().startswith("x") or t[-1] not in cells:
+                continue
+            inst, cell, nets = t[0], t[-1], t[1:-1]
+            ports = cells[cell]
+            checked += 1
+            if len(nets) != len(ports):
+                bad.append(f"{bench}:{n} {inst} passes {len(nets)} nets to {cell}, "
+                           f"which has {len(ports)} ports")
+                continue
+            for net, port in zip(nets, ports):
+                want = _BENCH_REWIRES.get((inst, port))
+                if want is not None:
+                    # ⛔ A rewire is REQUIRED, not merely permitted. Accepting the port's own
+                    # name here as well leaves the worst failure of all invisible: x_fb
+                    # driving vfb instead of vfbd does not break the loop, every phase margin
+                    # in this repository becomes meaningless, and a name-equality rule waves
+                    # it through because vfb does equal vfb. Caught by testing that this
+                    # check could FAIL on it -- it could not, and this is the fix.
+                    if net != want:
+                        bad.append(f"{bench}:{n} {inst} -> {cell}: port {port!r} must be "
+                                   f"driven by {want!r} and is driven by {net!r}")
+                    continue
+                if net != port:
+                    bad.append(f"{bench}:{n} {inst} -> {cell}: net {net!r} is in the position "
+                               f"of port {port!r}. Either the order is wrong, or add it to "
+                               f"_BENCH_REWIRES with a reason.")
+    print(f"\nbench wiring: {checked} hand-written instantiation(s) across {len(BENCHES)} bench(es)")
+    if bad:
+        print(f"{len(bad)} problem(s):")
+        for b in bad:
+            print(f"  {b}")
+        return 1
+    print("every hand-wired instantiation matches the port order xschem emits")
+    return 0
+
+
 # ---------------------------------------------------------------- the pin list
 
 # ⛔ WHY THIS CHECK EXISTS. doc/datasheet/<NAME>.md is HAND-WRITTEN -- this script only ever
@@ -456,7 +549,7 @@ def check():
     # ⛔ Runs even when the figures failed, and its status is OR-ed in: reporting only the
     # first failing category means the second one is found on the next run instead of this
     # one, which is how a two-line fix becomes two review cycles.
-    return check_pins() | rc
+    return check_pins() | check_bench_ports() | rc
 
 
 # ---------------------------------------------------------------- plots
