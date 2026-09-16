@@ -1,0 +1,135 @@
+* tb_ldo_psrr -- DIAGNOSTIC. Where does supply ripple actually get into the output?
+*
+* PSRR is 35.1 dB at 1 kHz against a 40 dB specification, 15.1 dB at 10 kHz, and ABOVE UNITY
+* at 100 kHz (+1.6 dB) and 1 MHz (+4.4 dB) -- the block amplifies supply ripple there rather
+* than rejecting it. implementation.md attributes the high-frequency end to "the same Cout
+* limitation as the load transient".
+*
+* ⚠️ THAT ATTRIBUTION IS SUSPECT AND THAT IS WHY THIS BENCH EXISTS. The same document said the
+* release overshoot was a Cout problem (it was a dI/dt threshold in the gate pull-up) and that
+* the droop was a Cout problem (it is a ramp-tracking error, and tripling Cout moves it
+* 0.3 mV in the wrong direction). Cout has now been blamed for three things and measured to
+* cause none of them. A fourth attribution to the same cause, never probed, should not be
+* trusted on its record.
+*
+* WHAT THIS MEASURES. The pass device is a pMOS whose SOURCE IS vin, so its drive is
+* Vsg = vin - eout. If eout tracked vin one-for-one, Vsg would be constant and the supply
+* would not reach the output at all. So the question is not "how good is the loop" but
+* "does eout follow the supply", and every node below is measured as a transfer from vin:
+*
+*   a_eout    v(eout)/v(vin)   -> 0 dB means eout rides the supply perfectly: ideal
+*   a_ptail   the amplifier's tail node, which is a pMOS drain off vin
+*   a_eout1   the first-stage output, referenced to vss through the nMOS mirror
+*   a_vref    the reference, to show it is not the leak
+*   a_vout    the output itself: this is PSRR
+*
+* 🔑 THE DISCRIMINATOR. eout is pulled toward vin by XM6 and toward vss-referenced eout1 by
+* XM5 and by XCm. If a_eout falls away from 0 dB at the frequency where PSRR collapses, the
+* compensation capacitor is tying the pass gate to ground instead of to the supply -- which is
+* the classic Miller-compensation PSRR failure and has nothing to do with Cout. If instead
+* a_eout stays near 0 dB while a_vout degrades, the leak is downstream and Cout is back in
+* the frame.
+*
+* ============================ WHAT THIS BENCH FOUND ============================
+*
+* ✅ PSRR IS PURELY A LOOP-GAIN PROBLEM, and the relation is exact over four decades:
+*
+*     f        loop gain   PSRR     sum
+*     10 Hz    115.66     -67.43   48.23
+*     100 Hz   102.32     -54.86   47.46
+*     1 kHz     82.47     -35.07   47.40
+*     10 kHz    60.97     -15.12   45.86
+*
+*   PSRR(f) = 47 dB - loop_gain(f). The open-loop supply-to-output coupling is a constant
+*   +47 dB -- the pass device's gm times its output impedance -- and everything the block
+*   achieves is the loop dividing it down.
+*
+* ⛔ NONE OF THE SUSPECTED CAUSES SURVIVED.
+*   - Not Cout, the standing attribution in implementation.md. That document has now blamed
+*     Cout for the release overshoot, the droop and the high-frequency PSRR, and measurement
+*     has cleared it of all three.
+*   - Not the compensation tying the pass gate to ground, which was this bench's own opening
+*     hypothesis: eout tracks vin to within 0.03 dB at EVERY frequency measured. That is not
+*     the absence of a leak, it is the loop succeeding -- the open-loop coupling is +47 dB and
+*     what remains is the closed-loop residue.
+*   - Not the reference, rejected by 99 dB at 1 kHz.
+*
+* 🔑 SO THE LEVER IS LOOP GAIN, AND IT IS THE SAME LEVER AS THE DROOP. Both are set by gm:
+*
+*     tail    PSRR@1k   droop     loop gain@1k   Iq       243-corner PM
+*     10 uA   35.07 dB  338.2 mV  82.47 dB       41.5 uA  45.10 deg
+*     20 uA   38.18     226.3     84.71          51.2     --
+*     30 uA   39.91     183.8     85.77          60.8     24.67 deg  ⛔
+*     40 uA   41.08     159.7     86.39          70.4     --
+*
+* ⛔ AND IT IS UNUSABLE. Reaching 40 dB needs about 30 uA of tail, which costs 20.4 degrees of
+* worst-corner phase margin -- 45.10 down to 24.67 against a 45 deg minimum. It also puts Iq
+* at 60.8 against a 60 uA budget, but the stability is what kills it, not the current.
+*
+* ⚠️ Nor can the compensation buy it back. At the typical corner, tripling Cm from 193 um to
+* 334 um square -- 23 % of the slot to 68 % -- recovers 3.5 degrees, against the 20 needed.
+* (Measured at no load and at the typical corner only; the UGF does not move with Cm there,
+* which suggests the loop is not Miller-dominated at no load, and that is not fully explained.)
+*
+* ⟹ DROOP, PSRR AND PHASE MARGIN ARE ONE TRADE, not three problems. The block as drawn sits
+* exactly where phase margin just passes and the other two just fail. Moving any of them by
+* turning up gain moves the others the wrong way, and the compensation that would normally pay
+* for it is already 23 % of a 530 x 310 um slot. What this needs is gain WITHOUT bandwidth --
+* cascoding the first stage is the standard answer and costs headroom and area rather than
+* current -- not a larger number on an existing device.
+*
+* Run: cd sim && ngspice -b tb_ldo_psrr.spice
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cap_cmomf.lib
+.lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerRES.lib res_typ
+.include $PDK_ROOT/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/spice/sg13cmos5l_stdcell.spice
+.global sub!
+.include ../sim/netlist/ldo_capless.spice
+
+* ⚠️ The reference is an IDEAL source here, exactly as in tb_ldo_perf. That is deliberate: it
+* measures the block's own rejection rather than the harness bandgap's. A real bandgap adds
+* its own supply sensitivity on top of whatever this finds.
+Vin     vin     0 DC 3.3 AC 1
+Vrefbg  vref_bg 0 1.2
+Vss     vss     0 0
+Vsub    sub!    0 0
+Vddd    vddd    0 1.2
+Ven     en      0 1.2
+Vilim   ilim_en 0 0
+Ibias   0       ibias DC 1u
+Iload   vout    0 DC 1m
+Vt0 vtrim0 0 0
+Vt1 vtrim1 0 0
+Vt2 vtrim2 0 0
+Vt3 vtrim3 0 0
+Vt4 vtrim4 0 1.2
+
+.control
+  op
+  ac dec 20 10 100meg
+  let a_vout  = db(v(vout))
+  let a_eout  = db(v(eout))
+  let a_ptail = db(v(x_amp.ptail))
+  let a_eout1 = db(v(x_amp.eout1))
+  let a_vref  = db(v(vref))
+  * Published PSRR points, so this bench can be checked against tb_ldo_perf.
+  meas ac p1k   FIND a_vout AT=1k
+  meas ac p10k  FIND a_vout AT=10k
+  meas ac p100k FIND a_vout AT=100k
+  meas ac p1m   FIND a_vout AT=1meg
+  * Does the pass gate ride the supply? 0 dB is perfect, negative is the leak.
+  meas ac e1k   FIND a_eout AT=1k
+  meas ac e10k  FIND a_eout AT=10k
+  meas ac e100k FIND a_eout AT=100k
+  meas ac e1m   FIND a_eout AT=1meg
+  meas ac t1k   FIND a_ptail AT=1k
+  meas ac t100k FIND a_ptail AT=100k
+  meas ac o1k   FIND a_eout1 AT=1k
+  meas ac o100k FIND a_eout1 AT=100k
+  meas ac r1k   FIND a_vref AT=1k
+  meas ac r100k FIND a_vref AT=100k
+  print p1k p10k p100k p1m e1k e10k e100k e1m t1k t100k o1k o100k r1k r100k
+  wrdata psrr_nodes.csv a_vout a_eout a_ptail a_eout1 a_vref
+.endc
+.end

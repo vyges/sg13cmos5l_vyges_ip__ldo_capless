@@ -105,7 +105,7 @@ echo "cells:   $(grep -c '^\.subckt' sim/ldo_cells.spice) subcircuits -> sim/ldo
 # list: the guard below fails if one appears that is not accounted for, which is the only
 # way a named set stays honest as the directory grows.
 PUBLISHED="tb_ldo_ac tb_ldo_dc tb_ldo_ilim_lowvin tb_ldo_perf tb_ldo_status tb_ldo_trim"
-DIAGNOSTIC="tb_ldo_overshoot tb_ldo_slewtest tb_ldo_m6sweep tb_ldo_ac_m6 tb_ldo_boost tb_ldo_ovboost tb_ldo_hybboost tb_ldo_droop"
+DIAGNOSTIC="tb_ldo_overshoot tb_ldo_slewtest tb_ldo_m6sweep tb_ldo_ac_m6 tb_ldo_boost tb_ldo_ovboost tb_ldo_hybboost tb_ldo_droop tb_ldo_psrr"
 for tb in sim/tb_*.spice; do
   n=$(basename "$tb" .spice)
   case " $PUBLISHED $DIAGNOSTIC " in
