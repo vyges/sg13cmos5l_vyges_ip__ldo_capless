@@ -78,6 +78,33 @@
 * cascoding the first stage is the standard answer and costs headroom and area rather than
 * current -- not a larger number on an existing device.
 *
+* ⛔ AND CASCODING THE FIRST STAGE WILL NOT FIX IT. That was the obvious next move -- gain
+* without bandwidth, raise ro so the loop gain rises while gm and therefore UGF stay put -- and
+* it was tested in its cheapest form first: scale W and L of the input pair and the mirror
+* TOGETHER, which raises ro with L while gm follows W/L and stays constant. A cascode would
+* raise ro further by the same mechanism, so if ro is the lever this must show it.
+*
+*     scale   loop gain @1 kHz   PSRR      droop      PM no-load
+*     x1      82.47 dB           35.07 dB  338.2 mV   58.98 deg
+*     x2      82.94              34.85     348.5      58.12
+*     x4      83.16              34.71     357.2      53.73
+*
+* Four times the device size buys 0.7 dB of loop gain and makes PSRR, droop and phase margin
+* all slightly WORSE. Output resistance is not the lever at 1 kHz, so neither is a cascode --
+* which raises exactly the same quantity, at a cost in headroom and devices this saves.
+*
+* ⚠️ NOT FULLY EXPLAINED, and said plainly rather than dressed up. The natural account is that
+* at 1 kHz the loop is already past its dominant pole and in the integrator region, where
+* |T| = gm1/(w*Cm) and ro does not appear. But the arithmetic does not close: a pure
+* integrator predicts 74.50 dB at 1 kHz from the measured unity-gain frequency against 83.16
+* measured, and the loop crosses 0 dB TWICE (1.54 MHz and 5.31 MHz), so it is not the simple
+* single-pole shape that account assumes. The measurement is solid; the explanation is not,
+* and the measurement is what decides the cascode question.
+*
+* ⟹ WHAT IS LEFT. Loop gain at 1 kHz responds to gm and to Cm, and both move UGF and
+* therefore phase margin -- the trade already established above. There is no free gain in this
+* topology at this frequency.
+*
 * Run: cd sim && ngspice -b tb_ldo_psrr.spice
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt
