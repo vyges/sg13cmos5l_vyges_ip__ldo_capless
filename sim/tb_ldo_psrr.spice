@@ -80,9 +80,10 @@
 *
 * ⛔ AND CASCODING THE FIRST STAGE WILL NOT FIX IT. That was the obvious next move -- gain
 * without bandwidth, raise ro so the loop gain rises while gm and therefore UGF stay put -- and
-* it was tested in its cheapest form first: scale W and L of the input pair and the mirror
-* TOGETHER, which raises ro with L while gm follows W/L and stays constant. A cascode would
-* raise ro further by the same mechanism, so if ro is the lever this must show it.
+* it was tested in its cheapest form first, by rocheck.sh: scale W and L of the input pair and
+* the mirror TOGETHER, which raises ro with L while gm follows W/L and stays constant. A
+* cascode raises the same quantity by the same mechanism, so if ro is the lever this must show
+* it.
 *
 *     scale   loop gain @1 kHz   PSRR      droop      PM no-load
 *     x1      82.47 dB           35.07 dB  338.2 mV   58.98 deg
@@ -90,16 +91,39 @@
 *     x4      83.16              34.71     357.2      53.73
 *
 * Four times the device size buys 0.7 dB of loop gain and makes PSRR, droop and phase margin
-* all slightly WORSE. Output resistance is not the lever at 1 kHz, so neither is a cascode --
-* which raises exactly the same quantity, at a cost in headroom and devices this saves.
+* all slightly WORSE.
 *
-* ⚠️ NOT FULLY EXPLAINED, and said plainly rather than dressed up. The natural account is that
-* at 1 kHz the loop is already past its dominant pole and in the integrator region, where
-* |T| = gm1/(w*Cm) and ro does not appear. But the arithmetic does not close: a pure
-* integrator predicts 74.50 dB at 1 kHz from the measured unity-gain frequency against 83.16
-* measured, and the loop crosses 0 dB TWICE (1.54 MHz and 5.31 MHz), so it is not the simple
-* single-pole shape that account assumes. The measurement is solid; the explanation is not,
-* and the measurement is what decides the cascode question.
+* ✅ AND THE REASON IS NOW MEASURED, not guessed -- ro DOES rise, it simply cannot help here.
+* The whole loop gain curve, at 1 mA load, says it in one table:
+*
+*     f          x1        x4      delta
+*     1 Hz     116.66    127.77   +11.12     <- ro is real: +12.0 dB expected from 4x L
+*     10 Hz    115.66    121.92    +6.26
+*     100 Hz   102.32    103.16    +0.84
+*     1 kHz     82.47     83.16    +0.69     <- and by here it is gone
+*     10 kHz    60.97     61.38    +0.40
+*     100 kHz   29.53     29.34    -0.18
+*
+* 🔑 THE LEVER WORKS AND EXPIRES BELOW 100 Hz, because ro sets the DC gain and the dominant
+* pole in opposite directions and the two cancel exactly above the pole:
+*
+*     scale   DC gain    dominant pole   slope 100 Hz - 10 kHz
+*     x1      116.66 dB     19.55 Hz        -20.7 dB/dec
+*     x4      127.77        5.96            -20.9
+*
+*   ro rises 3.60x (read off the DC gain) and the pole falls 3.28x (19.55 -> 5.96 Hz). Their
+*   product -- the gain-bandwidth above the pole -- is gm/C and ro is not in it. Predicting
+*   1 kHz from DC gain and pole alone closes to 0.01 dB at x1 and 0.11 dB at x4, and the slope
+*   is a clean single pole through the whole band of interest. 1 kHz sits 51x above the x1
+*   pole, deep in the region where only gm and C appear.
+*
+* ⟹ SO A CASCODE RAISES THE GAIN AT 1 Hz AND NOTHING AT 1 kHz. The PSRR specification is at
+* 1 kHz. It would cost headroom, devices and bias for gain in a decade nobody measures.
+*
+* ⚠️ An earlier draft of this note recorded the mechanism as unexplained, on an apparent 8.7 dB
+* gap between a single-pole prediction and the measurement. That gap was an error of mine: the
+* unity-gain frequency was taken from the NO-LOAD loop file and applied to the 1 mA loop's
+* gain. Same quantity, different operating point. Read from one file the arithmetic closes.
 *
 * ⟹ WHAT IS LEFT. Loop gain at 1 kHz responds to gm and to Cm, and both move UGF and
 * therefore phase margin -- the trade already established above. There is no free gain in this
