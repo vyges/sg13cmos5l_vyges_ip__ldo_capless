@@ -30,10 +30,17 @@
 #     ghcr.io/vyges-tools/vyges-iic-osic-tools:iic-latest-loom0.1.14 --skip \
 #     bash -lc 'sh /work/sim/rocheck.sh'
 #
-# ⚠️ PDK=ihp-sg13cmos5l here, not the ihp-sg13g2 that run.sh defaults to: on the PDK tree
-# this was measured against, the cap_cmomf OSDI model resolves under the cmos5l variant only,
-# and under the base it fails with "Unable to find definition of model cap_cmomf_mod" AFTER
-# netlisting has already succeeded -- which looks like a netlist bug and is not one.
+# ⛔ SPICE_USERINIT_DIR MUST MATCH PDK_ROOT/PDK, and that is the whole of it. IIC-OSIC-TOOLS
+# already EXPORTS SPICE_USERINIT_DIR pointing at its own bundled /foss/pdks, so run.sh's
+# "set it only if the caller has not" guard leaves it alone even when the caller passed a
+# different PDK_ROOT. ngspice then reads the image's .spiceinit, loads the image's OSDI, and
+# every bench dies with "Unable to find definition of model cap_cmomf_mod" AFTER netlisting
+# has succeeded -- which reads as a netlist bug and is not one.
+# ⚠️ An earlier version of this note blamed the PDK VARIANT, claiming cap_cmomf resolves only
+# under ihp-sg13cmos5l. That was wrong: with SPICE_USERINIT_DIR set to match, EITHER variant
+# runs this suite clean, and both were tested.
+# ⟹ PDK=ihp-sg13cmos5l is still the right setting, for the ordinary reason rather than that
+# one: it is the process this IP is designed for and the repository is named after it.
 set -e
 export PDK_ROOT=/pdks PDK=ihp-sg13cmos5l
 export SPICE_USERINIT_DIR=$PDK_ROOT/$PDK/libs.tech/ngspice

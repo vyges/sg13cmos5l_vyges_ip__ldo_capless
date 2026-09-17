@@ -10,7 +10,7 @@ cd "$(dirname "$0")"
 # Exported because the generated deck reaches the stdcell library through $PDK_ROOT
 # directly, not through @M@.
 PDK_ROOT="${PDK_ROOT:-/foss/pdks}"
-PDK="${PDK:-ihp-sg13g2}"
+PDK="${PDK:-ihp-sg13cmos5l}"   # the process this IP targets; see sim/run.sh
 export PDK_ROOT PDK
 if [ -z "${SPICE_USERINIT_DIR:-}" ]; then
   SPICE_USERINIT_DIR="$PDK_ROOT/$PDK/libs.tech/ngspice"

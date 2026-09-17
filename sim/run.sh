@@ -32,10 +32,15 @@ cd "$(dirname "$0")/.." || exit 2
 # base -- so they resolve whichever variant $PDK names, which is what upstream means by
 # "use $PDK to switch between the PDKs". Verified at dev@17dc8dc: PDK=ihp-sg13cmos5l runs
 # this suite with no OSDI errors and byte-identical measurements. It was NOT true before
-# the merge, when neither directory held all six. The default below stays on the base
-# because that is what every published number here was measured with.
+# the merge, when neither directory held all six.
+#
+# ✅ THE DEFAULT IS ihp-sg13cmos5l AS OF 2026-09-17, changed from the base. This IP is
+# designed for SG13CMOS5L and the repository is named for it, so the default should name the
+# process the design targets rather than the one it historically borrowed models from.
+# Measurements are byte-identical between the two, so nothing moves; verified by running the
+# whole suite under the new default and diffing every published figure.
 PDK_ROOT="${PDK_ROOT:-/foss/pdks}"
-PDK="${PDK:-ihp-sg13g2}"
+PDK="${PDK:-ihp-sg13cmos5l}"
 export PDK_ROOT PDK
 # Set only if the caller has not: outside IIC-OSIC-TOOLS nothing else points ngspice at
 # the .spiceinit that loads the OSDI libraries.
@@ -46,6 +51,8 @@ export PDK_ROOT PDK
 # loads the image's OSDI models, and every bench dies with
 #   Unable to find definition of model cap_cmomf_mod
 # AFTER netlisting has already succeeded, which reads as a netlist bug and is not one.
+# ⚠️ It is NOT the PDK variant. Either ihp-sg13g2 or ihp-sg13cmos5l runs this suite clean
+# once SPICE_USERINIT_DIR matches; the variant was blamed first and measured innocent.
 # ⟹ If you override PDK_ROOT, override SPICE_USERINIT_DIR with it:
 #   PDK_ROOT=/pdks PDK=ihp-sg13cmos5l SPICE_USERINIT_DIR=/pdks/ihp-sg13cmos5l/libs.tech/ngspice
 if [ -z "${SPICE_USERINIT_DIR:-}" ]; then
