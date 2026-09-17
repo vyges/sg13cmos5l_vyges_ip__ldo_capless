@@ -50,12 +50,21 @@ Vt4 vtrim4 0 1.2
   alter @Iload[pulse] = [ 1m 1m 20u 1u 1u 20u 60u ]
   ac dec 20 10 100meg
   let psrr_db = db(v(vout))
+  meas ac psrr_100  FIND psrr_db AT=100
   meas ac psrr_1k   FIND psrr_db AT=1k
   meas ac psrr_10k  FIND psrr_db AT=10k
   meas ac psrr_100k FIND psrr_db AT=100k
   meas ac psrr_1m   FIND psrr_db AT=1meg
-  * The four .meas points above are the published specification points; this writes the
-  * whole sweep so the datasheet can DRAW the curve instead of four dots. Relative path:
+  * 🔑 Where rejection runs out. The specification is a mask over 100 Hz - 10 kHz and it has
+  * to say where it stops being true: above this frequency the block does not reject the
+  * supply at all, and around 2 MHz it AMPLIFIES it. rej crosses zero going down, so this is
+  * the FALL crossing of -psrr_db.
+  let rej = -psrr_db
+  meas ac psrr_f0db WHEN rej=0 FALL=1
+  * ⚠️ The .meas points above are NOT all specification points. The specification is a mask
+  * at 100 Hz, 1 kHz and 10 kHz; 100 kHz and 1 MHz are reported without limits because the
+  * block has no rejection there at all. This writes the whole sweep so the datasheet can
+  * DRAW the curve instead of a few dots. Relative path:
   * the runner invokes ngspice with sim/ as the working directory, and an absolute one
   * silently wrote nothing under our own documented invocation once already.
   wrdata psrr.csv psrr_db

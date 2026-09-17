@@ -229,7 +229,23 @@ def rows():
         ("Quiescent current, enabled", "uA", None, 60e-6, (min(iqs), nom_iq, max(iqs))),
         ("Current limit trip", "mA", None, 60e-3, one(_meas("tb_ldo_status.spice", "i_trip"))),
         ("Phase margin over PVT", "deg", 45.0, None, spread(pms)),
-        ("PSRR at 1 kHz", "dB", 40.0, None, one(abs(_meas("tb_ldo_perf.spice", "psrr_1k")))),
+        # ⛔ RESPECIFIED 2026-09-17, from one number to a mask. The old row was a single
+        # 40 dB limit at 1 kHz, and the block delivers 33.73 dB there at the worst of 243
+        # corners. Supply noise does not arrive at one frequency, and the physics is a slope,
+        # not a point: PSRR(f) = 47.4 dB of open-loop coupling MINUS the loop gain, and the
+        # loop is an integrator through this whole band, so rejection falls 20 dB per decade.
+        # One number at one frequency describes none of that. See tb_ldo_psrr.spice.
+        #
+        # Limits are the 243-corner worst case rounded DOWN to the next 10 dB, which lands a
+        # uniform ~3.6 dB of margin at all three. Corner-worst: 53.59 / 33.73 / 13.74 dB.
+        ("PSRR at 100 Hz", "dB", 50.0, None, one(abs(_meas("tb_ldo_perf.spice", "psrr_100")))),
+        ("PSRR at 1 kHz", "dB", 30.0, None, one(abs(_meas("tb_ldo_perf.spice", "psrr_1k")))),
+        ("PSRR at 10 kHz", "dB", 10.0, None, one(abs(_meas("tb_ldo_perf.spice", "psrr_10k")))),
+        # ⚠️ NOT a rejection figure and deliberately limit-free: the frequency above which the
+        # block stops rejecting the supply at all. Reported so the mask above cannot be read
+        # as extending past where it is true.
+        ("Supply rejection holds below", "kHz", None, None,
+         one(_meas("tb_ldo_perf.spice", "psrr_f0db") / 1e3)),
         # ⛔ Reported WITHOUT a limit, because 19 mA/us is outside the specified slew rate.
         # The droop is a ramp-tracking error, so it is a function of dI/dt rather than of step
         # size, and a limit written against a 20 mA step names no condition the block can be
@@ -262,7 +278,11 @@ PHYSICAL = [
 ]
 
 SCALE = {"V": 1, "mV": 1e3, "mA": 1e3, "uA": 1e6, "mA": 1e3, "mV/V": 1e3, "dB": 1, "deg": 1,
-         "um2": 1e12, "": 1, "mA/us": 1}
+         "um2": 1e12, "": 1, "mA/us": 1,
+         # ⚠️ 1, not 1e-3: the row supplies psrr_f0db already divided into kHz, because the
+         # measurement is a frequency in Hz and every other entry here converts from SI base
+         # units. Scaling again would report 71.4 Hz.
+         "kHz": 1}
 
 
 # ---------------------------------------------------------------- rendering
@@ -322,7 +342,10 @@ PUBLISHED_AS = {
     "Quiescent current, enabled": ("Quiescent current, enabled", 0),
     "Current limit trip": ("Current limit trip", 0),
     "Phase margin over PVT": ("Phase margin, worst over PVT", 0),
+    "PSRR at 100 Hz": ("PSRR at 100 Hz", 0),
     "PSRR at 1 kHz": ("**PSRR at 1 kHz**", 0),
+    "PSRR at 10 kHz": ("PSRR at 10 kHz", 0),
+    "Supply rejection holds below": ("Supply rejection holds below", 0),
     "Load-step droop at 19 mA/us": ("**Load-step droop at 19 mA/\u00b5s**", 0),
     "Load slew rate for 120 mV droop": ("Load slew rate for \u2264120 mV droop", 0),
     # ⛔ These two were computed by rows() and emitted into the datasheet, but were NOT in
@@ -845,10 +868,16 @@ def plot_load_step():
 
 
 def plot_psrr():
-    """Power-supply rejection against frequency, with the four specification points marked.
+    """Power-supply rejection against frequency, against the specification MASK.
 
-    The single published figure is rejection at 1 kHz, but supply noise does not arrive at
-    one frequency. The curve shows where rejection actually collapses.
+    ⛔ This drew a single flat 40 dB line until 2026-09-17, which is not what the block is
+    specified to and never described what it does. Rejection is a SLOPE -- the open-loop
+    supply coupling is a constant 47.4 dB and the loop, an integrator through this whole
+    band, divides it down by less and less as frequency rises. A flat limit crosses that
+    slope once and says nothing on either side of the crossing.
+
+    The mask is the three specified points; the shaded region beyond is where the block has
+    no rejection at all, which a reader must not have to infer from the curve.
     """
     p = os.path.join(ROOT, "sim", "psrr.csv")
     if not os.path.isfile(p):
@@ -858,19 +887,36 @@ def plot_psrr():
         return None
     # psrr_db is db(v(vout)) for a 1 V supply perturbation, so rejection is its negation.
     pts = [(math.log10(f), -d) for f, d in rows if f > 0]
-    body, px, py = _axes(70, 30, 620, 330, pts[0][0], pts[-1][0], 0, 80,
+    body, px, py = _axes(70, 30, 620, 330, pts[0][0], pts[-1][0], -20, 80,
                          "frequency (Hz)", "rejection (dB)", "1e{:.0f}", "{:.0f}")
-    body += _limit_line(40.0, px, py, 70, 620, "40 dB specified")
+    # ⚠️ Below zero the block AMPLIFIES supply ripple. Shading it is the point of the figure:
+    # the old axis started at 0 dB and simply clipped that region out of sight.
+    y0, yb = py(0), py(-20)
+    body += (f'<rect x="70" y="{y0:.1f}" width="550" height="{yb-y0:.1f}" '
+             f'fill="#dc2626" opacity="0.08"/>\n'
+             f'<text x="614" y="{y0+14:.1f}" text-anchor="end" fill="#dc2626">'
+             f'below 0 dB the block amplifies supply ripple</text>\n')
+    # The specification mask: three points, joined, then left open to show it does not extend.
+    mask = [(1e2, 50.0), (1e3, 30.0), (1e4, 10.0)]
+    body += ('<polyline fill="none" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="5 3" '
+             'points="' + " ".join(f"{px(math.log10(f)):.1f},{py(v):.1f}" for f, v in mask)
+             + '"/>\n')
+    for f, v in mask:
+        body += (f'<circle cx="{px(math.log10(f)):.1f}" cy="{py(v):.1f}" r="4" fill="none" '
+                 f'stroke="#16a34a" stroke-width="1.5"/>\n')
+    body += (f'<text x="{px(2.0):.1f}" y="{py(50)-8:.1f}" fill="#16a34a">'
+             f'specified: 50 / 30 / 10 dB</text>\n')
     body += _series(pts, px, py, "#2563eb")
-    for key, f in (("psrr_1k", 1e3), ("psrr_10k", 1e4), ("psrr_100k", 1e5), ("psrr_1m", 1e6)):
+    # Reported-but-unlimited points, drawn in grey so they are not read as pass/fail.
+    for key, f in (("psrr_100k", 1e5), ("psrr_1m", 1e6)):
         try:
-            v = abs(_meas("tb_ldo_perf.spice", key))
+            v = -abs(_meas("tb_ldo_perf.spice", key))
         except SystemExit:
             continue
-        col = "#16a34a" if v >= 40 else "#dc2626"
-        body += f'<circle cx="{px(math.log10(f)):.1f}" cy="{py(v):.1f}" r="3.5" fill="{col}"/>\n'
+        body += (f'<circle cx="{px(math.log10(f)):.1f}" cy="{py(v):.1f}" r="3" '
+                 f'fill="#64748b"/>\n')
     body += ('<text x="620" y="24" text-anchor="end" fill="#0f172a">'
-             'marked points are the specification frequencies</text>\n')
+             'open circles are the specified points; grey are reported without a limit</text>\n')
     return _svg(650, 380, body, "Power-supply rejection")
 
 

@@ -13,7 +13,10 @@
 | Quiescent current, enabled | uA | any | 37.080 uA | 41.533 uA | 60.000 uA | 44.837 uA | Pass ✅ |
 | Current limit trip | mA | any | 58.499 mA | 58.499 mA | 60.000 mA | 58.499 mA | Pass ✅ |
 | Phase margin over PVT | deg | 45.000 deg | 45.097 deg | 64.842 deg | any | 74.716 deg | Pass ✅ |
-| PSRR at 1 kHz | dB | 40.000 dB | 35.067 dB | 35.067 dB | any | 35.067 dB | Fail ❌ |
+| PSRR at 100 Hz | dB | 50.000 dB | 54.865 dB | 54.865 dB | any | 54.865 dB | Pass ✅ |
+| PSRR at 1 kHz | dB | 30.000 dB | 35.067 dB | 35.067 dB | any | 35.067 dB | Pass ✅ |
+| PSRR at 10 kHz | dB | 10.000 dB | 15.118 dB | 15.118 dB | any | 15.118 dB | Pass ✅ |
+| Supply rejection holds below | kHz | any | 71.415 kHz | 71.415 kHz | any | 71.415 kHz | Pass ✅ |
 | Load-step droop at 19 mA/us | mV | any | 338.241 mV | 338.241 mV | any | 338.241 mV | Pass ✅ |
 | Load slew rate for 120 mV droop | mA/us | 1.000 mA/us | 2.649 mA/us | 2.649 mA/us | any | 2.649 mA/us | Pass ✅ |
 | Load-release overshoot | mV | any | 235.610 mV | 235.610 mV | 120.000 mV | 235.610 mV | Fail ❌ |

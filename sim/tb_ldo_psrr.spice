@@ -129,6 +129,58 @@
 * therefore phase margin -- the trade already established above. There is no free gain in this
 * topology at this frequency.
 *
+* ============================ THE RESPECIFICATION ============================
+*
+* ✅ PSRR IS NOW SPECIFIED AS A MASK, 2026-09-17, replacing a single 40 dB limit at 1 kHz
+* that the block misses by 4.9 dB typical and 6.3 dB at the worst corner and that no lever
+* above reaches. The old limit was not merely unmet, it was the wrong SHAPE: rejection here
+* is a slope, not a point.
+*
+*     PSRR(f) = 47.4 dB - |T(f)|
+*
+* The open-loop supply coupling is a constant 47.4 dB from 10 Hz to 10 kHz -- measured, flat
+* to 1.5 dB over three decades -- and the loop is an integrator through the whole band, so
+* rejection falls 20 dB per decade. A flat 40 dB line crosses that slope once and says
+* nothing on either side of the crossing.
+*
+* 🔑 So the mask is itself -20 dB/decade, parallel to the physics rather than across it:
+*
+*     frequency   specified   corner-worst   typical   margin
+*     100 Hz      >= 50 dB       53.59 dB    54.86     +3.59
+*     1 kHz       >= 30          33.73       35.07     +3.73
+*     10 kHz      >= 10          13.74       15.12     +3.74
+*
+* Limits are the 243-corner worst case rounded DOWN to the next 10 dB. That rule, not a
+* negotiation, is what sets them, and it happens to leave a uniform ~3.6 dB at all three.
+* ✅ The corner spread is remarkably tight -- 2.3 dB at 100 Hz, 2.4 at 1 kHz, 2.6 at 10 kHz
+* across mos x res x temp x vin x iload -- which is why so little margin is needed. Worst
+* corner is ss/res_wcs/110C/3.0V at both 100 Hz and 1 kHz. Measured by sim/psrr_pvt.sh.
+*
+* ⛔ AND THE MASK STOPS, WHICH IS THE PART A DATASHEET MUST NOT BURY. Rejection reaches
+* 0 dB at 71.4 kHz typical and as low as 49.5 kHz at the worst corner
+* (ss/res_bcs/110C/3.0V/100uA). Above that the block does not reject the supply at all, and
+* around 2.2 MHz it AMPLIFIES it -- 4.9 dB typical, 12.1 dB at that same worst corner, so
+* output ripple is up to 4x the supply ripple that caused it.
+*
+* ⚠️ THAT IS AN APPLICATION CONSTRAINT, not a number to bury in a table. A switching
+* regulator upstream puts its fundamental squarely in this band. This block must not be fed
+* directly from one without filtering, and that belongs in the integration notes rather than
+* only in a curve. It is a capless LDO: 20 pF of on-chip Cout is all there is, so there is no
+* output capacitor doing this job either.
+*
+* ⛔ NOT FULLY EXPLAINED, and flagged rather than dressed up. Two candidate mechanisms were
+* tested and both failed:
+*   - Closed-loop peaking at crossover. Reconstructing 1/(1+T) from the measured loop
+*     magnitude and phase puts its peak at +1.25 dB at 3.98 MHz, against a measured minimum
+*     of +4.94 dB at 2.24 MHz. Wrong frequency, a quarter the height.
+*   - A resonance in the coupling path. Backing the open-loop coupling out as
+*     (vout/vin)*(1+T) gives 47.4, 45.9, 31.0, 21.6, 11.4, 6.3, 4.0 dB at 1 k to 3 MHz --
+*     smooth and monotonic, with no peak anywhere.
+* ⟹ What the numbers DO say plainly: the coupling rolls off more slowly than the loop gain,
+* so above ~50 kHz the loop no longer has enough gain to hold the output below the supply.
+* The specification above is bounded by measurement across 243 corners and does not depend on
+* resolving this; the mechanism is worth chasing only if the high-frequency end has to move.
+*
 * Run: cd sim && ngspice -b tb_ldo_psrr.spice
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOShv.lib mos_tt
 .lib $PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models/cornerMOSlv.lib mos_tt

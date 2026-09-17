@@ -39,9 +39,22 @@ PDK="${PDK:-ihp-sg13g2}"
 export PDK_ROOT PDK
 # Set only if the caller has not: outside IIC-OSIC-TOOLS nothing else points ngspice at
 # the .spiceinit that loads the OSDI libraries.
+# ⛔ "Only if the caller has not" IS A TRAP INSIDE IIC-OSIC-TOOLS, and it cost a full debug
+# cycle on 2026-09-17. The container already EXPORTS SPICE_USERINIT_DIR pointing at its own
+# bundled /foss/pdks, so this guard sees it set and leaves it alone -- even when the caller
+# has explicitly passed a different PDK_ROOT. ngspice then reads the image's .spiceinit,
+# loads the image's OSDI models, and every bench dies with
+#   Unable to find definition of model cap_cmomf_mod
+# AFTER netlisting has already succeeded, which reads as a netlist bug and is not one.
+# ⟹ If you override PDK_ROOT, override SPICE_USERINIT_DIR with it:
+#   PDK_ROOT=/pdks PDK=ihp-sg13cmos5l SPICE_USERINIT_DIR=/pdks/ihp-sg13cmos5l/libs.tech/ngspice
 if [ -z "${SPICE_USERINIT_DIR:-}" ]; then
   SPICE_USERINIT_DIR="$PDK_ROOT/$PDK/libs.tech/ngspice"
   export SPICE_USERINIT_DIR
+elif [ "${SPICE_USERINIT_DIR}" != "$PDK_ROOT/$PDK/libs.tech/ngspice" ]; then
+  echo "note: SPICE_USERINIT_DIR=$SPICE_USERINIT_DIR does not match PDK_ROOT=$PDK_ROOT/$PDK." >&2
+  echo "      ngspice will load OSDI models from the former. If benches fail with" >&2
+  echo "      'Unable to find definition of model ...', that is why." >&2
 fi
 for d in ihp-sg13cmos5l "$PDK"; do
   if [ ! -d "$PDK_ROOT/$d" ]; then

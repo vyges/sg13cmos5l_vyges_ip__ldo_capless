@@ -41,18 +41,38 @@ Measured on the schematic hierarchy, tt/27 °C unless noted:
 | Current limit trip | 58.5 mA | 60 mA | ✅ |
 | Phase margin, worst over load | 58.2° (at 10 µA) | 45° min | ✅ |
 | Phase margin, worst over PVT | 45.1° (ff / worst-case sheet / −40 °C / 3.6 V / no load), 0 of 243 corners below | 45° min | ✅ |
-| **PSRR at 1 kHz** | **35.1 dB** | 40 dB | ❌ |
+| PSRR at 100 Hz | 54.9 dB | 50 dB min | ✅ |
+| **PSRR at 1 kHz** | **35.1 dB** | 30 dB min | ✅ |
+| PSRR at 10 kHz | 15.1 dB | 10 dB min | ✅ |
+| Supply rejection holds below | **71.4 kHz** (49.5 kHz worst corner) | — | |
 | Load slew rate for ≤120 mV droop | **2.65 mA/µs** | 1 mA/µs min | ✅ |
 | **Load-step droop at 19 mA/µs** | **338.2 mV** | beyond the specified rate | |
 | **Load-release overshoot, 20 → 1 mA** | **235.6 mV** | 120 mV max | ❌ |
 | Load step meeting ±120 mV | **2 mA** (droop 55.0 mV, overshoot 65.0 mV) | — | |
 | Output capacitor | **capless** — on-chip compensation only | no external cap | ✅ |
 
-⚠️ **Two specifications are still missed, and the third has been restated as the thing it
-actually depends on.** PSRR remains 35.1 dB against 40. The release overshoot is bounded at
-every corner now rather than reaching the supply rail, but still exceeds 120 mV. **And the
-droop is now specified as a load SLEW RATE rather than a step size**, because that is what
-it is a function of — see below.
+⚠️ **One specification is still missed, and two have been restated as the things they
+actually depend on.** The release overshoot is bounded at every corner now rather than
+reaching the supply rail, but still exceeds 120 mV. **The droop is now specified as a load
+SLEW RATE rather than a step size**, and **PSRR as a mask over frequency rather than one
+number at 1 kHz** — in both cases because that is what the quantity is a function of.
+
+🔑 **Why the PSRR specification changed shape.** Rejection here is a slope, not a point. The
+open-loop supply coupling is a constant 47.4 dB — flat to 1.5 dB from 10 Hz to 10 kHz — and
+the loop divides it down, so rejection falls 20 dB per decade. A flat 40 dB limit crosses
+that slope once and describes neither side of the crossing. The mask is parallel to the
+physics instead: **50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz**, each the worst of 243 PVT
+corners rounded down to the next 10 dB, which leaves a uniform ~3.6 dB of margin. The corner
+spread is unusually tight — 2.3 to 2.6 dB across process, resistor sheet, temperature, supply
+and load.
+
+⛔ **And the mask stops. Above about 50 kHz this block does not reject the supply at all**, and
+near 2.2 MHz it *amplifies* it — 4.9 dB typical and 12.1 dB at the worst corner, so output
+ripple can be four times the supply ripple that caused it. **Do not feed this block directly
+from a switching regulator**: a converter's fundamental lands squarely in that band, and being
+capless there is no output capacitor to cover it. Filter the input or accept the ripple. The
+frequency where rejection runs out is a reported figure in the datasheet so the mask cannot be
+read as extending past where it is true.
 
 🔑 **Why the droop specification changed shape.** It is a ramp-tracking error: the loop
 follows the load ramp to about three parts in ten thousand, and that residue is the droop.
