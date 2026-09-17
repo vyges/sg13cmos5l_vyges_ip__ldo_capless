@@ -168,19 +168,73 @@ this block into a slot:
 - **Against the proposal** — every specification line with what the schematic measures,
   including the three that do not yet meet target.
 
-## Layout
+## Physical design
+
+⚠️ **There is no full layout yet, and `magic/` is empty.** What exists is a floorplan held as
+checked data rather than a drawing, and the first device-level geometry generated and
+DRC-verified against the IHP deck.
+
+**The floorplan is data.** `tools/floorplan.py` places every block from footprints that
+`tools/area_budget.py` measured by instantiating the PDK's own PyCells, and the run fails if
+any block leaves the slot or lands on another — a diagram cannot do that. It reports 69.4 %
+of a 530 × 310 µm slot occupied, which is a **floor**: it reserves no routing channels, guard
+rings or well taps. `doc/datasheet/ldo_capless_floorplan.svg` is drawn from the same data.
+
+Three measured constraints set the shape: `Cm` at 193 × 193.5 µm and `Cout` at 125 × 125.5
+cannot stack (319 µm against a 310 µm slot), so they sit side by side and fix 318 µm of the
+530 µm width; the pass array is short enough to sit under something; and long resistors cost
+roughly **double** their drawn area once folded, so `XRb` at 1.4 × 2941 µm is pitch-limited
+rather than area-limited.
+
+**The pass array is generated and DRC-clean.** `tools/layout_pass.py` emits the 64-device
+array as GDS from the `pmosHV` PyCell and `tools/passdrc.sh` runs the IHP deck over a pitch
+sweep, which replaced an assumption with a measurement: the devices *do* abut legally, at
+2.42 µm, so the array is 154.9 × 101.2 µm.
+
+🔑 **The pitch is a cliff, not a spacing.** Abutted is clean because adjacent nwells merge;
+any gap from 0.02 to 0.5 µm reports `NW.b` (nwell minimum space, 0.62 µm); 0.62 µm is clean
+again. **There is no legal pitch between touching and 0.62 µm apart** — across 64 devices
+that is 40 µm of width, so nudging one device to slip a strap through costs the whole array.
+
+⛔ The sweep **exits non-zero if no row fails**. A pitch sweep in this project once returned
+zero violations at every pitch because the deck arguments were guessed and it never read the
+layout, and overlap turned out to be the wrong falsification: coincident geometry *merges*
+into shapes that pass every width and spacing rule, so overlapping two transistors is an LVS
+error rather than a DRC one. The falsifying case has to stay separate and too close.
+
+```sh
+sh tools/passdrc.sh 0.02 0.1 0.3 0.5 0.62 1.0 0     # inside the PDK container
+```
+
+⚠️ **A 52 % area saving on the pass array exists and is not taken.** `w` is the *total*
+device width and `ng` folds it into fingers, so every `ng` is the same transistor — same W,
+same L, same drive — in a different shape, and the drawn area is not flat across that
+choice: 245.0, 169.1, 132.8, 117.9, **117.0**, 129.6, 162.0 µm² per device for `ng` 1 to 64.
+The block is drawn at `ng=1`, the worst of them. At `ng=16` the 64 devices abut into
+124.96 × 59.92 µm and pass DRC — 7488 µm² against 15544.
+
+⛔ **It costs 0.33° of phase margin and the block has 0.097°.** Folding shares source/drain
+diffusions, cutting drain capacitance and lifting the loop's unity-gain frequency from 1.231
+to 1.246 MHz: 45.097° → 44.772° at the worst of 243 corners. Nearly all of it is the *first*
+fold (`ng` 2 through 16 are flat within 0.03°), so there is no partial retreat. Buying the
+margin back with `Cm` works electrically but breaks the floorplan and costs 1.3 dB of PSRR;
+buying it with `Cout` helps the failing corner and simply moves the worst case elsewhere.
+⟹ The saving is real, and available only if the 45° floor is revisited.
+
+## Repository layout
 
 | Dir | Contents |
 | --- | --- |
-| `xschem/` | schematics — `ldo_vref`, `ldo_erramp`, `ldo_pass`, `ldo_fbtrim`, `ldo_capless` |
+| `xschem/` | schematics — nine cells, generated, `ldo_capless` on top |
 | `doc/schematics/` | rendered SVGs of every cell, readable without opening xschem |
-| `magic/` | analog layout |
+| `tools/` | floorplan, area budget, datasheet/drift gate, layout and DRC scripts |
+| `sim/` | testbenches — six published, plus the diagnostics that found the mechanisms |
 | `netlist/` | extracted / simulation netlists |
-| `sim/` | testbenches |
-| `verilog/` | digital enable / trim / power-good wrapper (LibreLane) |
-| `signoff/` | DRC / LVS / extract / STA reports |
-| `doc/` | design notes, characterization |
+| `doc/` | design notes, characterization, datasheet |
 | `prototype/ldo/` | feasibility netlist (`ldo.spice`) — stable capless loop demonstrated in-process |
+| `magic/` | analog layout — **empty; not started** |
+| `verilog/` | digital enable / trim / power-good wrapper (LibreLane) |
+| `signoff/` | DRC / LVS / extract / STA reports — **empty until there is layout** |
 
 ## Toolchain
 

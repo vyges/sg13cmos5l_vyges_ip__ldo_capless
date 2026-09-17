@@ -54,9 +54,18 @@ change what a published figure looks like.
   Each is a shape the table cannot carry: *338 mV of droop* says nothing about how long the
   output is out of regulation, and *to the 3.3 V rail* says nothing about how sharp the
   release excursion is or that it is an over-voltage on thin-oxide devices.
-- **`ldo_capless_psrr.svg`** — rejection against frequency, with the four specification
-  points marked. Supply noise does not arrive at one frequency; the curve shows where
-  rejection collapses.
+- **`ldo_capless_psrr.svg`** — rejection against frequency, against the specification
+  **mask**. ⛔ This drew a single flat 40 dB line until 2026-09-17, which is not what the
+  block is specified to and never described what it does: rejection here is a *slope*, and a
+  flat limit crosses a slope once and says nothing on either side of the crossing. The mask
+  is the three specified points — 50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz — drawn open so
+  it is visibly finite, with the two reported-but-unlimited points in grey so they are not
+  read as pass/fail. ⚠️ The region **below 0 dB is shaded**, because the block amplifies
+  supply ripple there; the old figure's axis started at 0 dB and clipped that off the plot
+  entirely.
+- **`ldo_capless_floorplan.svg`** — block placement in the 530 × 310 µm slot, drawn from the
+  same data `tools/floorplan.py` checks rather than sketched alongside it. ⚠️ It reserves no
+  routing channels, guard rings or well taps, so its utilisation figure is a floor.
 
 ⛔ The annotations on the step plot use **the bench's own measurement windows** (`FROM=20u
 TO=30u` for droop, `40u`–`50u` for overshoot). A global extremum instead labelled the droop

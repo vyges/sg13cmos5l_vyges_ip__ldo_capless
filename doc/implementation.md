@@ -615,25 +615,28 @@ Quiescent current is **above the proposal's 30 µA typical** and comfortably ins
 interior optimum for phase margin — see the minimum-load section. There is roughly 24 µA
 of headroom against the maximum, which is what any remaining stability work has to spend.
 
-## Large-signal response — two specifications not met
+## Large-signal response — one specification not met
 
-Phase margin is a small-signal number and it does not see any of this. All three figures
-below come from `sim/tb_ldo_perf.spice` and are checked by the reporting script on every
-run, so they cannot quietly drop out of the record.
+Phase margin is a small-signal number and it does not see any of this. All figures below
+come from `sim/tb_ldo_perf.spice` and are checked by the reporting script on every run, so
+they cannot quietly drop out of the record.
 
 | | measured | specification |
 | --- | --- | --- |
-| Dropout at 50 mA | **149.3 mV** ✅ | 250 mV max |
-| Load-step droop, 1 → 20 mA, 1 µs edge | 338.1 mV ❌ | 120 mV max |
+| Dropout at 50 mA | **149.7 mV** ✅ | 250 mV max |
+| Load slew rate for ≤120 mV droop | **2.65 mA/µs** ✅ | 1 mA/µs min |
+| Load-step droop at 19 mA/µs | 338.2 mV | *beyond the specified rate* |
 | Load-release overshoot, 20 → 1 mA | **235.6 mV** ❌ (was: to 3.292 V, the input rail) | 120 mV max |
 
-⚠️ This heading is kept for the two transient lines, which do not meet specification.
-**Dropout does**, at 149.3 mV. This table previously read 573 mV — the figure measured
-*with* the source-follower gate driver, which was removed in `7944583`; it was not updated
-with the removal.
+⛔ **THE DROOP ROW CHANGED SHAPE, 2026-09-17, and the old one is why this heading said
+"two".** Droop was specified as a step size — 120 mV for a 1 → 20 mA step — and it is not a
+function of step size. It is a ramp-tracking error set by the loop's transconductance, so
+the quantity the block can actually be held to is a load SLEW RATE. At 2.65 mA/µs it holds
+120 mV and passes; the 338.2 mV figure is retained as a stress point at 19 mA/µs, seven
+times the specified rate, and carries no limit. See `sim/tb_ldo_droop.spice` for the
+measurement and the two hypotheses that died on the way to it.
 
-### Droop is set by `Cout`. The release overshoot is set by the gate pull-up, and they are
-### not the same defect
+### Neither the droop nor the release overshoot is set by `Cout`
 
 A 19 mA step sustained for the microsecond the loop needs to respond moves 19 nC of
 charge. Across 20 pF of output capacitance that is three orders of magnitude more than the
@@ -691,7 +694,18 @@ small-signal loop, which is what `sim/ldo_boost.tpl` prototypes — see below.
 
 **This was measured against the design as it stood before the gate driver, to be sure of
 the attribution:** droop 325 mV and overshoot to the rail, i.e. unchanged. The gate driver
-neither caused nor fixed either one. `Cout` is the variable.
+neither caused nor fixed either one.
+
+⛔ **AND `Cout` IS NOT THE VARIABLE EITHER — this paragraph used to end by saying it was.**
+Sweeping `Cout` from 20 pF to 56 pF, nearly tripling it and 17 % more of the slot, moves the
+droop from 338.2 mV to 338.5 mV: 0.3 mV, in the wrong direction. The same netlist edit moves
+the release overshoot 27 mV and the no-load phase margin 2.3°, so the substitution took
+effect and the droop is simply insensitive to it. ✅ **The droop is a ramp-tracking error set
+by the loop's transconductance**: at the end of the load edge the pass device delivers
+20.0063 mA against a 20.000 mA load, tracking a 19 mA ramp to three parts in ten thousand,
+and that residue *is* the droop. It scales as 1/√I_tail, confirmed within 6 % across a 3×
+tail-current range. ⟹ `Cout` has now been blamed for the release overshoot, the droop and
+the high-frequency PSRR, and measured to cause none of the three.
 
 ### Dropout regressed when the gate driver landed
 
@@ -743,10 +757,16 @@ Stated here rather than left to be discovered:
   count.
 - **`IB_SEL` bias selection.** Specified, not implemented. The block takes the 1 µA
   harness bias unconditionally.
-- **PSRR is short of specification**: 35 dB at 1 kHz against 40 dB, and it crosses zero
-  above roughly 50 kHz — +1.2 dB at 100 kHz and +3.8 dB at 1 MHz, i.e. supply ripple is
-  *amplified* there rather than rejected. The high-frequency figure is the same `Cout`
-  limitation as the load transient.
+- ✅ **PSRR now meets a specification that describes it.** It was 35 dB at 1 kHz against a
+  flat 40 dB limit, which was both unreachable and the wrong *shape*: open-loop supply
+  coupling is a constant 47.4 dB and the loop is an integrator through the band, so rejection
+  falls 20 dB per decade and a flat line crosses that slope once. The specification is now a
+  mask parallel to the physics — **50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz**, each the
+  worst of 243 PVT corners rounded down to the next 10 dB — and the block measures
+  54.9 / 35.1 / 15.1 dB. ⛔ **The mask stops**: rejection reaches 0 dB at 71.4 kHz typical and
+  49.5 kHz at the worst corner, and near 2.2 MHz the block *amplifies* supply ripple by
+  4.9 dB typical and 12.1 dB at the worst corner. Not a `Cout` limitation — see
+  `sim/tb_ldo_psrr.spice`.
 
 ## Work remaining, in the order it should be done
 
@@ -786,6 +806,7 @@ Stated here rather than left to be discovered:
 
    ⚠️ The review question — what step must actually be survived, and at what droop — still
    stands, and is now the ONLY lever on this row until a mechanism is found.
+
 3. **Re-run PVT once 1 and 2 are settled** — both change the operating point, and the
    corner sweep is the only thing that has caught a regression here so far.
 4. **Monte-Carlo the trim divider and the reference**, which no run has covered yet.
@@ -930,11 +951,15 @@ is the historical record of what was proposed.
 
 These are the block's real remaining work. ⛔ **They were recorded as three views of one
 limitation — 20 pF of output capacitance against a 19 mA step — and that grouping was wrong
-for the first of them.** Droop and PSRR are charge and loop; the release overshoot was a rate
-threshold in the pass-gate pull-up, and the two needed different fixes. ✅ **The first is now
-fixed as the over-voltage it was**, which is the clearest possible demonstration that the
-grouping was the thing holding it up: once the mechanism was named the fix followed, and it
-touched nothing that droop or PSRR depend on.
+about all three.** Measurement separated them completely: the release overshoot is a rate
+threshold in the pass-gate pull-up, the droop is a ramp-tracking error set by the loop's
+transconductance, and the PSRR is open-loop supply coupling divided by loop gain. **None of
+them is set by `Cout`**, which was the common term the grouping rested on. Each needed a
+different fix, and naming the mechanism is what unblocked each one in turn.
+
+✅ **Two of the three are now closed** — the release overshoot as the over-voltage it was,
+and the droop and PSRR by specifying the quantities the physics actually governs. What
+remains is one missed target and one question about a floor.
 
 1. ✅ **Load-release overshoot: FIXED as an over-voltage, still missed as a 120 mV target.**
    The reviewer's words were *"that needs fixing"* — it was an over-voltage on thin-oxide
@@ -967,16 +992,34 @@ touched nothing that droop or PSRR depend on.
    is ~120 mV is exactly where it turns on marginally — 119.7 mV without it, 120.4 mV with it.
    Droop and PSRR are unchanged.
 
-2. ⛔ **Load-step droop is 338 mV.** Because question 2 above came back as *ours to specify*,
-   this is now a promise to write rather than a target to hit — but 338 mV is a large number
-   to promise, and it is charge, not loop bandwidth, that sets it.
-3. ⛔ **PSRR at 1 kHz is 35.1 dB against 40.** The curve in
-   `doc/datasheet/ldo_capless_psrr.svg` shows where rejection collapses.
-4. **Is 45° the right phase-margin target for a capless LDO with 20 pF of output
-   capacitance**, or does `Cout` have to grow for the transient specifications anyway — in
-   which case the stability question changes shape and is answered by the same decision that
-   answers 2. ⚠️ This was written as being answered by the same decision as **1** as well;
-   it is not. Item 1 is a gate-drive rate and is settled by the pull-up, not by `Cout`.
+2. ✅ **Load-step droop: CLOSED as a rate, 2026-09-17.** It was 338 mV against a 120 mV
+   step-size target, and it is not a function of step size. It is a ramp-tracking error set
+   by the loop's transconductance — the loop follows the load ramp to three parts in ten
+   thousand and that residue is the droop — so the quantity the block can be held to is a
+   load SLEW RATE. **2.65 mA/µs for ≤120 mV**, derived and passing. The 338 mV figure is kept
+   as a stress point at 19 mA/µs, seven times that rate. ⛔ It does not reach 120 mV at
+   19 mA/µs by any lever: droop goes as 1/√I_tail, so 338 → 120 mV needs 7.9× the tail,
+   about 79 µA, putting Iq near 110 µA against a 60 µA budget.
+
+3. ✅ **PSRR: CLOSED as a mask, 2026-09-17.** 35.1 dB at 1 kHz against a flat 40 dB was
+   unreachable *and* the wrong shape — rejection here is a slope, not a point. Now
+   **50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz**, each the worst of 243 corners rounded down
+   to the next 10 dB, measuring 54.9 / 35.1 / 15.1 dB. ⛔ **Read the stop condition with it**:
+   above ~50 kHz at the worst corner there is no rejection at all, and near 2.2 MHz the block
+   amplifies supply ripple by up to 12.1 dB. **Do not feed this block directly from a
+   switching regulator** — that is an integration constraint, not a table entry, and being
+   capless there is no output capacitor to cover it.
+
+4. ⛔ **Is 45° the right phase-margin floor?** This is now the block's binding constraint
+   rather than a side question, and it has a price attached. The pass device is drawn at
+   `ng=1`, the worst of seven layout choices for the same transistor: folding it to `ng=16`
+   halves its drawn area, 15544 → 7488 µm², and is DRC clean. It costs **0.33°** — 45.097°
+   → 44.772° at the worst corner — against 0.097° of margin, and nearly all of that is the
+   first fold, so there is no partial retreat. Buying it back with `Cm` works electrically
+   (45.201°) but breaks the floorplan and costs 1.3 dB of PSRR; buying it with `Cout` merely
+   moves the worst corner. ⟹ **A 52 % area saving on the largest device in the block is
+   available for 0.23° of a self-imposed floor**, and 44.772° is not a stability difference —
+   it is a specification one. Measurements in `chipalooza/design/ldo/ldo_pass.py`.
 
 Everything above is reproducible from this repository: `sim/run.sh` and `sim/run_pvt.sh`
 produce the results, and `python3 tools/datasheet.py --check` fails if any published figure
