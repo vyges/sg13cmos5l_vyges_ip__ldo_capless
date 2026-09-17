@@ -7,9 +7,33 @@ capacitor**. **All-CMOS** (PMOS pass device + error amp; no MiM cap — compensa
 is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 **Chipalooza Challenge #2 (IHP SG13CMOS5L)**.
 
-> Status: **schematic**. The full cell hierarchy is captured in xschem, netlists, and
-> simulates. See [`doc/implementation.md`](doc/implementation.md) for what is built and
-> measured, and [`doc/proposal.md`](doc/proposal.md) for the original design intent.
+## Current status
+
+**Phase: schematic complete, physical design started.**
+
+- ✅ **The design is captured and reproducible.** Nine cells generated from a single source,
+  netlisted, and simulated from a clean clone by `sim/run.sh`.
+- ✅ **Every published specification is met except one** — the load-release overshoot. It no
+  longer reaches the supply rail at any corner, which was the reliability concern, but it
+  still exceeds its excursion target.
+- ✅ **Two specifications were restated to the quantity the physics governs**, and both then
+  passed: droop as a load **slew rate** rather than a step size, and supply rejection as a
+  **mask over frequency** rather than a single point. Each limit is the worst of 243 corners,
+  not a typical value.
+- ✅ **Verified across corners, not at one operating point** — 243 PVT corners for phase
+  margin and for supply rejection, 81 for the transient response.
+- ⚠️ **Physical design is early.** The floorplan is held as checked data rather than a
+  drawing, and the first device array is generated and DRC-clean against the PDK deck. Full
+  layout, routing, LVS and sign-off have not started.
+- ⛔ **Known limits to read before integrating**: the supply-rejection mask **stops** — above
+  roughly 50 kHz at the worst corner this block does not reject supply ripple and near 2 MHz
+  it amplifies it, so it should not be fed directly from a switching regulator; and the
+  control logic runs from the 1.2 V rail, so the block cannot bring itself up in a system
+  where it is the source of that rail.
+
+Detail: [`doc/implementation.md`](doc/implementation.md) for what is built and measured,
+[`doc/datasheet/`](doc/datasheet/) for the generated datasheet and figures, and
+[`doc/proposal.md`](doc/proposal.md) for the original design intent.
 
 ![Block diagram](doc/schematics/ldo_capless_block.svg)
 
