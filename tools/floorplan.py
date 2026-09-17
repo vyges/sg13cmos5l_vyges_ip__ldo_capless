@@ -16,8 +16,17 @@ THE THREE CONSTRAINTS THAT DECIDE THIS FLOORPLAN, all from measured geometry:
   1. Cm is 193.0 x 193.5 um and the slot is only 310 um tall -- 62 % of the height. Cout is
      125.0 x 125.5. They cannot stack: 193.5 + 125.5 = 319 > 310. They go side by side, and
      that alone fixes 318 um of the 530 um width.
-  2. The pass device is 64 instances of 2.4 x 101.2 um. Laid side by side that is a
-     153.6 x 101.2 um array -- a natural shape, and short enough to sit under something.
+  2. The pass device is 64 instances of 2.42 x 101.24 um. Laid side by side that is a
+     154.9 x 101.2 um array -- a natural shape, and short enough to sit under something.
+     ✅ ABUTMENT IS NOW DRC-VERIFIED, 2026-09-17, by tools/passdrc.sh. It was an assumption
+     until then, and the pitch turns out to be a CLIFF rather than a spacing: gap 0 abuts
+     cleanly because the nwells merge, any gap from 0.02 to 0.5 um reports NW.b (nwell min
+     space 0.62 um), and 0.62 um is clean again. There is no legal pitch between touching
+     and 0.62 um apart, so the array is either abutted or 0.62 um looser per device --
+     40 um of extra width across 64 of them.
+     ⚠️ ng=1 IS A LAYOUT CHOICE AND IT IS THE WORST ONE MEASURED. Folding the same
+     100 um/0.5 um device into 16 fingers gives 15.62 x 7.49 um, and 64 of those abut into
+     124.96 x 59.92 um -- also DRC clean, and 7488 um2 against 15544. See the note below.
   3. XRb is 1.4 x 2941 um. It cannot be placed, only snaked, and snaking is pitch-limited
      rather than area-limited: at a 2.5 um pitch a 150 um tall snake needs 20 columns and
      50 um of width, so its real footprint is about 7500 um2 against 4118 um2 of drawn
@@ -108,7 +117,7 @@ BLOCKS = [
     # of device carrying up to 50 mA - is placed against that edge rather than in the middle.
     # On-slot metal resistance at 50 mA lands in the same budget as the 20 mV load-regulation
     # specification, so every micron of that path is spent, not free.
-    ("pass array 64x",    370, 6,   153.6, 101.2, "pass"),
+    ("pass array 64x",    370, 6,   154.9, 101.2, "pass"),
     ("Cout 125x125.5",    395, 115, 125,   125.5, "out"),
     ("Cc 40x40.5",        370, 250, 40,    40.5,  "amp"),
 ]
