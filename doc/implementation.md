@@ -442,6 +442,21 @@ gate that cannot fail is not a gate.
 ℹ️ Device-sizing comparison needs a build newer than v0.1.33; that release compares
 topology only.
 
+**A second, independent pass runs over each cell's own netlist** and asks three questions
+that need no golden to compare against: are two terminals of one device on the same net, is
+any net down to a single connection, and has an xschem auto-generated name (`net1`, `net2`)
+survived into the netlist. All eight cells are clean, with no deliberate exceptions needed.
+
+🔑 **It is worth running per cell rather than over the flattened top.** Slicing `.subckt`
+bodies out of the top-level netlist reaches only what the top *instantiates*, so an
+alternative cell or the top's own inter-cell wiring is never examined — a gap that is
+invisible in the output, because what is skipped simply does not appear.
+
+⛔ **Check for dropped devices first, or the pass means nothing.** xschem records a symbol
+it cannot resolve as a *comment* (`*  Cout -  cap_cmomf  IS MISSING !!!!`) and carries on,
+so a netlist built against a PDK without `cap_cmomf` is syntactically clean, passes a
+connectivity check, simulates — and has no capacitors in it.
+
 ## Enable
 
 `EN` arrives from the harness control bus at 1.2 V logic while the amplifier and pass

@@ -22,6 +22,9 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
   not a typical value.
 - ✅ **Verified across corners, not at one operating point** — 243 PVT corners for phase
   margin and for supply rejection, 81 for the transient response.
+- ✅ **Connectivity is checked on the netlist, cell by cell** — all eight cells pass with no
+  shorted device terminals, no unterminated nets and no auto-generated net names surviving,
+  against the pinned PDK and with every capacitor present.
 - ⚠️ **Physical design is early.** The floorplan is held as checked data rather than a
   drawing, and the first device array is generated and DRC-clean against the PDK deck. Full
   layout, routing, LVS and sign-off have not started.
@@ -299,5 +302,13 @@ fails on the missing pair. Symlink the two sets into each other after installing
 `$PDK_ROOT` defaults to `/foss/pdks` (what IIC-OSIC-TOOLS sets) and `$PDK` to
 `ihp-sg13g2`, so the bundled PDK still works — but it is the *old* two-repository pin and
 will not reproduce the numbers above.
+
+⛔ **A PDK missing `cap_cmomf` does not fail — it silently drops every capacitor.** For a
+symbol it cannot resolve, xschem writes `*  Cout -  cap_cmomf  IS MISSING !!!!` as a
+*comment*: the netlist stays syntactically valid, simulates, and is missing parts. The
+IIC-OSIC-TOOLS bundled PDK still ships the pre-rename `cap_mfringe` and no `cap_cmomf` at
+all, and netlisting `ldo_capless` against it loses **five** capacitors, `Cout` and the
+compensation among them. ⟹ Grep a fresh netlist for `IS MISSING` before trusting anything
+derived from it.
 
 Apache-2.0. See [`NOTICE`](NOTICE) for attribution.
