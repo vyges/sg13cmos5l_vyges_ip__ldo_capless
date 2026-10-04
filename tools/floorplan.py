@@ -128,7 +128,9 @@ BLOCKS = [
     # devices outside Cm measure 259 um2 (now in 5225), and the vref divider is four rhigh
     # totalling 424 um -- a 50 um tall fold is 11 um wide -- plus a 10 x 10 um Cf.
     # Both stay at the bottom, nearest the core-edge bias pins (vbias/ibias0 at y 94-99).
-    ("Cm  193x193.5",     6,   67,  193,   193.5, "amp"),
+    # Each MOM cap region is 1 um wider and taller than the cap: the routable terminals are
+    # Metal4 stubs reaching 1 um out of its left and top edges (the PDK pins are 0.2 um).
+    ("Cm  193x193.5",     6,   67,  194,   194.5, "amp"),
     ("erramp devices",    6,   6,   95,    55,    "amp"),
     ("vref divider",      106, 6,   40,    55,    "ref"),
 
@@ -136,12 +138,12 @@ BLOCKS = [
     ("fbtrim ladder",     205, 6,   60,    192,   "fb"),
     ("Rb snake",          272, 6,   RB_W,  RB_H,  "boost"),
     ("Rnx snake",         300, 6,   RNX_W, RNX_H, "boost"),
-    ("Cb 28x28.5",        313, 6,   28,    28.5,  "boost"),
+    ("Cb 28x28.5",        313, 6,   29,    29.5,  "boost"),
     ("boost devices",     313, 40,  40,    116,   "boost"),
     # 60 um tall, not 42: each holds a single-finger wide device standing on end -- ilim's
     # Mref (w 50 um) is 51.0 um tall and pgood's Mt (w 40 um) 40.4. The region was sized by
     # area and never by its tallest device; the placed GDS is what caught it.
-    ("ilim",              205, 205, 45,    60,    "stat"),
+    ("ilim",              205, 205, 45,    62,    "stat"),
     ("pgood",             255, 205, 45,    60,    "stat"),
     # XRls is a level-shift resistor with no matching partner, so its fold height is free.
     ("enable + Rls",      305, 165, 40,    95,    "stat"),
@@ -157,9 +159,12 @@ BLOCKS = [
     # directly on top of the array, beside Cout: eout comes up from the gates beneath it and
     # vout is the node it shares with Cout. Cout moved 11 um right to make the column.
     # 101.3, not 101.2: the device is 101.24 um tall; 101.2 was a rounding.
-    ("pass array 64x",    370, 6,   154.9, 101.3, "pass"),
-    ("Cc 40x40.5",        364, 115, 40,    40.5,  "amp"),
-    ("Cout 125x125.5",    406, 115, 125,   125.5, "out"),
+    # 157.5 x 101.5: 64 abutted fingers plus ONE shared well tap at the left end, and each
+    # finger's gate contact on top (the PyCell has none).
+    ("pass array 64x",    370, 6,   157.5, 101.5, "pass"),
+    # Cc and Cout keep 1 um between Cc's plates and Cout's left terminal stub.
+    ("Cc 40x40.5",        363, 115, 41,    41.5,  "amp"),
+    ("Cout 125x125.5",    405, 115, 126,   126.5, "out"),
 ]
 
 # Which region each netlist instance is placed in, for chipalooza's placement-only slot GDS
@@ -188,7 +193,7 @@ PACK = {
     "Cout 125x125.5":  dict(inset=0, gap=0),
     "Cc 40x40.5":      dict(inset=0, gap=0),
     "Cb 28x28.5":      dict(inset=0, gap=0),
-    "pass array 64x":  dict(inset=0, gap=0),
+    "pass array 64x":  dict(inset=0, gap=0, array=True),
     "Rb snake":        dict(inset=0, gap=0, fold=150.0),
     "Rnx snake":       dict(inset=0, gap=0, fold=120.0),
     "enable + Rls":    dict(fold=90.0),
