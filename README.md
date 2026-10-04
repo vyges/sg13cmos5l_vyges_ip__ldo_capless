@@ -203,7 +203,7 @@ DRC-verified against the IHP deck.
 
 **The floorplan is data.** `tools/floorplan.py` places every block from footprints that
 `tools/area_budget.py` measured by instantiating the PDK's own PyCells, and the run fails if
-any block leaves the slot or lands on another — a diagram cannot do that. It reports 72.9 %
+any block leaves the slot or lands on another — a diagram cannot do that. It reports 74.1 %
 of the 537.15 × 273 µm slot occupied, which is a **floor**: it reserves no routing channels, guard
 rings or well taps. `doc/datasheet/ldo_capless_floorplan.svg` is drawn from the same data.
 

@@ -87,10 +87,18 @@ DEVICE_AREA = 80085.0
 RES_PITCH = 1.2
 
 
+RES_END_W = 1.40     # a w = 1 um rhigh segment WITH its end contacts, as the PyCell draws it
+
+
 def snake(length_um, height_um, pitch=RES_PITCH):
-    """(w, h) of a folded resistor of the given drawn length."""
+    """(w, h) of a folded resistor of the given drawn length.
+
+    ⛔ (cols - 1) pitches plus one contacted segment, not cols x pitch: the PDK's own rhigh
+    serpentine (b bends) draws its segments at 1.18 um pitch with 1.40 um contacted ends.
+    cols x pitch under-reserved XRnx by 0.08 um, found when chipalooza's tools/slot_gds.py
+    placed the real PyCell (2026-10-04)."""
     cols = int(length_um / height_um) + 1
-    return cols * pitch, height_um
+    return (cols - 1) * pitch + RES_END_W, height_um
 
 
 RB_W, RB_H = snake(2941.2, 150.0)      # ldo_boost XRb
@@ -130,8 +138,11 @@ BLOCKS = [
     ("Rnx snake",         300, 6,   RNX_W, RNX_H, "boost"),
     ("Cb 28x28.5",        313, 6,   28,    28.5,  "boost"),
     ("boost devices",     313, 40,  40,    116,   "boost"),
-    ("ilim",              205, 205, 45,    42,    "stat"),
-    ("pgood",             255, 205, 45,    42,    "stat"),
+    # 60 um tall, not 42: each holds a single-finger wide device standing on end -- ilim's
+    # Mref (w 50 um) is 51.0 um tall and pgood's Mt (w 40 um) 40.4. The region was sized by
+    # area and never by its tallest device; the placed GDS is what caught it.
+    ("ilim",              205, 205, 45,    60,    "stat"),
+    ("pgood",             255, 205, 45,    60,    "stat"),
     # XRls is a level-shift resistor with no matching partner, so its fold height is free.
     ("enable + Rls",      305, 165, 40,    95,    "stat"),
 
@@ -145,10 +156,47 @@ BLOCKS = [
     # above the pass array it compensates, which lengthened both of its nets. It now sits
     # directly on top of the array, beside Cout: eout comes up from the gates beneath it and
     # vout is the node it shares with Cout. Cout moved 11 um right to make the column.
-    ("pass array 64x",    370, 6,   154.9, 101.2, "pass"),
+    # 101.3, not 101.2: the device is 101.24 um tall; 101.2 was a rounding.
+    ("pass array 64x",    370, 6,   154.9, 101.3, "pass"),
     ("Cc 40x40.5",        364, 115, 40,    40.5,  "amp"),
     ("Cout 125x125.5",    406, 115, 125,   125.5, "out"),
 ]
+
+# Which region each netlist instance is placed in, for chipalooza's placement-only slot GDS
+# (tools/slot_gds.py there). Instance-path regex, first match wins; every device must match.
+PLACE = [
+    (r"/x_amp/XCm$",      "Cm  193x193.5"),
+    (r"/x_amp/",          "erramp devices"),
+    (r"/x_vref/",         "vref divider"),
+    (r"/x_fb/",           "fbtrim ladder"),
+    (r"/x_boost/XRb$",    "Rb snake"),
+    (r"/x_boost/XRnx$",   "Rnx snake"),
+    (r"/x_boost/XCb$",    "Cb 28x28.5"),
+    (r"/x_boost/",        "boost devices"),
+    (r"/XMpre$",          "boost devices"),   # the 10 uA vout preload sink, beside the output
+    (r"/x_il/",           "ilim"),
+    (r"/x_pg/",           "pgood"),
+    (r"/x_en/",           "enable + Rls"),
+    (r"/x_pass/",         "pass array 64x"),
+    (r"/XCc$",            "Cc 40x40.5"),
+    (r"/XCout$",          "Cout 125x125.5"),
+]
+# Per-region packing. Regions drawn to a device's exact size take no inset; the pass array
+# abuts (gap 0 is DRC-verified, tools/passdrc.sh); folds are the snake heights used above.
+PACK = {
+    "Cm  193x193.5":   dict(inset=0, gap=0),
+    "Cout 125x125.5":  dict(inset=0, gap=0),
+    "Cc 40x40.5":      dict(inset=0, gap=0),
+    "Cb 28x28.5":      dict(inset=0, gap=0),
+    "pass array 64x":  dict(inset=0, gap=0),
+    "Rb snake":        dict(inset=0, gap=0, fold=150.0),
+    "Rnx snake":       dict(inset=0, gap=0, fold=120.0),
+    "enable + Rls":    dict(fold=90.0),
+    "vref divider":    dict(fold=50.0),
+    "fbtrim ladder":   dict(fold=50.0),
+    "ilim":            dict(fold=30.0),
+    "erramp devices":  dict(fold=30.0),
+}
 
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",
           "out": "#2a9d8f", "stat": "#adb5bd", "boost": "#e76f51"}
