@@ -270,7 +270,8 @@ def rows():
 # When there is one, these come from the Loom engines -- `vacuous` maps to Skip, a
 # violation count maps to the value.
 PHYSICAL = [
-    ("Area", "um2", None, 530 * 310e-12),
+    # The slot outline, from the harness wrapper layout (tools/floorplan.py SLOT_W x SLOT_H).
+    ("Area", "um2", None, 537.15 * 273e-12),
     ("Magic DRC", "", None, 0),
     ("Netgen LVS", "", None, 0),
     ("KLayout DRC", "", None, 0),

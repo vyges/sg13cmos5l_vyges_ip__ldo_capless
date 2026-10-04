@@ -13,9 +13,10 @@ on another.
 
 THE THREE CONSTRAINTS THAT DECIDE THIS FLOORPLAN, all from measured geometry:
 
-  1. Cm is 193.0 x 193.5 um and the slot is only 310 um tall -- 62 % of the height. Cout is
-     125.0 x 125.5. They cannot stack: 193.5 + 125.5 = 319 > 310. They go side by side, and
-     that alone fixes 318 um of the 530 um width.
+  1. Cm is 193.0 x 193.5 um and the slot is only 273 um tall -- 71 % of the height. Cout is
+     125.0 x 125.5. They cannot stack: 193.5 + 125.5 = 319 > 273. They go side by side, and
+     that alone fixes 318 um of the 537 um width. Below Cm there is room for exactly one
+     55 um band, which is where the amplifier and the reference go.
   2. The pass device is 64 instances of 2.42 x 101.24 um. Laid side by side that is a
      154.9 x 101.2 um array -- a natural shape, and short enough to sit under something.
      ✅ ABUTMENT IS NOW DRC-VERIFIED, 2026-09-17, by tools/passdrc.sh. It was an assumption
@@ -50,8 +51,19 @@ be looser. Treat a number near 100 % as failure, not as success.
 """
 import os, sys
 
-SLOT_W, SLOT_H = 530.0, 310.0
+# ⛔ THE REAL SLOT, read from the harness's own wrapper layout (magic/slot11_wrapper.mag,
+# magscale 1 2, harness @ 1906830; chipalooza/tools/slot_fit.py re-derives it). This said
+# 530 x 310 until 2026-10-04 -- a verbal figure that the drawn wrapper never had -- and three
+# blocks sat above the real top edge while this script reported that everything fit.
+SLOT_W, SLOT_H = 537.15, 273.0
+# Wrapper pins occupy a 2 um strip on both vertical edges; 4 um more keeps device geometry
+# off them. Applied on all four sides so a block cannot be placed flush against anything.
+EDGE = 6.0
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Sum of every device's PyCell bounding box, from tools/area_budget.py. A percentage of it was
+# hard-coded here once, and it went stale the moment the slot changed size.
+DEVICE_AREA = 80085.0
 
 # Footprints. Measured ones come from tools/area_budget.py; snaked ones are computed below
 # from the drawn length at a stated pitch, because a 2941 um resistor has no bounding box
@@ -83,23 +95,34 @@ def snake(length_um, height_um, pitch=RES_PITCH):
 
 RB_W, RB_H = snake(2941.2, 150.0)      # ldo_boost XRb
 RNX_W, RNX_H = snake(736.2, 120.0)     # ldo_boost XRnx
-RLS_W, RLS_H = snake(701.2, 120.0)     # ldo_enable XRls
+RLS_W, RLS_H = snake(701.2, 90.0)      # ldo_enable XRls -- 90 tall, not 120: see C2 below
 
 # name, x, y, w, h, group
 #
 # Three columns, ordered by the signal rather than by packing efficiency:
 #   C1  x 6..199    the quiet end -- reference, error amplifier, and Cm above them
-#   C2  x 205..360  the pass device, the feedback ladder and the status blocks
-#   C3  x 366..525  the output node, Cout, and the boost
+#   C2  x 205..360  the feedback ladder, the boost and the status blocks
+#   C3  x 364..531  the output node: pass array, Cc and Cout
 #
 # ⛔ Cm is placed ABOVE the amplifier rather than beside it because it is 193.5 um tall and
-# the slot is 310: there is no arrangement where Cm and Cout share a column. That single fact
+# the slot is 273: there is no arrangement where Cm and Cout share a column. That single fact
 # fixes the shape of everything else.
+#
+# 2026-10-04, refitted to the real 273 um height WITHOUT CHANGING A DEVICE. Every move is a
+# region reshaped or a block relocated; no W, L, value or finger count differs, so no
+# simulated number is touched. The three blocks that overran, and what was done:
+#   Cm         top 305.5 -> 260.5  dropped to y 67; the band below it shrinks 100 -> 55 um
+#   enable+Rls top 285.0 -> 260.0  XRls folded 90 um tall instead of 120 (8 columns, not 6)
+#   Cc         top 290.5 -> 155.5  moved down beside the pass array -- see C3
 BLOCKS = [
     # --- C1 x 6..199: reference and amplifier, at the CORE-facing edge.
-    ("Cm  193x193.5",     6,   112, 193,   193.5, "amp"),
-    ("erramp devices",    6,   6,   95,    100,   "amp"),
-    ("vref divider",      106, 6,   40,    100,   "ref"),
+    # The band under Cm is 55 um, not 100. Neither region was ever full: the error amp's
+    # devices outside Cm measure 259 um2 (now in 5225), and the vref divider is four rhigh
+    # totalling 424 um -- a 50 um tall fold is 11 um wide -- plus a 10 x 10 um Cf.
+    # Both stay at the bottom, nearest the core-edge bias pins (vbias/ibias0 at y 94-99).
+    ("Cm  193x193.5",     6,   67,  193,   193.5, "amp"),
+    ("erramp devices",    6,   6,   95,    55,    "amp"),
+    ("vref divider",      106, 6,   40,    55,    "ref"),
 
     # --- C2 x 205..360: feedback ladder, boost, status blocks.
     ("fbtrim ladder",     205, 6,   60,    192,   "fb"),
@@ -109,7 +132,8 @@ BLOCKS = [
     ("boost devices",     313, 40,  40,    116,   "boost"),
     ("ilim",              205, 205, 45,    42,    "stat"),
     ("pgood",             255, 205, 45,    42,    "stat"),
-    ("enable + Rls",      305, 165, 40,    RLS_H, "stat"),
+    # XRls is a level-shift resistor with no matching partner, so its fold height is free.
+    ("enable + Rls",      305, 165, 40,    95,    "stat"),
 
     # --- C3 x 366..525: the output, hard against the PADFRAME-facing edge.
     # ⛔ Tim confirmed 2026-09-16 that every wrapper has padframe-facing pins on the RIGHT and
@@ -117,9 +141,13 @@ BLOCKS = [
     # of device carrying up to 50 mA - is placed against that edge rather than in the middle.
     # On-slot metal resistance at 50 mA lands in the same budget as the 20 mV load-regulation
     # specification, so every micron of that path is spent, not free.
+    # ⛔ Cc is the Miller capacitor from eout (the pass gate) to vout. It sat at y 250, 140 um
+    # above the pass array it compensates, which lengthened both of its nets. It now sits
+    # directly on top of the array, beside Cout: eout comes up from the gates beneath it and
+    # vout is the node it shares with Cout. Cout moved 11 um right to make the column.
     ("pass array 64x",    370, 6,   154.9, 101.2, "pass"),
-    ("Cout 125x125.5",    395, 115, 125,   125.5, "out"),
-    ("Cc 40x40.5",        370, 250, 40,    40.5,  "amp"),
+    ("Cc 40x40.5",        364, 115, 40,    40.5,  "amp"),
+    ("Cout 125x125.5",    406, 115, 125,   125.5, "out"),
 ]
 
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",
@@ -129,8 +157,9 @@ COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703"
 def check():
     bad = []
     for n, x, y, w, h, _ in BLOCKS:
-        if x < 0 or y < 0 or x + w > SLOT_W or y + h > SLOT_H:
-            bad.append(f"{n!r} leaves the slot: ({x:.1f},{y:.1f}) {w:.1f}x{h:.1f}")
+        if x < EDGE or y < EDGE or x + w > SLOT_W - EDGE or y + h > SLOT_H - EDGE:
+            bad.append(f"{n!r} is outside the slot less its {EDGE:g} um edge: "
+                       f"({x:.1f},{y:.1f}) {w:.1f}x{h:.1f}")
     for i, a in enumerate(BLOCKS):
         for b in BLOCKS[i + 1:]:
             if (a[1] < b[1] + b[3] and b[1] < a[1] + a[3] and
@@ -152,13 +181,14 @@ def report():
     print(f"  (long resistors folded at a {RES_PITCH} um pitch: "
           f"Rb {RB_W:.0f}x{RB_H:.0f}, Rnx {RNX_W:.0f}x{RNX_H:.0f}, Rls {RLS_W:.0f}x{RLS_H:.0f})")
     # ⛔ RESERVED AREA IS NOT DEVICE AREA, and conflating them is how a floorplan flatters
-    # itself. tools/area_budget.py measures 80085 um2 of actual devices -- 48.7 % of the slot.
-    # The blocks above reserve 72.3 %. The difference is slack INSIDE the regions, and it is
+    # itself. tools/area_budget.py measures DEVICE_AREA of actual devices; the blocks above
+    # reserve noticeably more. The difference is slack INSIDE the regions, and it is
     # not spread evenly: Cm, Cout and the pass array are the devices themselves and are at
     # 100 % density by construction, so every bit of that slack sits in the small cells, where
     # the local routing and the well taps actually go. The erramp's devices outside Cm measure
     # 259 um2 in a 9500 um2 region; the trim ladder is 836 um2 in 11520.
-    print(f"  devices measured elsewhere: 80085 um2 (48.7 %). The {100*used/(SLOT_W*SLOT_H)-48.7:.1f} "
+    dev = 100 * DEVICE_AREA / (SLOT_W * SLOT_H)
+    print(f"  devices measured elsewhere: {DEVICE_AREA:.0f} um2 ({dev:.1f} %). The {100*used/(SLOT_W*SLOT_H)-dev:.1f} "
           f"point difference is in-region slack for local routing and taps, concentrated in the "
           f"small cells -- Cm, Cout and the pass array have none by construction.")
     bad = check()

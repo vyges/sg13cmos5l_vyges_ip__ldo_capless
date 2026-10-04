@@ -21,7 +21,7 @@
 | Load slew rate for 120 mV droop | mA/us | 1.000 mA/us | 2.649 mA/us | 2.649 mA/us | any | 2.649 mA/us | Pass ✅ |
 | Load-release overshoot | mV | any | 235.610 mV | 235.610 mV | 120.000 mV | 235.610 mV | Fail ❌ |
 | Load step meeting ±120 mV | mA | 1.000 mA | 2.000 mA | 2.000 mA | any | 2.000 mA | Pass ✅ |
-| Area | um2 | any | ​ | ​ | 164300.000 um2 | ​ | Skip 🟧 |
+| Area | um2 | any | ​ | ​ | 146641.950 um2 | ​ | Skip 🟧 |
 | Magic DRC | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |
 | Netgen LVS | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |
 | KLayout DRC | - | any | ​ | ​ | 0.000 | ​ | Skip 🟧 |

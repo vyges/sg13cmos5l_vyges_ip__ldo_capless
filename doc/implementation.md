@@ -157,11 +157,11 @@ from the model rather than taken from its header — a 10 × 10 µm device reads
 increased by ×1.80 in area to hold the same values. That is the area cost of the
 recalibration, and it lands on the review's predicted "×2" row:
 
-| Capacitor | Value | Drawn size (was) | Share of a 530 × 310 µm slot |
+| Capacitor | Value | Drawn size (was) | Share of the 537.15 × 273 µm slot |
 | --- | --- | --- | --- |
-| `Cm` (amplifier compensation) | 47.98 pF | 193 × 193 µm (144 × 144) | **22.7%** |
-| `Cout` | 20.11 pF | 125 × 125 µm (93 × 93) | 9.5% |
-| `Cc` | 2.06 pF | 40 × 40 µm (30 × 30) | 1.0% |
+| `Cm` (amplifier compensation) | 47.98 pF | 193 × 193 µm (144 × 144) | **25.4%** |
+| `Cout` | 20.11 pF | 125 × 125 µm (93 × 93) | 10.7% |
+| `Cc` | 2.06 pF | 40 × 40 µm (30 × 30) | 1.1% |
 
 ℹ️ Tim Edwards measured **1.20 fF/µm²** with a magic MoM generator at the 2026-09-01
 review, against the 2.32 this document then carried. The recalibrated model gives 1.287 —
@@ -386,8 +386,8 @@ loop gain rises and the crossover pushes out to where there is no phase left, wh
   make it worse — see the preload section above.
 
 The capacitors are the block's area cost, and it roughly doubled with the capacitor
-model's recalibration: `Cm` at 193 × 193 µm is about **23 %** of a 530 × 310 µm slot, and
-`Cout` a further **9.5 %**. Holding the same 48 pF under a density of 1.287 fF/µm² instead
+model's recalibration: `Cm` at 193 × 193 µm is about **25 %** of the 537.15 × 273 µm slot, and
+`Cout` a further **10.7 %**. Holding the same 48 pF under a density of 1.287 fF/µm² instead
 of 2.32 is what bought the margin back.
 
 ## Verification with Vyges Loom
@@ -957,9 +957,11 @@ part a reader coming to this block later actually needs.
 4. ✅ **Is derating maximum load acceptable?** — **yes, if we announce it.**
 
 ⚠️ **One answer changed a design input rather than resolving a question:** the slot is
-**≈530 × 310 µm**, not the 520 × 250 µm `doc/proposal.md` was written against — SG13CMOS5L
-has no thick top metal, so the core was widened for power distribution. Every area figure in
-this document already uses the larger slot; the proposal has not been rewritten because it
+**larger** than the 520 × 250 µm `doc/proposal.md` was written against — SG13CMOS5L
+has no thick top metal, so the core was widened for power distribution. ⛔ **Corrected 2026-10-04:** the review's verbal figure was ≈530 × 310 µm, and the drawn
+harness wrapper is **537.15 × 273.00 µm**, 11 % less area, all of it height. Every area figure
+in this document now uses the drawn outline, and `tools/floorplan.py` was refitted to it
+without changing a device; the proposal has not been rewritten because it
 is the historical record of what was proposed.
 
 ## What is actually open

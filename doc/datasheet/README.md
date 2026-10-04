@@ -63,7 +63,7 @@ change what a published figure looks like.
   read as pass/fail. ⚠️ The region **below 0 dB is shaded**, because the block amplifies
   supply ripple there; the old figure's axis started at 0 dB and clipped that off the plot
   entirely.
-- **`ldo_capless_floorplan.svg`** — block placement in the 530 × 310 µm slot, drawn from the
+- **`ldo_capless_floorplan.svg`** — block placement in the 537.15 × 273 µm slot, drawn from the
   same data `tools/floorplan.py` checks rather than sketched alongside it. ⚠️ It reserves no
   routing channels, guard rings or well taps, so its utilisation figure is a floor.
 

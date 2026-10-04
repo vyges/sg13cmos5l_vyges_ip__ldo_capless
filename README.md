@@ -203,13 +203,13 @@ DRC-verified against the IHP deck.
 
 **The floorplan is data.** `tools/floorplan.py` places every block from footprints that
 `tools/area_budget.py` measured by instantiating the PDK's own PyCells, and the run fails if
-any block leaves the slot or lands on another — a diagram cannot do that. It reports 69.4 %
-of a 530 × 310 µm slot occupied, which is a **floor**: it reserves no routing channels, guard
+any block leaves the slot or lands on another — a diagram cannot do that. It reports 72.9 %
+of the 537.15 × 273 µm slot occupied, which is a **floor**: it reserves no routing channels, guard
 rings or well taps. `doc/datasheet/ldo_capless_floorplan.svg` is drawn from the same data.
 
 Three measured constraints set the shape: `Cm` at 193 × 193.5 µm and `Cout` at 125 × 125.5
-cannot stack (319 µm against a 310 µm slot), so they sit side by side and fix 318 µm of the
-530 µm width; the pass array is short enough to sit under something; and long resistors cost
+cannot stack (319 µm against a 273 µm slot), so they sit side by side and fix 318 µm of the
+537 µm width; the pass array is short enough to sit under something; and long resistors cost
 roughly **double** their drawn area once folded, so `XRb` at 1.4 × 2941 µm is pitch-limited
 rather than area-limited.
 
