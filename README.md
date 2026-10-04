@@ -25,9 +25,11 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 - ✅ **Connectivity is checked on the netlist, cell by cell** — all eight cells pass with no
   shorted device terminals, no unterminated nets and no auto-generated net names surviving,
   against the pinned PDK and with every capacitor present.
-- ⚠️ **Physical design is early.** The floorplan is held as checked data rather than a
-  drawing, and the first device array is generated and DRC-clean against the PDK deck. Full
-  layout, routing, LVS and sign-off have not started.
+- ⚠️ **Placed and routed, not finished.** Every device is placed in the floorplan and the
+  block is routed to a slot layout that is DRC-clean on the PDK's KLayout deck. LVS matches
+  except for the 11 folded resistors, whose serpentine parameters the schematic does not carry
+  yet. The 50 mA `vin`/`vout` path is still minimum-width wire, so the layout is **not
+  committed** yet — see Physical design.
 - ⛔ **Known limits to read before integrating**: the supply-rejection mask **stops** — above
   roughly 50 kHz at the worst corner this block does not reject supply ripple and near 2 MHz
   it amplifies it, so it should not be fed directly from a switching regulator; and the
@@ -197,9 +199,39 @@ this block into a slot:
 
 ## Physical design
 
-⚠️ **There is no full layout yet, and `magic/` is empty.** What exists is a floorplan held as
-checked data rather than a drawing, and the first device-level geometry generated and
-DRC-verified against the IHP deck.
+⚠️ **A routed layout exists and is not committed yet.** Every device of the netlist is placed
+in the floorplan below and the block is routed to the slot outline, on the harness's own pins.
+On the PDK decks:
+
+| Check | Result |
+| --- | --- |
+| DRC (KLayout, main rules) | **0 violations** |
+| LVS (KLayout, strict top-level ports) | matches **except the 11 folded resistors** |
+| LVS with those resistors' drawn parameters (confirmation only) | **matches** |
+| Antenna | **0** |
+| Density | fails at block level, as expected — chip-level fill is a harness step |
+
+What still has to happen before the layout goes into `gds/slot_11.gds` (and so `magic/`,
+`gds/` and `signoff/` stay empty until then):
+
+- ⛔ **The 50 mA path is minimum-width wire.** `vin` and `vout` connect correctly but are not
+  current-capable; they need straps sized against the PDK's electromigration rules.
+- ⛔ **Folded resistors.** A resistor drawn as the PDK `rhigh` serpentine extracts as a
+  per-segment `l`, a bend count `b` and a leg spacing `ps`, with about 2.2 µm of bend allowance
+  per bend. It never equals a straight schematic `l`. The schematic has to carry `b`, the
+  per-segment `l` and `ps`, and be **re-simulated**, because the bends change the resistance.
+  `XRb` (2,940 µm) cannot be drawn unfolded.
+- ⚠️ **Post-layout simulation is not run.** Parasitic extraction works, but it does not yet
+  recognise the PDK's MOM capacitor as a device and extracts its combs at about twice the
+  model value. Until that is resolved with the PDK, a post-layout number on `Cm`, `Cout` or
+  `Cc` would mislead.
+- ⚠️ The control inputs (`en`, `ilim_en`, `vtrim0–4`) and status outputs (`pgood`, `oc`) wait on
+  their harness bit assignment, and the single `vss` on the harness's ground-domain decision.
+
+**What routing needed that the PDK cells do not provide**, now part of the floorplan: a gate
+contact on every MOSFET; a well tap per pMOS, shared across the pass array as **one** tap in one
+merged N-well; a substrate tie column beside every nMOS (LU.b); and 1 µm Metal4 terminal stubs
+on each MOM capacitor, whose own pins are below Metal4's minimum width.
 
 **The floorplan is data.** `tools/floorplan.py` places every block from footprints that
 `tools/area_budget.py` measured by instantiating the PDK's own PyCells, and the run fails if
@@ -216,7 +248,8 @@ rather than area-limited.
 **The pass array is generated and DRC-clean.** `tools/layout_pass.py` emits the 64-device
 array as GDS from the `pmosHV` PyCell and `tools/passdrc.sh` runs the IHP deck over a pitch
 sweep, which replaced an assumption with a measurement: the devices *do* abut legally, at
-2.42 µm, so the array is 154.9 × 101.2 µm.
+2.42 µm, so the array is 154.9 × 101.2 µm. With the gate contacts and the one shared well tap that
+routing adds, the floorplan reserves 157.5 × 101.5 µm for it.
 
 🔑 **The pitch is a cliff, not a spacing.** Abutted is clean because adjacent nwells merge;
 any gap from 0.02 to 0.5 µm reports `NW.b` (nwell minimum space, 0.62 µm); 0.62 µm is clean
@@ -259,9 +292,9 @@ buying it with `Cout` helps the failing corner and simply moves the worst case e
 | `netlist/` | extracted / simulation netlists |
 | `doc/` | design notes, characterization, datasheet |
 | `prototype/ldo/` | feasibility netlist (`ldo.spice`) — stable capless loop demonstrated in-process |
-| `magic/` | analog layout — **empty; not started** |
+| `magic/` | analog layout — **empty: the routed layout is held back until the items under Physical design close** |
 | `verilog/` | digital enable / trim / power-good wrapper (LibreLane) |
-| `signoff/` | DRC / LVS / extract / STA reports — **empty until there is layout** |
+| `signoff/` | DRC / LVS / extract / STA reports — **empty until the layout is committed** |
 
 ## Toolchain
 
