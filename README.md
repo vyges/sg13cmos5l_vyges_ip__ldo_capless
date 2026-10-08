@@ -28,8 +28,9 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 - ⚠️ **Placed and routed, not finished.** Every device is placed in the floorplan and the
   block is routed to a slot layout that is DRC-clean on the PDK's KLayout deck. LVS matches
   except for the 11 folded resistors, whose serpentine parameters the schematic does not carry
-  yet. The 50 mA `vin`/`vout` path is still minimum-width wire, so the layout is **not
-  committed** yet — see Physical design.
+  yet. The 50 mA `vin`/`vout` path is now strapped and checked against the PDK's current
+  limits; post-layout simulation has not run, so the layout is **not committed** yet — see
+  Physical design.
 - ⛔ **Known limits to read before integrating**: the supply-rejection mask **stops** — above
   roughly 50 kHz at the worst corner this block does not reject supply ripple and near 2 MHz
   it amplifies it, so it should not be fed directly from a switching regulator; and the
@@ -214,24 +215,39 @@ On the PDK decks:
 What still has to happen before the layout goes into `gds/slot_11.gds` (and so `magic/`,
 `gds/` and `signoff/` stay empty until then):
 
-- ⛔ **The 50 mA path is minimum-width wire.** `vin` and `vout` connect correctly but are not
-  current-capable; they need straps sized against the PDK's electromigration rules.
+- ✅ **The 50 mA path is strapped** (2026-10-08). Metal2 runs over every pass finger's source
+  and drain, with a via every 1 µm. A Metal3 + Metal4 `vout` band sits at the output pin's
+  height, there are two Metal3 + Metal4 + TopMetal1 `vin` bands over the array, and a 28 µm
+  TopMetal1 feed comes from `vdd_3v3`. `tools/floorplan.py` checks every segment against the
+  process specification's current limits (Rev 0.2 §3.5, 105 °C, 11 years) and reports the IR
+  drop: **26 mV on `vin` and 8 mV on `vout` at 50 mA**, worst-case sheet resistance. That is
+  computed, not simulated; the measured 149.7 mV dropout does not include it. Routed DRC 0; LVS
+  as before.
+- ⚠️ **The output pin limits the current rating.** The harness pin for `vout` is Metal3 only,
+  24.77 µm tall, which the process specification rates at 49.5 mA, just under 50. This is
+  raised with the harness owner; if it stays, the block is rated 45 mA continuous.
+- ⚠️ **The straps add coupling.** Extracted: `vin` to the pass gate 176 fF (about 1 % of its
+  roughly 16 pF), `vin` to `vout` 1.4 pF, `vout` +0.8 pF. The `vin` feed crosses the top of `Cm`
+  to keep the IR drop down. The post-layout simulation decides whether any of it matters.
 - ⛔ **Folded resistors.** A resistor drawn as the PDK `rhigh` serpentine extracts as a
   per-segment `l`, a bend count `b` and a leg spacing `ps`, with about 2.2 µm of bend allowance
   per bend. It never equals a straight schematic `l`. The schematic has to carry `b`, the
   per-segment `l` and `ps`, and be **re-simulated**, because the bends change the resistance.
   `XRb` (2,940 µm) cannot be drawn unfolded.
-- ⚠️ **Post-layout simulation is not run.** Parasitic extraction works, but it does not yet
-  recognise the PDK's MOM capacitor as a device and extracts its combs at about twice the
-  model value. Until that is resolved with the PDK, a post-layout number on `Cm`, `Cout` or
-  `Cc` would mislead.
-- ⚠️ The control inputs (`en`, `ilim_en`, `vtrim0–4`) and status outputs (`pgood`, `oc`) wait on
-  their harness bit assignment, and the single `vss` on the harness's ground-domain decision.
+- ⚠️ **Post-layout simulation is not run yet.** Extraction is now trustworthy on the MOM
+  capacitors: on magic 8.3.684 their combs extract at the model value (`Cm` 49.9 / 47.9 pF
+  against 48; `vout` 22.7 pF against 22.2). They come out as parasitic capacitance, not as
+  devices. The post-layout run itself is next.
+- ⚠️ The control inputs (`en`, `ilim_en`, `vtrim0–4`) and status outputs (`pgood`, `oc`) have no
+  slot pins yet. Every harness control bit reaches every slot, so the bits are ours to choose.
+  The single `vss` is fine: the harness ties the grounds chip-wide.
 
 **What routing needed that the PDK cells do not provide**, now part of the floorplan: a gate
 contact on every MOSFET; a well tap per pMOS, shared across the pass array as **one** tap in one
-merged N-well; a substrate tie column beside every nMOS (LU.b); and 1 µm Metal4 terminal stubs
-on each MOM capacitor, whose own pins are below Metal4's minimum width.
+merged N-well; a substrate tie column beside every nMOS (LU.b); and 1 µm Metal4 stubs that bring
+each MOM capacitor's minimum-width terminal pins out of a cell that fills Metal1–Metal4.
+Reported upstream as [IHP-Open-PDK#1267](https://github.com/IHP-GmbH/IHP-Open-PDK/issues/1267);
+newer PDK versions add a guard-ring option that covers the taps and ties.
 
 **The floorplan is data.** `tools/floorplan.py` places every block from footprints that
 `tools/area_budget.py` measured by instantiating the PDK's own PyCells, and the run fails if
