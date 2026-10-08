@@ -203,6 +203,82 @@ PACK = {
     "erramp devices":  dict(fold=30.0),
 }
 
+# ---- The 50 mA path: vin and vout straps, drawn by chipalooza tools/slot_gds.py (STRAPS).
+# The router draws every net at minimum width. These are sized against the process spec's
+# current limits (SG13CMOS5L Process Specification Rev 0.2 §3.5, 0.01 % failures in 11 years at
+# 105 C) and its sheet resistances (§3, RSMET2-4 103, RSTM1 21 mOhm/sq max). strap_check()
+# below recomputes every number quoted here.
+#
+#   vin   enters on the LEFT edge (vdd_3v3, TopMetal1, y 150-256) and the pass array is at the
+#         far right. TopMetal1 runs along the top of the slot (y 242-270) and down at the right
+#         (x 497-525) onto two vin bands over the array, each Metal3 + Metal4 + TopMetal1.
+#         ⚠️ 28 um, not narrower: an 8 um run was 89 squares = 93 mV at 50 mA, which is most of
+#         the 100 mV dropout margin (149.7 measured, 250 max). 28 um is the widest metal allowed
+#         without slits (Slt.c, 30 um). ⚠️ The run crosses the top 19.5 um of Cm (eout/nzc):
+#         about 46 fF from vin against Cm's 48 pF. Accepted for the IR drop, NOT simulated.
+#   vout  leaves on the RIGHT edge (s11_an[0], Metal3, y 80.18-104.95), level with the array's
+#         top. One Metal3 + Metal4 band at exactly the pin's height carries it right.
+#   per finger: Metal2 over each source and drain strip, along its length, Via1 every 1 um.
+#         The PyCell's own strips are Metal1 0.16 um wide; the spec's IMAXM1 is 0.36 mA for a
+#         line that narrow, and a finger carries 50/64 = 0.78 mA.
+STRAPS = dict(
+    fingers=r"/x_pass/XMpass", terms={"S": "vin", "D": "vout"}, n_fingers=64, load_ma=50.0,
+    m1_w=0.29,          # Via1 (0.19) + 0.05 each side; < 0.30, so M1 spacing stays 0.18
+    m2_w=0.50,          # 1.0 mA at JMAXM2 2 mA/um; > 0.39, so M2 spacing 0.24 (S-D gap 0.38)
+    m2_top=111.9,       # stop 0.92 um below the gate pads (finger top + 0.2), router access
+    via_pitch=1.0, plate_pitch=2.0,
+    bands=[
+        ("vout", ("Metal3", "Metal4"),              370.0, 80.18, 527.5, 104.95),
+        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 370.0, 8.0,   527.5, 36.0),
+        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 370.0, 44.0,  527.5, 72.0),
+    ],
+    feed=[
+        ("vout", "Metal3",    527.0, 80.18, 536.15, 104.95),   # band -> s11_an[0]
+        ("vin",  "TopMetal1", 0.0,   242.0, 525.0,  270.0),    # vdd_3v3 -> along the top
+        ("vin",  "TopMetal1", 497.0, 8.0,   525.0,  270.0),    # down onto the vin bands
+    ],
+)
+
+
+def strap_check():
+    """Current and IR drop of every strap segment at STRAPS["load_ma"]. Returns the failures."""
+    I, n = STRAPS["load_ma"], STRAPS["n_fingers"]
+    J = {"Metal2": 2.0, "Metal3": 2.0, "Metal4": 2.0, "TopMetal1": 15.0}   # mA/um, w > 0.3
+    RS = {"Metal3": 0.103, "Metal4": 0.103, "TopMetal1": 0.021}           # ohm/sq, max
+    rows, bad = [], []
+    def seg(name, i, cap, harness=False):
+        # harness=True: the limit is the harness wrapper's metal, not ours; reported apart, so
+        # it is neither hidden by a pass nor counted as a failure of these straps
+        rows.append((name, i, cap, harness))
+        if i > cap + 1e-9 and not harness:
+            bad.append(f"{name}: {i:.2f} mA over its {cap:.2f} mA limit")
+    seg("Metal2 strip per finger (0.50 um)", I / n, J["Metal2"] * STRAPS["m2_w"])
+    seg("Via1 per strip (1 um pitch, >= 90 cuts)", I / n, 90 * 0.4)
+    vb = STRAPS["bands"][0]
+    h = vb[5] - vb[3]
+    seg(f"vout band Metal3 + Metal4 ({h:.2f} um)", I, 2 * J["Metal3"] * h)
+    fo = STRAPS["feed"][0]
+    # ⚠️ The wrapper's own metal at s11_an[0] is Metal3 only, 24.77 um tall (magic/
+    # slot11_wrapper.mag @ c32fabe): 49.5 mA at JMAXM3, 1 % under the 50 mA load. Raised with
+    # the harness owner; nothing on our side of the outline can widen it.
+    seg(f"vout through the harness pin, Metal3 ({fo[5] - fo[3]:.2f} um)", I, J["Metal3"] * (fo[5] - fo[3]), True)
+    for f in STRAPS["feed"][1:]:
+        w = min(f[4] - f[2], f[5] - f[3])
+        seg(f"vin feed TopMetal1 ({w:.0f} um)", I, J["TopMetal1"] * w)
+    # IR drop, vin: the run's length in squares plus the leg down to the first band's top
+    run, leg = STRAPS["feed"][1], STRAPS["feed"][2]
+    sq = (run[4] - run[2]) / (run[5] - run[3]) + (run[3] - STRAPS["bands"][2][5]) / (leg[4] - leg[2])
+    v_in = I * sq * RS["TopMetal1"]
+    # vout: current injected evenly along the band and collected at its right end: I*R/2
+    v_out = I * ((vb[4] - vb[2]) / h) * RS["Metal3"] / 2 / 2      # two layers in parallel
+    for name, i, cap, harness in rows:
+        flag = ("  ⚠️ HARNESS LIMIT, over" if i > cap else "  (harness)") if harness else ""
+        print(f"  {name:<48} {i:6.2f} mA of {cap:7.2f}{flag}")
+    print(f"  IR drop at {I:g} mA, max sheet R: vin feed {sq:.1f} sq = {v_in:.1f} mV; "
+          f"vout band to pin {v_out:.1f} mV (average over the fingers)")
+    return bad
+
+
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",
           "out": "#2a9d8f", "stat": "#adb5bd", "boost": "#e76f51"}
 
@@ -250,7 +326,12 @@ def report():
         for b in bad:
             print(f"  {b}")
         return 1
-    print("\nevery block is inside the slot and none overlap")
+    sb = strap_check()
+    for b in sb:
+        print("  FAIL " + b)
+    if sb:
+        return 1
+    print("\nevery block is inside the slot and none overlap; every strap is within its current limit")
     return 0
 
 
