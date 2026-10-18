@@ -30,9 +30,12 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
   harness wrapper. DRC 0 and antenna 0 on both; LVS matches apart from the 11 folded resistors,
   each of which is drawn to the straight resistor's exact value (see Physical design). The
   harness test build places it and its contract check passes.
-- ⚠️ **Post-layout simulation has not run.** The layout went in for the final design review
-  before it; the schematic's phase margin has only 0.097° over its floor, so that run decides
-  whether the layout needs design work.
+- ⛔ **Post-layout, phase margin fails: 39.4° worst against the 45° floor** (schematic 45.1°).
+  The first post-layout run (2026-10-18; capacitance extracted, no wire resistance) costs
+  0.4–7.4° over the 243 corners, mean 3.8°. Every other published row passes post-layout
+  except the load-release overshoot, which already fails on the schematic (236 → 264 mV).
+  The layout went in for the final design review before this result, so it needs design work
+  — see Physical design.
 - ⛔ **Known limits to read before integrating**: the supply-rejection mask **stops** — above
   roughly 50 kHz at the worst corner this block does not reject supply ripple and near 2 MHz
   it amplifies it, so it should not be fed directly from a switching regulator; and the
@@ -257,10 +260,33 @@ to `gds/slot_11.gds` (XOR clean, 36 layers).
 - ⚠️ **The straps add coupling.** Extracted: `vin` to the pass gate 176 fF (about 1 % of its
   roughly 16 pF), `vin` to `vout` 1.4 pF, `vout` +0.8 pF. The post-layout simulation decides
   whether any of it matters.
-- ⚠️ **Post-layout simulation is not run yet.** Extraction is trustworthy on the MOM
-  capacitors: on magic 8.3.684 their combs extract at the model value (`Cm` 49.9 / 47.9 pF
-  against 48; `vout` 22.7 pF against 22.2). They come out as parasitic capacitance, not as
-  devices.
+- ⛔ **Post-layout gate (2026-10-18): phase margin 39.4° worst, against 45°.** The run is
+  chipalooza's `tools/ldo_postlayout_run.sh`. It swaps the extracted cells (magic 8.3.684,
+  capacitance only) into this repository's own benches and judges every row of
+  `tools/datasheet.py` on both netlists.
+
+  | Row | Schematic | Post-layout |
+  | --- | --- | --- |
+  | Phase margin over PVT (min / typ / max) | 45.10 / 64.84 / 74.72° | **39.42** / 59.71 / 72.15° |
+  | Output voltage, mid code (typ) | 1.209 V | 1.211 V |
+  | Dropout at 50 mA | 149.7 mV | 146.6 mV |
+  | Quiescent current (typ) | 41.53 µA | 41.51 µA |
+  | PSRR 100 Hz / 1 kHz / 10 kHz | 54.87 / 35.07 / 15.12 dB | 54.84 / 35.04 / 15.10 dB |
+  | Load-release overshoot (limit 120 mV) | 235.6 mV | 264.0 mV |
+
+  Line and load regulation, trim range, current-limit trip and droop rate are unchanged and
+  pass. Where the 5.7° goes at the worst corner (ff, `res_wcs`, −40 °C, 3.6 V, no load), found by
+  removing one extracted component at a time:
+
+  | Cause | Cost |
+  | --- | --- |
+  | Wiring inside the device cells (gate heads, source/drain metal; the 64 pass fingers dominate) | −2.7° |
+  | Coupling between nets, plus the MOM combs as extracted (`Cout` 19.09 pF against the model's 20.11) | −1.6° |
+  | magic's reading of the folded resistors (+1–3 % length; the PDK's own value is exact) | −0.8° |
+  | Remainder | −0.5° |
+
+  The strap coupling is small (under 1°). The schematic had 0.097° of margin, so any real layout
+  was going to need design margin; this run measures how much.
 
 **What routing needed that the PDK cells do not provide**, now part of the floorplan: a gate
 contact on every MOSFET; a well tap per pMOS, shared across the pass array as **one** tap in one
