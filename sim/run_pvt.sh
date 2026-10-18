@@ -23,8 +23,14 @@ for d in ihp-sg13cmos5l "$PDK"; do
   fi
 done
 M="$PDK_ROOT/ihp-sg13cmos5l/libs.tech/ngspice/models"
+# Points are independent runs, so they go in parallel (PVT_JOBS, as the PLL's sweep). The
+# sweep is enumerated first and executed second, and dc.txt is written in the enumeration
+# order afterwards, so the file is the same whichever point finishes first. 243 decks
+# serially took long enough on the extracted netlist (the post-layout gate) to matter.
+JOBS="${PVT_JOBS:-8}"
 mkdir -p pvt
-: > pvt/dc.txt
+rm -f pvt/_pt_*
+: > pvt/_order
 # Resistor corners are swept INDEPENDENTLY of the MOS corner, not paired with it.
 #
 # Pairing them was a guess borrowed from digital practice, where "best case" resistor means
@@ -39,11 +45,6 @@ mkdir -p pvt
 # so there is no physical basis for tying them. Sweeping independently costs 3x the runs and
 # finds the real worst case instead of a chosen one.
 for corner in tt ss ff; do
-  case $corner in
-    tt) mos=mos_tt ;;
-    ss) mos=mos_ss ;;
-    ff) mos=mos_ff ;;
-  esac
  for res in res_typ res_bcs res_wcs; do
   for temp in -40 27 110; do
     for vin in 3.0 3.3 3.6; do
@@ -51,18 +52,19 @@ for corner in tt ss ff; do
      # dip. A corner sweep at no load alone reported 45.0 deg while the same design was
      # at 32.5 deg at 300 uA typical, so the two sweeps have to be crossed, not stacked.
      for iload in 0 100u 300u; do
-      tag="${corner}_${res}_${temp}_${vin}_${iload}"
-      sed -e "s|@MOS@|$mos|g" -e "s|@RES@|$res|g" -e "s|@TEMP@|$temp|g" \
-          -e "s|@VIN@|$vin|g" -e "s|@TAG@|$tag|g" -e "s|@M@|$M|g" \
-          -e "s|@ILOAD@|$iload|g" tb_ldo_pvt.tpl > _p.spice
-      ngspice -b _p.spice > _p.log 2>&1 || true
-      vout=$(grep -oE "^v\(vout\) = [-0-9.e+]+" _p.log | head -1 | grep -oE "[-0-9.e+]+$")
-      iq=$(grep -oE "^-i\(vin\) = [-0-9.e+]+" _p.log | head -1 | grep -oE "[-0-9.e+]+$")
-      echo "$tag ${vout:-fail} ${iq:-?}" >> pvt/dc.txt
+      echo "$corner $res $temp $vin $iload" >> pvt/_order
      done
     done
-   done
   done
+ done
 done
-rm -f _p.spice _p.log
+export M
+# one point per call of pvt_point.sh: deck, run, and its dc line in pvt/_pt_<tag>
+xargs -P "$JOBS" -L 1 sh ./pvt_point.sh < pvt/_order
+: > pvt/dc.txt
+while read -r corner res temp vin iload; do
+  f="pvt/_pt_${corner}_${res}_${temp}_${vin}_${iload}"
+  if [ -s "$f" ]; then cat "$f" >> pvt/dc.txt; else echo "${corner}_${res}_${temp}_${vin}_${iload} fail ?" >> pvt/dc.txt; fi
+done < pvt/_order
+rm -f pvt/_pt_* pvt/_order
 echo "simulated $(wc -l < pvt/dc.txt) corners"
