@@ -9,7 +9,7 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 
 ## Current status
 
-**Phase: schematic complete, physical design started.**
+**Phase: laid out and handed off to the harness; post-layout simulation still to run.**
 
 - ✅ **The design is captured and reproducible.** Nine cells generated from a single source,
   netlisted, and simulated from a clean clone by `sim/run.sh`.
@@ -25,12 +25,14 @@ is MOM/poly), sized to a single openframe analog-slot footprint. Built for the
 - ✅ **Connectivity is checked on the netlist, cell by cell** — all eight cells pass with no
   shorted device terminals, no unterminated nets and no auto-generated net names surviving,
   against the pinned PDK and with every capacitor present.
-- ⚠️ **Placed and routed, not finished.** Every device is placed in the floorplan and the
-  block is routed to a slot layout that is DRC-clean on the PDK's KLayout deck. LVS matches
-  except for the 11 folded resistors, whose serpentine parameters the schematic does not carry
-  yet. The 50 mA `vin`/`vout` path is now strapped and checked against the PDK's current
-  limits; post-layout simulation has not run, so the layout is **not committed** yet — see
-  Physical design.
+- ✅ **Laid out as a block of its own, and handed off.** `gds/` holds the block cell
+  `sg13cmos5l_vyges_ip__ldo_capless` and `slot_11.gds`, which instances it once inside the
+  harness wrapper. DRC 0 and antenna 0 on both; LVS matches apart from the 11 folded resistors,
+  each of which is drawn to the straight resistor's exact value (see Physical design). The
+  harness test build places it and its contract check passes.
+- ⚠️ **Post-layout simulation has not run.** The layout went in for the final design review
+  before it; the schematic's phase margin has only 0.097° over its floor, so that run decides
+  whether the layout needs design work.
 - ⛔ **Known limits to read before integrating**: the supply-rejection mask **stops** — above
   roughly 50 kHz at the worst corner this block does not reject supply ripple and near 2 MHz
   it amplifies it, so it should not be fed directly from a switching regulator; and the
@@ -41,7 +43,18 @@ Detail: [`doc/implementation.md`](doc/implementation.md) for what is built and m
 [`doc/datasheet/`](doc/datasheet/) for the generated datasheet and figures, and
 [`doc/proposal.md`](doc/proposal.md) for the original design intent.
 
-![Block diagram](doc/schematics/ldo_capless_block.svg)
+![LDO top level](doc/figures/ldo_top.svg)
+
+The top level: the error amplifier drives the gate of the 64-finger PMOS pass device; `Cc`
+compensates; `Rtop` over the trimmed ladder feeds `vfb` back; `Msense`/`Mcas` mirror the pass
+current into the current limit, which pulls the gate up through `Mlim`. The figures in
+[`doc/figures/`](doc/figures/) are drawn from the xschem schematics and checked against them pin
+by pin (the check tables are in that directory's README); the schematics in `xschem/` remain
+the source of truth.
+
+| Error amplifier | Current limit and `oc` sense | Feedback trim network |
+| --- | --- | --- |
+| ![Error amplifier](doc/figures/ldo_erramp.svg) | ![Current limit](doc/figures/ldo_ilim.svg) | ![Trim network](doc/figures/ldo_trim.svg) |
 
 ## What it is
 
@@ -200,47 +213,54 @@ this block into a slot:
 
 ## Physical design
 
-⚠️ **A routed layout exists and is not committed yet.** Every device of the netlist is placed
-in the floorplan below and the block is routed to the slot outline, on the harness's own pins.
-On the PDK decks:
+✅ **The layout is in [`gds/`](gds/).** The block is its own cell,
+`sg13cmos5l_vyges_ip__ldo_capless` (527.15 × 269 µm, pins named by its ports), and
+`gds/slot_11.gds` instances it once in the harness slot, with a straight stub from each wrapper
+pin it uses to the block pin facing it. Both files are checked on the PDK decks:
 
-| Check | Result |
-| --- | --- |
-| DRC (KLayout, main rules) | **0 violations** |
-| LVS (KLayout, strict top-level ports) | matches **except the 11 folded resistors** |
-| LVS with those resistors' drawn parameters (confirmation only) | **matches** |
-| Antenna | **0** |
-| Density | fails at block level, as expected — chip-level fill is a harness step |
+| Check | Block alone | In `slot_11` |
+| --- | --- | --- |
+| DRC (KLayout, main rules) | **0** | **0** |
+| Antenna | **0** | **0** |
+| LVS (KLayout, strict top-level ports) | matches **except the 11 folded resistors' parameters** | same |
+| LVS with those resistors' drawn parameters (confirmation) | **matches** | **matches** |
+| Folded resistors by value (PDK resistance, folded vs straight) | **all 11 within 0.007 %** | — |
+| Unused wrapper pins clear of our metal | — | **0 violations, 38 pins** |
+| Density | fails at block level, as expected — chip-level fill is a harness step | |
 
-What still has to happen before the layout goes into `gds/slot_11.gds` (and so `magic/`,
-`gds/` and `signoff/` stay empty until then):
+In the harness's own test build, the slot is found and placed, its outline and every pin land
+on the wrapper's (contract check PASS), and the slot as assembled into the chip is identical
+to `gds/slot_11.gds` (XOR clean, 36 layers).
 
-- ✅ **The 50 mA path is strapped** (2026-10-08). Metal2 runs over every pass finger's source
-  and drain, with a via every 1 µm. A Metal3 + Metal4 `vout` band sits at the output pin's
-  height, there are two Metal3 + Metal4 + TopMetal1 `vin` bands over the array, and a 28 µm
-  TopMetal1 feed comes from `vdd_3v3`. `tools/floorplan.py` checks every segment against the
-  process specification's current limits (Rev 0.2 §3.5, 105 °C, 11 years) and reports the IR
-  drop: **26 mV on `vin` and 8 mV on `vout` at 50 mA**, worst-case sheet resistance. That is
-  computed, not simulated; the measured 149.7 mV dropout does not include it. Routed DRC 0; LVS
-  as before.
+- ✅ **Folded resistors, signed off by value.** A resistor drawn as the PDK `rhigh` serpentine
+  extracts as a per-segment `l`, a bend count and a leg spacing, so it can never equal a straight
+  schematic `l` ([IHP-Open-PDK#746](https://github.com/IHP-GmbH/IHP-Open-PDK/issues/746)), and
+  the PDK prices every bend: R ∝ (b+1)·l + (2/κ·w + ps)·b. Drawn at l/(b+1) per segment, the 11
+  resistors came out 0.8–3.6 % high. Each segment is now shortened by the bend term, and the
+  generator asks the PyCell itself for the resistance of the folded device and of a straight one
+  of the schematic's length: all 11 agree within 0.007 % (the 5 nm grid). A check reading the
+  LVS database confirms the layout's bends and widths are the recorded ones.
+- ✅ **Control pins** (2026-10-18): `en` → `dig_in[8]`, `ilim_en` → `dig_in[10]`, `vtrim0–4` →
+  `dig_in[12]`–`[20]` (even bits), `pgood` → `dig_out[0]`, `oc` → `dig_out[2]`. All power up
+  safe at 0: disabled, and the lowest trim code (1.000 V). The single `vss` is fine: the harness
+  ties the grounds chip-wide.
+- ✅ **The 50 mA path is strapped.** Metal2 runs over every pass finger's source and drain, with
+  a via every 1 µm. A Metal3 + Metal4 `vout` band sits at the output pin's height, there are two
+  Metal3 + Metal4 + TopMetal1 `vin` bands over the array, and a 28 µm TopMetal1 feed comes from
+  `vdd_3v3`. `tools/floorplan.py` checks every segment against the process specification's
+  current limits (Rev 0.2 §3.5, 105 °C, 11 years) and reports the IR drop: **26 mV on `vin` and
+  8 mV on `vout` at 50 mA**, worst-case sheet resistance. That is computed, not simulated; the
+  measured 149.7 mV dropout does not include it.
 - ⚠️ **The output pin limits the current rating.** The harness pin for `vout` is Metal3 only,
-  24.77 µm tall, which the process specification rates at 49.5 mA, just under 50. This is
-  raised with the harness owner; if it stays, the block is rated 45 mA continuous.
+  24.77 µm tall, which the process specification rates at 49.5 mA, just under 50. If it stays,
+  the block is rated 45 mA continuous.
 - ⚠️ **The straps add coupling.** Extracted: `vin` to the pass gate 176 fF (about 1 % of its
-  roughly 16 pF), `vin` to `vout` 1.4 pF, `vout` +0.8 pF. The `vin` feed crosses the top of `Cm`
-  to keep the IR drop down. The post-layout simulation decides whether any of it matters.
-- ⛔ **Folded resistors.** A resistor drawn as the PDK `rhigh` serpentine extracts as a
-  per-segment `l`, a bend count `b` and a leg spacing `ps`, with about 2.2 µm of bend allowance
-  per bend. It never equals a straight schematic `l`. The schematic has to carry `b`, the
-  per-segment `l` and `ps`, and be **re-simulated**, because the bends change the resistance.
-  `XRb` (2,940 µm) cannot be drawn unfolded.
-- ⚠️ **Post-layout simulation is not run yet.** Extraction is now trustworthy on the MOM
+  roughly 16 pF), `vin` to `vout` 1.4 pF, `vout` +0.8 pF. The post-layout simulation decides
+  whether any of it matters.
+- ⚠️ **Post-layout simulation is not run yet.** Extraction is trustworthy on the MOM
   capacitors: on magic 8.3.684 their combs extract at the model value (`Cm` 49.9 / 47.9 pF
   against 48; `vout` 22.7 pF against 22.2). They come out as parasitic capacitance, not as
-  devices. The post-layout run itself is next.
-- ⚠️ The control inputs (`en`, `ilim_en`, `vtrim0–4`) and status outputs (`pgood`, `oc`) have no
-  slot pins yet. Every harness control bit reaches every slot, so the bits are ours to choose.
-  The single `vss` is fine: the harness ties the grounds chip-wide.
+  devices.
 
 **What routing needed that the PDK cells do not provide**, now part of the floorplan: a gate
 contact on every MOSFET; a well tap per pMOS, shared across the pass array as **one** tap in one
@@ -308,9 +328,9 @@ buying it with `Cout` helps the failing corner and simply moves the worst case e
 | `netlist/` | extracted / simulation netlists |
 | `doc/` | design notes, characterization, datasheet |
 | `prototype/ldo/` | feasibility netlist (`ldo.spice`) — stable capless loop demonstrated in-process |
-| `magic/` | analog layout — **empty: the routed layout is held back until the items under Physical design close** |
+| `gds/` | the layout: block cell `sg13cmos5l_vyges_ip__ldo_capless` and the harness hand-off `slot_11.gds` |
 | `verilog/` | digital enable / trim / power-good wrapper (LibreLane) |
-| `signoff/` | DRC / LVS / extract / STA reports — **empty until the layout is committed** |
+| `doc/figures/` | presentation circuit figures (cirfig_gen), each checked pin by pin against the schematic |
 
 ## Toolchain
 
