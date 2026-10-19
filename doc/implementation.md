@@ -161,7 +161,7 @@ recalibration, and it lands on the review's predicted "×2" row:
 | --- | --- | --- | --- |
 | `Cm` (amplifier compensation) | 47.98 pF | 193 × 193 µm (144 × 144) | **25.4%** |
 | `Cout` | 20.11 pF | 125 × 125 µm (93 × 93) | 10.7% |
-| `Cc` | 2.06 pF | 40 × 40 µm (30 × 30) | 1.1% |
+| `Cc` | 3.56 pF | w 69.15 × l 40 µm (40 × 40 for 2.06 pF until the 2026-10-19 retune) | 1.9% |
 
 ℹ️ Tim Edwards measured **1.20 fF/µm²** with a magic MoM generator at the 2026-09-01
 review, against the 2.32 this document then carried. The recalibrated model gives 1.287 —
@@ -360,7 +360,7 @@ load sweep at one corner do not bound it between them.
 | | across all 27 corners | specification |
 | --- | --- | --- |
 | Output | 1.2094 – 1.2135 V | trimmed, ±3 % |
-| Worst phase margin | 45.6° (ff / worst-case sheet / −40 °C / 3.6 V, no load) | 45° min ✅ |
+| Worst phase margin | 49.4° (ff / best-case sheet / 110 °C / 3.0 V, no load); 48.4° post-layout | 45° min ✅ |
 
 **The block regulates across the full commercial range**, −40 to 110 °C, 3.0 to 3.6 V,
 tt/ss/ff. ✅ **It now meets the 45° phase-margin minimum**: the worst case is 45.6°, at ff
@@ -375,15 +375,57 @@ Unity-gain crossover is gm₁/Cm, and gm₁ moves with process and temperature �
 loop gain rises and the crossover pushes out to where there is no phase left, while at
 110 °C both fall. Controlling that spread is what sets the component values:
 
-- **The input pair is deliberately narrow (5 µm).** The loop had roughly 60 dB more gain
-  than the specification needs, so narrowing the pair trades surplus gain for crossover
-  control. It is a stability parameter here, not just a gain one — and it *saves* area.
+- **The input pair is deliberately narrow (2.5 µm; 5 µm until 2026-10-19).** The loop had
+  roughly 60 dB more gain than the specification needs, so narrowing the pair trades surplus
+  gain for crossover control. It is a stability parameter here, not just a gain one — and it
+  *saves* area.
 - **`Rz` is not tuned to a corner, and must not be.** Its optimum conflicts across PVT:
   50 kΩ is best at ss/−40 °C, 80 kΩ at ff/110 °C, and moving toward either wrecks the
   other. The resolution is to lower the crossover until that optimum stops being sharp,
   not to keep re-tuning it.
 - **`Cm` = 48 pF is the knee.** Both larger `Rz` and smaller `Cm` were swept and both
   make it worse — see the preload section above.
+
+### The post-layout retune (2026-10-19)
+
+The first layout failed the phase-margin floor post-layout: 39.4° at the worst of 243 corners,
+against 45.1° on the schematic (the layout cost up to 7.4°, mostly the wiring inside the 64
+pass fingers; attribution in the README). The compensation was retuned against the
+**extracted** netlist, every candidate priced over all 243 corners on both the schematic and
+the extracted cells (chipalooza `tools/ldo_comp_run.sh`; a 48-corner screen of the extremes
+first, then full sweeps of the leaders).
+
+Two corners bind and pull in opposite directions:
+
+- **ff / `res_wcs` / −40 °C, no load.** The layout costs about 5° here. It improves with less
+  input-pair gm and with more `Cc`, and gets worse with a longer `Rz` (high sheet resistance
+  already puts `Rz` at or past its optimum).
+- **ff / `res_bcs` / 110 °C, no load.** The layout barely moves it (0.3°). It wants a longer
+  `Rz`, and a smaller preload hurts it.
+
+A narrower pair and more `Cc` give the cold corner the room for the longer `Rz` the hot one
+needs. Measured, worst corner, schematic / post-layout:
+
+| Variant | Schematic | Post-layout |
+| --- | --- | --- |
+| As first laid out | 45.10° | 39.42° |
+| Pair 3 µm alone (`Rz` 1.0×) — the hot corner takes over | 44.14° | 43.95° |
+| Pair 3 µm, `Rz` 1.1× | 49.10° | 43.73° |
+| Pair 3 µm, `Rz` 1.1×, `Cc` +1.5 pF | 47.47° | 47.25° |
+| **Pair 2.5 µm, `Rz` 1.15×, `Cc` +1.5 pF (adopted)** | **49.44°** | **48.33°** (48.38° re-laid out) |
+
+Priced and rejected: more `Cout` (+2 or +5 pF moves the worst case to 100 µA load and loses),
+the preload (×0.7 helps the cold corner and costs the hot one; ×1.5 costs both), less `Cc`
+(−0.4 pF: 41.8° post-layout), and a longer `Rz` without the narrower pair (every step worse).
+
+Adopted: `M1`/`M2` 5 → 2.5 µm, `Rz` 35.2 → 40.48 µm, `Cc` 40 × 40 → w 69.15 × l 40 µm
+(2.06 → 3.56 pF by the PDK model, which is symmetric in w and l; w is the PyCell's y extent,
+so `Cc` grows up its floorplan column). Re-laid out and re-extracted, the gate measures 48.38°
+post-layout with 0 of 243 corners below 45°.
+
+What it cost: about 2.6 dB of PSRR (worst corner now ~1 dB over the 50 / 30 / 10 dB mask), the
+droop slew rate 2.65 → 1.77 mA/µs (limit 1), and line regulation 0.38 → 0.51 mV/V (limit 5).
+Quiescent current, dropout, trim and current limit are unchanged.
 
 The capacitors are the block's area cost, and it roughly doubled with the capacitor
 model's recalibration: `Cm` at 193 × 193 µm is about **25 %** of the 537.15 × 273 µm slot, and
@@ -641,7 +683,7 @@ they cannot quietly drop out of the record.
 | Dropout at 50 mA | **149.7 mV** ✅ | 250 mV max |
 | Load slew rate for ≤120 mV droop | **2.65 mA/µs** ✅ | 1 mA/µs min |
 | Load-step droop at 19 mA/µs | 338.2 mV | *beyond the specified rate* |
-| Load-release overshoot, 20 → 1 mA | **235.6 mV** ❌ (was: to 3.292 V, the input rail) | 120 mV max |
+| Load-release overshoot, 20 → 1 mA | **228.3 mV** ❌ (235.6 before the 2026-10-19 retune; was: to 3.292 V, the input rail) | 120 mV max |
 
 ⛔ **THE DROOP ROW CHANGED SHAPE, 2026-09-17, and the old one is why this heading said
 "two".** Droop was specified as a step size — 120 mV for a 1 → 20 mA step — and it is not a
@@ -778,9 +820,10 @@ Stated here rather than left to be discovered:
   falls 20 dB per decade and a flat line crosses that slope once. The specification is now a
   mask parallel to the physics — **50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz**, each the
   worst of 243 PVT corners rounded down to the next 10 dB — and the block measures
-  54.9 / 35.1 / 15.1 dB. ⛔ **The mask stops**: rejection reaches 0 dB at 71.4 kHz typical and
-  49.5 kHz at the worst corner, and near 2.2 MHz the block *amplifies* supply ripple by
-  4.9 dB typical and 12.1 dB at the worst corner. Not a `Cout` limitation — see
+  52.2 / 32.4 / 12.5 dB typical and 50.96 / 31.09 / 11.10 dB at the worst corner (since the
+  2026-10-19 retune; it was 54.9 / 35.1 / 15.1 typical). ⛔ **The mask stops**: rejection reaches
+  0 dB at 49.4 kHz typical and 36.4 kHz at the worst corner, and in the low-MHz range the block
+  *amplifies* supply ripple by 5.3 dB typical and 12.4 dB at the worst corner. Not a `Cout` limitation — see
   `sim/tb_ldo_psrr.spice`.
 
 ## Work remaining, in the order it should be done
@@ -980,9 +1023,9 @@ remains is one missed target and one question about a floor.
 
 1. ✅ **Load-release overshoot: FIXED as an over-voltage, still missed as a 120 mV target.**
    The reviewer's words were *"that needs fixing"* — it was an over-voltage on thin-oxide
-   devices, not a settling wobble, and that is what has been fixed. **235.6 mV at the typical
-   corner, 573 mV at the worst of 81 transient corners, and no corner reaching the rail
-   against 81 of 81 before.** The 120 mV target is still missed, so the row stays ❌, but it
+   devices, not a settling wobble, and that is what has been fixed. **228.3 mV at the typical
+   corner, 422 mV at the worst of 81 transient corners (235.6 and 573 mV before the 2026-10-19
+   retune), and no corner reaching the rail against 81 of 81 before.** The 120 mV target is still missed, so the row stays ❌, but it
    is an ordinary excursion now rather than a reliability hazard.
 
    **The mechanism, which is why the fix looks the way it does.** It is a release-RATE
@@ -1013,22 +1056,26 @@ remains is one missed target and one question about a floor.
    step-size target, and it is not a function of step size. It is a ramp-tracking error set
    by the loop's transconductance — the loop follows the load ramp to three parts in ten
    thousand and that residue is the droop — so the quantity the block can be held to is a
-   load SLEW RATE. **2.65 mA/µs for ≤120 mV**, derived and passing. The 338 mV figure is kept
-   as a stress point at 19 mA/µs, seven times that rate. ⛔ It does not reach 120 mV at
-   19 mA/µs by any lever: droop goes as 1/√I_tail, so 338 → 120 mV needs 7.9× the tail,
-   about 79 µA, putting Iq near 110 µA against a 60 µA budget.
+   load SLEW RATE. **1.77 mA/µs for ≤120 mV** since the 2026-10-19 compensation retune (2.65
+   before it: the narrower input pair tracks the ramp with less transconductance), derived and
+   passing against 1 mA/µs. The 19 mA/µs figure, now 404.7 mV (338 before the retune), is kept
+   as a stress point. ⛔ It does not reach 120 mV at 19 mA/µs by any lever: droop goes as
+   1/√I_tail, so the tail would have to grow about 8× (figures measured before the retune),
+   putting Iq near 110 µA against a 60 µA budget.
 
 3. ✅ **PSRR: CLOSED as a mask, 2026-09-17.** 35.1 dB at 1 kHz against a flat 40 dB was
    unreachable *and* the wrong shape — rejection here is a slope, not a point. Now
    **50 / 30 / 10 dB at 100 Hz / 1 kHz / 10 kHz**, each the worst of 243 corners rounded down
-   to the next 10 dB, measuring 54.9 / 35.1 / 15.1 dB. ⛔ **Read the stop condition with it**:
-   above ~50 kHz at the worst corner there is no rejection at all, and near 2.2 MHz the block
-   amplifies supply ripple by up to 12.1 dB. **Do not feed this block directly from a
+   to the next 10 dB, measuring 52.2 / 32.4 / 12.5 dB typical and about 1 dB over the mask at
+   the worst corner since the 2026-10-19 retune (54.9 / 35.1 / 15.1 before it). ⛔ **Read the
+   stop condition with it**: above ~36 kHz at the worst corner there is no rejection at all, and
+   in the low-MHz range the block amplifies supply ripple by up to 12.4 dB. **Do not feed this block directly from a
    switching regulator** — that is an integration constraint, not a table entry, and being
    capless there is no output capacitor to cover it.
 
-4. ⛔ **Is 45° the right phase-margin floor?** This is now the block's binding constraint
-   rather than a side question, and it has a price attached. The pass device is drawn at
+4. ⛔ **Is 45° the right phase-margin floor?** ℹ️ Written when the schematic had 0.097° of
+   margin; the 2026-10-19 retune left 4.4° on the schematic and 3.4° post-layout, so the trade
+   below is open again but has not been re-priced. It had a price attached. The pass device is drawn at
    `ng=1`, the worst of seven layout choices for the same transistor: folding it to `ng=16`
    halves its drawn area, 15544 → 7488 µm², and is DRC clean. It costs **0.33°** — 45.097°
    → 44.772° at the worst corner — against 0.097° of margin, and nearly all of that is the
