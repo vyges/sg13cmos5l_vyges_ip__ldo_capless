@@ -75,7 +75,7 @@ N 40 340 40 380 {lab=vtrim3}
 C {devices/lab_pin.sym} 40 380 0 0 {name=l_x_fb_vtrim3 sig_type=std_logic lab=vtrim3}
 N 40 420 40 460 {lab=vtrim4}
 C {devices/lab_pin.sym} 40 460 0 0 {name=l_x_fb_vtrim4 sig_type=std_logic lab=vtrim4}
-C {sg13cmos5l_pr/cap_cmomf.sym} -40 -480 0 0 {name=Cc model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=40u l=40u}
+C {sg13cmos5l_pr/cap_cmomf.sym} -40 -480 0 0 {name=Cc model=cap_cmomf mmin=1 mmax=4 spiceprefix=X w=69.15u l=40u}
 C {ldo_boost.sym} 620 -540 0 0 {name=x_boost }
 N 475 -660 475 -700 {lab=vout}
 C {devices/lab_pin.sym} 475 -700 0 0 {name=l_x_boost_vout sig_type=std_logic lab=vout}

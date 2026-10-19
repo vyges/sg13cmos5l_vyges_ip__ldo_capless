@@ -56,7 +56,7 @@ x_boost vout vfb vref_ov ibias eout vin vss ldo_boost
 * elements on one node pair is a degenerate loop for the DC solve.
 Vinj vfbd vfb DC 0 AC 1
 XMpre vout ibias vss vss sg13_hv_nmos w=20u l=1u ng=1 m=1
-XCc   eout vout cap_cmomf w=40u l=40u mmin=1 mmax=4
+XCc   eout vout cap_cmomf w=69.15u l=40u mmin=1 mmax=4
 XCout vout vss  cap_cmomf w=125u l=125u mmin=1 mmax=4
 .control
   op

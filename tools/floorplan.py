@@ -163,7 +163,9 @@ BLOCKS = [
     # finger's gate contact on top (the PyCell has none).
     ("pass array 64x",    370, 6,   157.5, 101.5, "pass"),
     # Cc and Cout keep 1 um between Cc's plates and Cout's left terminal stub.
-    ("Cc 40x40.5",        363, 115, 41,    41.5,  "amp"),
+    # 2026-10-19: Cc 2.06 -> 3.56 pF for the post-layout phase-margin retune (w 69.15 x l 40;
+    # the PyCell draws w along y, so it grows up this column, which is empty above it).
+    ("Cc 40x69.65",       363, 115, 41,    70.65, "amp"),
     ("Cout 125x125.5",    405, 115, 126,   126.5, "out"),
 ]
 
@@ -183,7 +185,7 @@ PLACE = [
     (r"/x_pg/",           "pgood"),
     (r"/x_en/",           "enable + Rls"),
     (r"/x_pass/",         "pass array 64x"),
-    (r"/XCc$",            "Cc 40x40.5"),
+    (r"/XCc$",            "Cc 40x69.65"),
     (r"/XCout$",          "Cout 125x125.5"),
 ]
 # Per-region packing. Regions drawn to a device's exact size take no inset; the pass array
@@ -191,7 +193,7 @@ PLACE = [
 PACK = {
     "Cm  193x193.5":   dict(inset=0, gap=0),
     "Cout 125x125.5":  dict(inset=0, gap=0),
-    "Cc 40x40.5":      dict(inset=0, gap=0),
+    "Cc 40x69.65":      dict(inset=0, gap=0),
     "Cb 28x28.5":      dict(inset=0, gap=0),
     "pass array 64x":  dict(inset=0, gap=0, array=True),
     "Rb snake":        dict(inset=0, gap=0, fold=150.0),
