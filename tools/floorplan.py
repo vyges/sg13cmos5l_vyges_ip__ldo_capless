@@ -155,7 +155,11 @@ BLOCKS = [
     # Mref (w 50 um) is 51.0 um tall and pgood's Mt (w 40 um) 40.4. The region was sized by
     # area and never by its tallest device; the placed GDS is what caught it.
     ("ilim",              205, 200, 45,    67,    "stat"),     # +5 for its ring (2026-10-26)
-    ("pgood",             255, 205, 45,    60,    "stat"),
+    # pgood sits directly ABOVE the fbtrim ladder, not up beside ilim (2026-10-26): its comparator
+    # takes vfb, the loop's high-impedance node, and the branch up to y 205 was ~230 of vfb's
+    # ~490 um. vfb's C to vss follows its length (~0.04 fF/um on any of Metal1-3: holding it off
+    # Metal1 moved nothing), and each fF costs ~0.065 deg at the worst corner.
+    ("pgood",             205, 82,  45,    60,    "stat"),
     # XRls is a level-shift resistor with no matching partner, so its fold height is free.
     ("enable + Rls",      305, 165, 40,    95,    "stat"),
 
