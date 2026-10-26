@@ -130,12 +130,23 @@ BLOCKS = [
     # Both stay at the bottom, nearest the core-edge bias pins (vbias/ibias0 at y 94-99).
     # Each MOM cap region is 1 um wider and taller than the cap: the routable terminals are
     # Metal4 stubs reaching 1 um out of its left and top edges (the PDK pins are 0.2 um).
-    ("Cm  193x193.5",     6,   67,  194,   194.5, "amp"),
+    # 72.5, not 67 (2026-10-26): up against the top edge, to open the band beneath it for the
+    # digital row; the slot's top less EDGE is exactly 267.
+    ("Cm  193x193.5",     6,   72.5, 194,   194.5, "amp"),
+    # The DIGITAL ROW (layout review item 5 and 11, 2026-10-22; the SAR ADC and Ridha pattern):
+    # every standard cell of the block -- the en and ilim_en input inverters and the pgood and oc
+    # output drivers -- in ONE ringed row beside the left-edge digital pins (y 72-88) and the
+    # vdd_1v2 pin (y 2-57). Before, they sat in three places 200-330 um from those pins, so the
+    # outputs were small gates driving long wires over the resistor snakes, and vdd_1v2 crossed
+    # the slot at minimum width (">100 ohm", Tim). Now the pin-side wires are a few um long; the
+    # long runs are the static analog-side controls, which no pad loads.
+    ("digital row",       10,  62.5, 24,    8.2,   "dig"),     # cells 4.39 tall (bbox), + ring
     ("erramp devices",    6,   6,   95,    55,    "amp"),
     ("vref divider",      106, 6,   40,    55,    "ref"),
 
     # --- C2 x 205..360: feedback ladder, boost, status blocks.
-    ("fbtrim ladder",     205, 6,   60,    192,   "fb"),
+    # 70 tall, not 192 (2026-10-26): its devices use 61 um; the rest was empty
+    ("fbtrim ladder",     205, 6,   60,    70,    "fb"),
     ("Rb snake",          272, 6,   RB_W,  RB_H,  "boost"),
     ("Rnx snake",         300, 6,   RNX_W, RNX_H, "boost"),
     ("Cb 28x28.5",        313, 6,   29,    29.5,  "boost"),
@@ -143,7 +154,7 @@ BLOCKS = [
     # 60 um tall, not 42: each holds a single-finger wide device standing on end -- ilim's
     # Mref (w 50 um) is 51.0 um tall and pgood's Mt (w 40 um) 40.4. The region was sized by
     # area and never by its tallest device; the placed GDS is what caught it.
-    ("ilim",              205, 205, 45,    62,    "stat"),
+    ("ilim",              205, 200, 45,    67,    "stat"),     # +5 for its ring (2026-10-26)
     ("pgood",             255, 205, 45,    60,    "stat"),
     # XRls is a level-shift resistor with no matching partner, so its fold height is free.
     ("enable + Rls",      305, 165, 40,    95,    "stat"),
@@ -172,6 +183,9 @@ BLOCKS = [
 # Which region each netlist instance is placed in, for chipalooza's placement-only slot GDS
 # (tools/slot_gds.py there). Instance-path regex, first match wins; every device must match.
 PLACE = [
+    (r"/x_en/Xinv$",      "digital row"),
+    (r"/x_pg/Xout$",      "digital row"),
+    (r"/x_il/Xinv_(ie|oc)$", "digital row"),
     (r"/x_amp/XCm$",      "Cm  193x193.5"),
     (r"/x_amp/",          "erramp devices"),
     (r"/x_vref/",         "vref divider"),
@@ -203,7 +217,16 @@ PACK = {
     "fbtrim ladder":   dict(fold=50.0),
     "ilim":            dict(fold=30.0),
     "erramp devices":  dict(fold=30.0),
+    # standard cells abut; the p+ ring needs 0.7 um plus 1 um clear
+    "digital row":     dict(inset=1.8, gap=0.0, rings=("p",)),
 }
+# A p+ guard ring around every region of small devices (chipalooza tools/slot_gds.py, Ridha's
+# construction; layout review item 2): the reference, the amplifier, the ladder's switches, the
+# boost and the three status blocks. Their inset grows 1.0 -> 2.0 um for it. The MOM caps, the
+# snakes and the pass array (one shared well, abutted fingers, inset 0) are not ringed here.
+for _r in ("erramp devices", "vref divider", "fbtrim ladder", "boost devices", "ilim", "pgood",
+           "enable + Rls"):
+    PACK.setdefault(_r, {}).update(inset=2.0, rings=("p",))
 
 # ---- The 50 mA path: vin and vout straps, drawn by chipalooza tools/slot_gds.py (STRAPS).
 # The router draws every net at minimum width. These are sized against the process spec's
@@ -241,6 +264,81 @@ STRAPS = dict(
     ],
 )
 
+# ---- vss / vin supply grid over the small cells (layout review 2026-10-22: the ground was "a
+# single thin wire on a long, wandering path"; the PLL got the same grid on 2026-10-26).
+#   vss  a 28 um TopMetal1 bar from the vss_3v3 pin (y 113.5-143.5) straight across Cm --
+#        TopMetal1 only, as the vin run already crosses it -- to a vss spine at x 202-216, the
+#        gap between Cm and the middle column.
+#   vin  a spine at x 346-360 hanging from the vin run along the top (y 242-270).
+#   fingers 4 um on a 6 um pitch, vss and vin alternating, Metal4 + TopMetal1, over the middle
+#        column (x 202-360, y 8-240): vss from the left spine, vin from the right. The vss rows
+#        below Cm also run LEFT along the bottom band (error amp, vref), x 8-202.
+# ⛔ No Metal4 over a MOM capacitor (Cm, Cb, Cc, Cout fill Metal1-4) nor over the vref divider
+#    (Cf is a MOM cap placed by the packer, and the divider is the highest-impedance network):
+#    a row's TopMetal1 runs on over them, its Metal4 is split around them.
+GRID_Y0, GRID_W, GRID_PITCH, GRID_N = 8.0, 4.0, 6.0, 39
+VSS_SPINE, VIN_SPINE = (202.0, 216.0), (346.0, 360.0)
+M4_KEEPOUT = [b for b in BLOCKS if b[0].startswith(("Cm ", "Cb ", "Cc ", "Cout ", "vref divider"))]
+
+
+def _m4_spans(x1, x2, y1, y2):
+    """x1..x2 at rows y1..y2, less every Metal4 keep-out (1 um clear of each)"""
+    cuts = sorted((b[1] - 1.0, b[1] + b[3] + 1.0) for b in M4_KEEPOUT
+                  if b[2] - 1.0 < y2 and y1 < b[2] + b[4] + 1.0 and b[1] - 1.0 < x2 and x1 < b[1] + b[3] + 1.0)
+    spans, x = [], x1
+    for a, b in cuts:
+        if a > x + 4.0:
+            spans.append((x, min(a, x2)))
+        x = max(x, b)
+    if x2 > x + 4.0:
+        spans.append((x, x2))
+    return spans
+
+
+GRID_BANDS = []
+for _k in range(GRID_N):
+    _y = GRID_Y0 + _k * GRID_PITCH
+    _net = "vss" if _k % 2 == 0 else "vin"
+    if _net == "vss":
+        # into the bottom band too, where the row clears Cm (y 67)
+        _x1, _x2 = (8.0 if _y + GRID_W < 66.0 else VSS_SPINE[0]), VIN_SPINE[0] - 2.0
+    else:
+        _x1, _x2 = VSS_SPINE[1] + 2.0, VIN_SPINE[0]
+    GRID_BANDS.append((_net, ("TopMetal1",), _x1, _y, _x2, _y + GRID_W))
+    GRID_BANDS += [(_net, ("Metal4", "TopMetal1"), a, _y, b, _y + GRID_W)
+                   for a, b in _m4_spans(_x1, _x2, _y, _y + GRID_W)]
+STRAPS["bands"] += GRID_BANDS
+STRAPS["feed"] += [
+    ("vss", "TopMetal1", 0.0,           114.5, VSS_SPINE[1], 142.5),   # vss_3v3 pin -> spine
+    ("vss", "TopMetal1", VSS_SPINE[0], GRID_Y0, VSS_SPINE[1], 240.0),
+    ("vin", "TopMetal1", VIN_SPINE[0], GRID_Y0, VIN_SPINE[1], 244.0),  # from the top vin run
+]
+STRAPS["drops"] = dict(nets=("vss", "vin"), step=2.5, max_jog=8.0)
+# vdd_1v2 has no room in the grid: it feeds the digital row by its pin and five devices in pgood
+# and ilim, 200 um away. Routed 1 um wide (a non-default rule; Metal1-3) instead of 0.2: about
+# 5x less resistance than the ">100 ohm" minimum-width path of the layout review.
+WIDE_NETS = {"vddd": 1.0}
+
+
+def grid_check():
+    """the vss/vin grid's geometry: TopMetal1 width, opposite-net spacing on each layer, and
+    no Metal4 over a keep-out. Returns the failures."""
+    bad = []
+    shapes = [(n, "TopMetal1", f[2:]) for f in STRAPS["feed"] for n in (f[0],) if f[1] == "TopMetal1"]
+    shapes += [(n, l, (x1, y1, x2, y2)) for n, ls, x1, y1, x2, y2 in STRAPS["bands"] for l in ls]
+    for i, (na, la, a) in enumerate(shapes):
+        for nb, lb, b in shapes[i + 1:]:
+            if na == nb or la != lb:
+                continue
+            dx, dy = max(b[0] - a[2], a[0] - b[2], 0), max(b[1] - a[3], a[1] - b[3], 0)
+            if max(dx, dy) < 1.64:
+                bad.append(f"{na}/{nb} {la} {a} and {b}: {max(dx, dy):.2f} um apart")
+    for n, ls, x1, y1, x2, y2 in GRID_BANDS:
+        for b in M4_KEEPOUT:
+            if "Metal4" in ls and x1 < b[1] + b[3] and b[1] < x2 and y1 < b[2] + b[4] and b[2] < y2:
+                bad.append(f"{n} Metal4 at y {y1} over {b[0]!r}")
+    return bad
+
 
 def strap_check():
     """Current and IR drop of every strap segment at STRAPS["load_ma"]. Returns the failures."""
@@ -264,7 +362,7 @@ def strap_check():
     # slot11_wrapper.mag @ c32fabe): 49.5 mA at JMAXM3, 1 % under the 50 mA load. Raised with
     # the harness owner; nothing on our side of the outline can widen it.
     seg(f"vout through the harness pin, Metal3 ({fo[5] - fo[3]:.2f} um)", I, J["Metal3"] * (fo[5] - fo[3]), True)
-    for f in STRAPS["feed"][1:]:
+    for f in STRAPS["feed"][1:3]:                      # the 50 mA vin run; the grid feeds are not on it
         w = min(f[4] - f[2], f[5] - f[3])
         seg(f"vin feed TopMetal1 ({w:.0f} um)", I, J["TopMetal1"] * w)
     # IR drop, vin: the run's length in squares plus the leg down to the first band's top
@@ -282,7 +380,7 @@ def strap_check():
 
 
 COLOUR = {"ref": "#8ecae6", "amp": "#219ebc", "pass": "#fb8500", "fb": "#ffb703",
-          "out": "#2a9d8f", "stat": "#adb5bd", "boost": "#e76f51"}
+          "out": "#2a9d8f", "stat": "#adb5bd", "boost": "#e76f51", "dig": "#6c757d"}
 
 
 def check():
@@ -328,7 +426,7 @@ def report():
         for b in bad:
             print(f"  {b}")
         return 1
-    sb = strap_check()
+    sb = strap_check() + grid_check()
     for b in sb:
         print("  FAIL " + b)
     if sb:
