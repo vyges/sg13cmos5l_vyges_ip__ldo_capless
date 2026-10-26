@@ -326,6 +326,11 @@ STRAPS["drops"] = dict(nets=("vss", "vin"), step=2.5, max_jog=8.0)
 # and ilim, 200 um away. Routed 1 um wide (a non-default rule; Metal1-3) instead of 0.2: about
 # 5x less resistance than the ">100 ohm" minimum-width path of the layout review.
 WIDE_NETS = {"vddd": 1.0}
+# vfb, the divider tap into the amplifier, is the loop's high-impedance node: deleting only its
+# extracted C to vss is worth 2.0 deg at the worst corner (ff/res_wcs/-40 C, 46.6 -> 48.6), and
+# that C doubled with the grid because the router ran vss wires beside it at 0.42-0.48 um (Metal2
+# at x 212 and 119, Metal3 at y 19.6). A spacing rule keeps the router's neighbours away from it.
+SPACED_NETS = {"vfb": 1.2}
 
 
 def grid_check():
