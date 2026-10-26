@@ -405,7 +405,7 @@ gate runs once the refinements are done.
 
 Short check: DRC 0, antenna 0, keepouts 0, as-folded LVS match (block and slot), resistors by
 value 0 failures. vout 1.2117 V post-layout (tt / 27 °C, no load). Phase margin at the nine
-worst corners of the taped-out layout, three loads each: worst **47.0°** (ff / `res_wcs` /
+worst corners of the taped-out layout, three loads each: worst **47.2°** (ff / `res_wcs` /
 −40 °C / 3.6 V, no load), against 48.4° for the taped-out layout. The floor is 45°.
 
 The feedback node `vfb` sets most of that margin. It is the divider's high-impedance tap, and at
@@ -419,11 +419,14 @@ router carries `vfb` on Metal2 and Metal3, under the grid. Its extracted C went:
 | Metal4 narrowed to 1.64 µm fingers | 41.6 fF (30.9) | 46.6° |
 | + `vfb` routed under a 1.2 µm spacing rule | 31.6 fF (24.4) | 46.8° |
 | + the two lowest vss rows stop at the spine | 27.8 fF (20.2) | 47.0° |
+| + pgood moved directly above the feedback ladder | 24.8 fF (19.3) | 47.2° |
 
 The spacing rule exists because the router ran vss beside `vfb` at 0.42 µm. The two rows ran
 directly over `vfb`'s Metal3 along the bottom of the amplifier band; without the spacing rule,
 removing them made things worse (46.25°), because the router filled the gap with vss wires
-next to `vfb`. Deleting couplings from the final extraction at the worst corner: `vfb` to vss
+next to `vfb`. Past that, `vfb`'s C to vss follows its length -- about 0.04 fF/µm on any of
+Metal1-3 (holding it off Metal1 moved nothing) -- so pgood, whose comparator takes `vfb`, now sits
+on top of the ladder: `vfb` went from about 490 to 386 µm. Deleting couplings from the extraction before the pgood move, at the worst corner: `vfb` to vss
 (20.2 fF) is worth 1.3°, and the Miller nodes `nzc` and `eout` to vss (about 150 fF each,
 around Cm) 0.8° together; both at once, 2.1° (49.1°). Neither is all removable -- the taped-out
 layout had 14.5 fF from `vfb` to vss as well.
