@@ -285,7 +285,6 @@ GRID_Y0, GRID_W, GRID_PITCH, GRID_N = 8.0, 4.0, 6.0, 39
 # margin at the high-UGF corners (ff/res_wcs/-40 C, 48.4 -> 45.3 deg).
 GRID_M4_W = 1.64
 VSS_SPINE, VIN_SPINE = (202.0, 216.0), (346.0, 360.0)
-VFB_CLEAR_Y = 25.0           # vss rows at or below this y stop at the spine (see GRID_BANDS)
 M4_KEEPOUT = [b for b in BLOCKS if b[0].startswith(("Cm ", "Cb ", "Cc ", "Cout ", "vref divider"))]
 
 
@@ -308,14 +307,8 @@ for _k in range(GRID_N):
     _y = GRID_Y0 + _k * GRID_PITCH
     _net = "vss" if _k % 2 == 0 else "vin"
     if _net == "vss":
-        # into the bottom band too, where the row clears Cm (y 67) -- but not the two lowest rows
-        # (y 8, y 20): the feedback node vfb leaves the amplifier along the bottom of the band on
-        # Metal3 (y 12 and 19.6, x 71-213), and those rows doubled its capacitance to vss
-        # (14.5 -> 30.9 fF). Deleting exactly that coupling in the extracted netlist is worth
-        # 2.0 deg at the worst corner (ff/res_wcs/-40 C, 46.6 -> 48.6). Rows y 32-56 still ground
-        # the band.
-        _x1 = 8.0 if VFB_CLEAR_Y < _y and _y + GRID_W < 66.0 else VSS_SPINE[0]
-        _x2 = VIN_SPINE[0] - 2.0
+        # into the bottom band too, where the row clears Cm (y 67)
+        _x1, _x2 = (8.0 if _y + GRID_W < 66.0 else VSS_SPINE[0]), VIN_SPINE[0] - 2.0
     else:
         _x1, _x2 = VSS_SPINE[1] + 2.0, VIN_SPINE[0]
     GRID_BANDS.append((_net, ("TopMetal1",), _x1, _y, _x2, _y + GRID_W))
