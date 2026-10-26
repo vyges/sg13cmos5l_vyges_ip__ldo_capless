@@ -5,7 +5,11 @@
 | `sg13cmos5l_vyges_ip__ldo_capless.gds` | `sg13cmos5l_vyges_ip__ldo_capless` | 527.15 × 269.00 | The LDO as a reusable block: its own prBoundary, pins named by its ports (`vin`, `vout`, `vddd`, `vss`, `vref_bg`, `ibias`, `en`, `ilim_en`, `vtrim0`–`vtrim4`, `pgood`, `oc`) |
 | `slot_11.gds` | `slot_11` | 537.15 × 273.00 | The Chipalooza slot 11 hand-off: one instance of the block at (4, 2), the wrapper pins it uses, and a straight stub from each to the block pin facing it |
 
-Checks on both files (2026-10-19, after the compensation retune; IHP-Open-PDK KLayout decks, block alone and in the slot):
+This is the `layout-refine` layout (2026-10-26): TopMetal1 supply grid, guard rings on every region, one digital row,
+`vdd_1v2` routed 1 µm wide, `vfb` under a spacing rule, pgood above the feedback ladder. The taped-out layout
+(2026-10-19) is the one on `main`.
+
+Checks on both files (2026-10-26; IHP-Open-PDK KLayout decks, block alone and in the slot):
 
 - DRC 0, antenna 0, and every unused wrapper pin clear of our metal.
 - LVS: every device and net matches except the 11 folded `rhigh` resistors. The deck extracts a serpentine
