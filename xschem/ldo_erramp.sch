@@ -4,12 +4,12 @@ K {}
 V {}
 S {}
 E {}
-T {ldo_erramp -- 5T OTA error amplifier, PMOS input pair (sg13_hv, 3.3 V domain)} -400 -460 0 0 0.4 0.4 {}
+T {ldo_erramp -- 5T OTA error amplifier, PMOS input pair (sg13_hv, 3.3 V domain)} -1000 -700 0 0 0.4 0.4 {}
 T {The input common mode is 0.6 V, set by the reference the trim range requires.
 That is below the hv NMOS threshold, so an NMOS pair here never leaves
 subthreshold -- it limps at 27 C and fails at -40 C. A PMOS pair sees about
 1.8 V of Vsg at the same common mode. Do not 'simplify' this back to an NMOS
-pair; the room-temperature bench will not show the problem.} -900 -560 0 0 0.25 0.25 {layer=15}
+pair; the room-temperature bench will not show the problem.} -1000 -660 0 0 0.25 0.25 {layer=15}
 N -480 -380 -480 -470 {lab=vin}
 N -480 -470 -480 -450 {lab=vin}
 N -480 -450 -230 -450 {lab=vin}
@@ -49,8 +49,8 @@ N 65 50 130 50 {lab=n3}
 N 170 -150 170 -110 {lab=eout1}
 N 170 -110 170 -20 {lab=eout1}
 N 170 -20 170 20 {lab=eout1}
-N 170 20 300 -20 {lab=eout1}
-N 300 -20 300 50 {lab=eout1}
+N 170 20 300 20 {lab=eout1}
+N 300 20 300 50 {lab=eout1}
 N 300 50 365 50 {lab=eout1}
 N 365 50 430 50 {lab=eout1}
 N 470 20 470 -20 {lab=eout}
@@ -76,14 +76,17 @@ N -730 170 -730 200 {lab=vss}
 N -730 200 170 200 {lab=vss}
 N 170 200 170 170 {lab=vss}
 N 170 170 170 80 {lab=vss}
+N -1000 -60 -730 -60 {lab=ibias}
+N -730 -60 -730 20 {lab=ibias}
+N -1000 280 215 280 {lab=en_n}
+N 215 280 215 200 {lab=en_n}
+N 215 200 280 200 {lab=en_n}
 C {devices/lab_pin.sym} -480 -380 0 0 {name=l_net_vin sig_type=std_logic lab=vin}
 C {devices/lab_pin.sym} -520 -350 0 0 {name=l_net_pbias sig_type=std_logic lab=pbias}
 C {devices/lab_pin.sym} -230 -320 0 0 {name=l_net_ptail sig_type=std_logic lab=ptail}
 C {devices/lab_pin.sym} -80 -150 0 0 {name=l_net_n3 sig_type=std_logic lab=n3}
 C {devices/lab_pin.sym} 170 -150 0 0 {name=l_net_eout1 sig_type=std_logic lab=eout1}
-C {devices/lab_pin.sym} 470 20 0 0 {name=l_net_eout sig_type=std_logic lab=eout}
 C {devices/lab_pin.sym} 760 -170 0 0 {name=l_net_nzc sig_type=std_logic lab=nzc}
-C {devices/lab_pin.sym} -770 50 0 0 {name=l_net_ibias sig_type=std_logic lab=ibias}
 C {devices/lab_pin.sym} -730 80 0 0 {name=l_net_vss sig_type=std_logic lab=vss}
 C {sg13cmos5l_pr/sg13_hv_pmos.sym} -500 -350 0 0 {name=Mp0 l=1u ng=1 m=1 model=sg13_hv_pmos spiceprefix=X w=4u}
 N -480 -350 -410 -350 {lab=vin}
@@ -128,8 +131,6 @@ C {devices/lab_pin.sym} 760 110 0 0 {name=l_Rz_M sig_type=std_logic lab=eout1}
 C {sg13cmos5l_pr/sg13_lv_nmos.sym} 300 200 0 0 {name=Men1 l=0.13u w=5u ng=1 m=1 model=sg13_lv_nmos spiceprefix=X}
 N 320 170 320 130 {lab=eout1}
 C {devices/lab_pin.sym} 320 130 0 0 {name=l_Men1_D sig_type=std_logic lab=eout1}
-N 280 200 230 200 {lab=en_n}
-C {devices/lab_pin.sym} 230 200 0 1 {name=l_Men1_G sig_type=std_logic lab=en_n}
 N 320 230 320 270 {lab=vss}
 C {devices/lab_pin.sym} 320 270 0 0 {name=l_Men1_S sig_type=std_logic lab=vss}
 N 320 200 390 200 {lab=vss}
@@ -146,9 +147,39 @@ N -120 -180 -170 -180 {lab=vref}
 C {devices/ipin.sym} -170 -180 0 1 {name=p_vref lab=vref}
 N 130 -180 80 -180 {lab=vfb}
 C {devices/ipin.sym} 80 -180 0 1 {name=p_vfb lab=vfb}
-C {devices/ipin.sym} -1000 -300 0 0 {name=p_ibias lab=ibias}
-C {devices/ipin.sym} -1000 -240 0 0 {name=p_en_n lab=en_n}
+C {devices/ipin.sym} -1000 -60 0 0 {name=p_ibias lab=ibias}
+C {devices/ipin.sym} -1000 280 0 0 {name=p_en_n lab=en_n}
 N 470 20 470 -20 {lab=eout}
 C {devices/opin.sym} 470 -20 0 0 {name=p_eout lab=eout}
-C {devices/iopin.sym} -1000 -180 0 0 {name=p_vin lab=vin}
-C {devices/iopin.sym} -1000 -120 0 0 {name=p_vss lab=vss}
+C {devices/iopin.sym} -1000 -480 0 0 {name=p_vin lab=vin}
+C {devices/iopin.sym} -1000 330 0 0 {name=p_vss lab=vss}
+L 4 -900 -420 -410 -420 {dash=8}
+L 4 -410 -420 -410 140 {dash=8}
+L 4 -410 140 -900 140 {dash=8}
+L 4 -900 140 -900 -420 {dash=8}
+T {BIAS} -894 -446 0 0 0.3 0.3 {layer=4}
+L 4 -340 -420 250 -420 {dash=8}
+L 4 250 -420 250 -130 {dash=8}
+L 4 250 -130 -340 -130 {dash=8}
+L 4 -340 -130 -340 -420 {dash=8}
+T {TAIL + INPUT PAIR} -334 -446 0 0 0.3 0.3 {layer=4}
+L 4 -200 -20 250 -20 {dash=8}
+L 4 250 -20 250 120 {dash=8}
+L 4 250 120 -200 120 {dash=8}
+L 4 -200 120 -200 -20 {dash=8}
+T {MIRROR LOAD} -194 -46 0 0 0.3 0.3 {layer=4}
+L 4 360 -420 580 -420 {dash=8}
+L 4 580 -420 580 130 {dash=8}
+L 4 580 130 360 130 {dash=8}
+L 4 360 130 360 -420 {dash=8}
+T {SECOND STAGE} 366 -446 0 0 0.3 0.3 {layer=4}
+L 4 680 -290 880 -290 {dash=8}
+L 4 880 -290 880 110 {dash=8}
+L 4 880 110 680 110 {dash=8}
+L 4 680 110 680 -290 {dash=8}
+T {MILLER Rz-Cm} 686 -316 0 0 0.3 0.3 {layer=4}
+L 4 200 160 400 160 {dash=8}
+L 4 400 160 400 260 {dash=8}
+L 4 400 260 200 260 {dash=8}
+L 4 200 260 200 160 {dash=8}
+T {ENABLE} 206 134 0 0 0.3 0.3 {layer=4}

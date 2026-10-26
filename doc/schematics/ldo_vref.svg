@@ -1,16 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="780" height="795" viewBox="-440 -525 780 795">
-<rect x="-440.0" y="-525.0" width="780.0" height="795.0" fill="#ffffff"/>
-<line x1="0.0" y1="-380.0" x2="0.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-320.0" x2="0.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-230.0" x2="0.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-170.0" x2="0.0" y2="-130.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="957" height="871" viewBox="-375 -571 957 871">
+<rect x="-375.0" y="-571.0" width="957.0" height="871.0" fill="#ffffff"/>
+<line x1="-90.0" y1="-440.0" x2="160.0" y2="-440.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="160.0" y1="-440.0" x2="160.0" y2="230.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="160.0" y1="230.0" x2="-90.0" y2="230.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="-90.0" y1="230.0" x2="-90.0" y2="-440.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="-330.0" y1="-150.0" x2="-150.0" y2="-150.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="-150.0" y1="-150.0" x2="-150.0" y2="50.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="-150.0" y1="50.0" x2="-330.0" y2="50.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<line x1="-330.0" y1="50.0" x2="-330.0" y2="-150.0" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="8 6"/>
+<text x="-84.0" y="-450.0" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="bold" fill="#718096">DIVIDER (one chain, three taps)</text>
+<text x="-324.0" y="-160.0" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="bold" fill="#718096">FILTER CAP</text>
+<line x1="0.0" y1="-320.0" x2="0.0" y2="-270.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-270.0" x2="0.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-170.0" x2="0.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-120.0" x2="0.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-20.0" x2="0.0" y2="45.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="45.0" x2="0.0" y2="90.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="90.0" x2="0.0" y2="130.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-80.0" x2="0.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="-20.0" x2="0.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="130.0" x2="0.0" y2="90.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="0.0" y1="190.0" x2="0.0" y2="230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="240.0" y1="-80.0" x2="240.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
-<line x1="240.0" y1="-20.0" x2="240.0" y2="20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-120.0" x2="-240.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-240.0" y1="-120.0" x2="-240.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="190.0" x2="0.0" y2="260.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="260.0" x2="-240.0" y2="260.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-240.0" y1="260.0" x2="-240.0" y2="45.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="-240.0" y1="45.0" x2="-240.0" y2="-20.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="500.0" y1="-280.0" x2="0.0" y2="-280.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-280.0" x2="0.0" y2="-230.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="500.0" y1="-120.0" x2="0.0" y2="-120.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-120.0" x2="0.0" y2="-80.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="500.0" y1="70.0" x2="0.0" y2="70.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="70.0" x2="0.0" y2="130.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="500.0" y1="260.0" x2="0.0" y2="260.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="260.0" x2="0.0" y2="190.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-380.0" x2="0.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<line x1="0.0" y1="-380.0" x2="0.0" y2="-420.0" stroke="#2b6cb0" stroke-width="2" stroke-linecap="round"/>
+<circle cx="0.0" cy="-120.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="0.0" cy="-80.0" r="3.2" fill="#2b6cb0"/>
+<circle cx="0.0" cy="260.0" r="3.2" fill="#2b6cb0"/>
 <line x1="0.0" y1="-330.0" x2="0.0" y2="-320.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-330.0" x2="7.5" y2="-332.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-7.5" y1="-337.5" x2="7.5" y2="-332.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
@@ -26,8 +52,6 @@
 <text x="-30.0" y="-375.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=194.4u</text>
 <circle cx="0.0" cy="-420.0" r="2.6" fill="#c05621"/>
 <text x="7.0" y="-415.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_bg</text>
-<circle cx="0.0" cy="-280.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="-275.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_ov</text>
 <line x1="0.0" y1="-180.0" x2="0.0" y2="-170.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-180.0" x2="7.5" y2="-182.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-7.5" y1="-187.5" x2="7.5" y2="-182.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
@@ -41,10 +65,6 @@
 <line x1="0.0" y1="-230.0" x2="0.0" y2="-220.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <text x="-30.0" y="-238.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">R1b</text>
 <text x="-30.0" y="-225.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=17.6u</text>
-<circle cx="0.0" cy="-270.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="-265.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_ov</text>
-<circle cx="0.0" cy="-130.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="-125.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
 <line x1="0.0" y1="-30.0" x2="0.0" y2="-20.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="-30.0" x2="7.5" y2="-32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-7.5" y1="-37.5" x2="7.5" y2="-32.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
@@ -58,10 +78,6 @@
 <line x1="0.0" y1="-80.0" x2="0.0" y2="-70.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <text x="-30.0" y="-88.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">R2a</text>
 <text x="-30.0" y="-75.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=21.1u</text>
-<circle cx="0.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
-<circle cx="0.0" cy="20.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="24.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_pg</text>
 <line x1="0.0" y1="180.0" x2="0.0" y2="190.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="0.0" y1="180.0" x2="7.5" y2="177.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <line x1="-7.5" y1="172.5" x2="7.5" y2="177.5" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
@@ -75,25 +91,21 @@
 <line x1="0.0" y1="130.0" x2="0.0" y2="140.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
 <text x="-30.0" y="122.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">R2b</text>
 <text x="-30.0" y="135.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=1u L=190.5u</text>
-<circle cx="0.0" cy="90.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="94.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_pg</text>
-<circle cx="0.0" cy="230.0" r="2.6" fill="#c05621"/>
-<text x="7.0" y="234.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<rect x="180.0" y="-110.0" width="120" height="120" rx="6" fill="#f4f7fb" stroke="#4a6fa5" stroke-width="2"/>
-<text x="240.0" y="-46.0" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="12" font-weight="bold" fill="#2f5c9e">sg13cmos5l_pr/cap_cmomf</text>
-<circle cx="240.0" cy="-120.0" r="2.6" fill="#c05621"/>
-<text x="247.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
-<circle cx="240.0" cy="20.0" r="2.6" fill="#c05621"/>
-<text x="247.0" y="24.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<line x1="-240.0" y1="-45.0" x2="-240.0" y2="-20.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-240.0" y1="-80.0" x2="-240.0" y2="-55.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-250.0" y1="-55.0" x2="-230.0" y2="-55.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<line x1="-250.0" y1="-45.0" x2="-230.0" y2="-45.0" stroke="#1a202c" stroke-width="2" stroke-linecap="round"/>
+<text x="-270.0" y="-88.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="11" font-weight="bold" fill="#1a202c">Cf</text>
+<text x="-270.0" y="-75.0" text-anchor="end" font-family="Helvetica,Arial,sans-serif" font-size="9.5" fill="#4a5568">W=10u L=10u</text>
 <circle cx="0.0" cy="-420.0" r="2.6" fill="#c05621"/>
 <text x="7.0" y="-415.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_bg</text>
-<circle cx="-400.0" cy="-160.0" r="2.6" fill="#c05621"/>
-<text x="-393.0" y="-155.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
-<circle cx="-400.0" cy="-100.0" r="2.6" fill="#c05621"/>
-<text x="-393.0" y="-95.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_pg</text>
-<circle cx="-400.0" cy="-40.0" r="2.6" fill="#c05621"/>
-<text x="-393.0" y="-35.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
-<circle cx="-400.0" cy="20.0" r="2.6" fill="#c05621"/>
-<text x="-393.0" y="24.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_ov</text>
-<text x="-400.0" y="-485.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_vref -- reference divider, 1.2 V bandgap -&gt; 0.6 V</text>
+<circle cx="500.0" cy="-120.0" r="2.6" fill="#c05621"/>
+<text x="507.0" y="-115.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref</text>
+<circle cx="500.0" cy="70.0" r="2.6" fill="#c05621"/>
+<text x="507.0" y="74.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_pg</text>
+<circle cx="500.0" cy="260.0" r="2.6" fill="#c05621"/>
+<text x="507.0" y="264.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vss</text>
+<circle cx="500.0" cy="-280.0" r="2.6" fill="#c05621"/>
+<text x="507.0" y="-275.5" text-anchor="start" font-family="Helvetica,Arial,sans-serif" font-size="11" fill="#7b341e">vref_ov</text>
+<text x="-335.0" y="-531.0" font-family="Helvetica,Arial,sans-serif" font-size="17.0" font-weight="bold" fill="#1a202c">ldo_vref -- reference divider, 1.2 V bandgap -&gt; 0.6 V</text>
 </svg>
