@@ -385,6 +385,36 @@ margin back with `Cm` works electrically but breaks the floorplan and costs 1.3 
 buying it with `Cout` helps the failing corner and simply moves the worst case elsewhere.
 ⟹ The saving is real, and available only if the 45° floor is revisited.
 
+### Layout refinement (branch `layout-refine`, in progress)
+
+Everything above describes the taped-out layout (tag `tapeout-2026-10`). This branch carries
+the items from the layout review. Its numbers come from short checks only; the full post-layout
+gate runs once the refinements are done.
+
+- **Supply grid.** vss and vin run as TopMetal1 bands over the reference, amplifier, ladder,
+  boost and status blocks, fed from a spine on each side. Each band has a 1.64 µm Metal4 finger
+  on its centre line, for the drops and the TopVia1 row. The grid stays off the MOM capacitors
+  and the vref divider. Each supply terminal is joined to its band by a drawn via stack.
+- **Digital row.** All the standard cells (the `en` and `ilim_en` input inverters, and the
+  `pgood` and `oc` output drivers) sit in one ringed row beside the left-edge digital pins.
+  Before, they were spread over three places 200–330 µm from those pins. `pgood`, `oc` and `en`
+  wires went from about 430 µm to about 20 µm.
+- **`vdd_1v2` routed 1 µm wide** through a non-default rule, instead of at minimum width: an
+  upper bound of about 45 Ω of series resistance, against about 374 Ω before.
+- **Guard rings.** Every analog region and the digital row have a p+ substrate ring.
+
+Short check: DRC 0, antenna 0, keepouts 0, as-folded LVS match (block and slot), resistors by
+value 0 failures. vout 1.2117 V post-layout (tt / 27 °C, no load). Phase margin at the nine
+worst corners of the taped-out layout, three loads each: worst **46.6°** (ff / `res_wcs` /
+−40 °C / 3.6 V, no load), against 48.4° for the taped-out layout. The floor is 45°.
+
+The first version of the grid used full-width (4 µm) Metal4 and measured 45.3°. The guard
+rings fence off Metal1, so the router carries the feedback node `vfb` on Metal3, under the grid.
+`vfb` is the divider's high-impedance tap, and its extracted C went from 27 to 64 fF. Narrowing
+the Metal4 fingers brought it back to 42 fF. Removing that C from the extraction altogether
+restores the 48.3°, so `vfb` is the lever for the remaining 1.8°. The rest of the attribution:
+`vin` 0.3°; about 0.8° not yet attributed.
+
 ## Repository layout
 
 | Dir | Contents |
