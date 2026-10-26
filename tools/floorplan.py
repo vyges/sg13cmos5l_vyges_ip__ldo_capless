@@ -277,6 +277,13 @@ STRAPS = dict(
 #    (Cf is a MOM cap placed by the packer, and the divider is the highest-impedance network):
 #    a row's TopMetal1 runs on over them, its Metal4 is split around them.
 GRID_Y0, GRID_W, GRID_PITCH, GRID_N = 8.0, 4.0, 6.0, 39
+# The Metal4 under each band is a 1.64 um finger on its centre line, not the band's full 4 um
+# (2026-10-26): Metal4 here only lands the drops and the TopVia1 row (0.42 cut, 0.42 margin), and
+# every block under the grid draws uA. At full width it covered 2/3 of the area over the analog
+# routing, and the router takes Metal3 over the guard rings: the feedback node vfb (the divider's
+# high-impedance tap) went 27 -> 64 fF, mostly to Metal4 overhead, which cost 3-5 deg of phase
+# margin at the high-UGF corners (ff/res_wcs/-40 C, 48.4 -> 45.3 deg).
+GRID_M4_W = 1.64
 VSS_SPINE, VIN_SPINE = (202.0, 216.0), (346.0, 360.0)
 M4_KEEPOUT = [b for b in BLOCKS if b[0].startswith(("Cm ", "Cb ", "Cc ", "Cout ", "vref divider"))]
 
@@ -305,8 +312,9 @@ for _k in range(GRID_N):
     else:
         _x1, _x2 = VSS_SPINE[1] + 2.0, VIN_SPINE[0]
     GRID_BANDS.append((_net, ("TopMetal1",), _x1, _y, _x2, _y + GRID_W))
-    GRID_BANDS += [(_net, ("Metal4", "TopMetal1"), a, _y, b, _y + GRID_W)
-                   for a, b in _m4_spans(_x1, _x2, _y, _y + GRID_W)]
+    _m1, _m2 = _y + (GRID_W - GRID_M4_W) / 2, _y + (GRID_W + GRID_M4_W) / 2
+    GRID_BANDS += [(_net, ("Metal4", "TopMetal1"), a, _m1, b, _m2)
+                   for a, b in _m4_spans(_x1, _x2, _m1, _m2)]
 STRAPS["bands"] += GRID_BANDS
 STRAPS["feed"] += [
     ("vss", "TopMetal1", 0.0,           114.5, VSS_SPINE[1], 142.5),   # vss_3v3 pin -> spine
