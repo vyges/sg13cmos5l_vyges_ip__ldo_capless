@@ -338,6 +338,9 @@ WIDE_NETS = {"vddd": 1.0}
 # that C doubled with the grid because the router ran vss wires beside it at 0.42-0.48 um (Metal2
 # at x 212 and 119, Metal3 at y 19.6). A spacing rule keeps the router's neighbours away from it.
 SPACED_NETS = {"vfb": 1.2}
+# and held to Metal2-Metal3, off Metal1: its ~490 um run to the amp, the boost and pgood was 100 um
+# of Metal1, the layer nearest the substrate (vss)
+LAYER_NETS = {"vfb": "Metal2-Metal3"}
 
 
 def grid_check():
