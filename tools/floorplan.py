@@ -44,9 +44,9 @@ ELECTRICAL ORDERING, which is why the columns are in this order and not a tighte
   divider and the trim ladder are the two highest-impedance nets in the block and sit at the
   far left, away from the pass device's switching edge and from the 3.3 V input rail.
 
-⚠️ WHAT THIS IS NOT. It is a first-cut placement, not a routed floorplan. It reserves no
-channels, no guard rings, no well taps and no seal-ring keep-out, and it assumes each block
-is a rectangle. The utilisation number it prints is therefore a floor: a real placement will
+⚠️ WHAT THIS IS NOT. It is a placement, not a routed floorplan. Each region's inset leaves
+room for its guard ring (PACK "rings", 2026-10-26), but no routing channels are reserved and
+each block is a rectangle. The utilisation number it prints is therefore a floor: a real placement will
 be looser. Treat a number near 100 % as failure, not as success.
 """
 import os, sys
@@ -459,9 +459,12 @@ def svg():
         if w * S > 46 and h * S > 16:
             out.append(f'<text x="{px+3:.1f}" y="{py+13:.1f}" font-family="sans-serif" '
                        f'font-size="10">{n}</text>')
+        elif w * S > 30 and h * S > 10:             # the digital row: small, but worth naming
+            out.append(f'<text x="{px+2:.1f}" y="{py+9:.1f}" font-family="sans-serif" '
+                       f'font-size="6.5">{n}</text>')
     out.append(f'<text x="40" y="{SLOT_H*S+62:.0f}" font-family="sans-serif" font-size="11">'
-               f'first-cut placement from measured device geometry -- no routing channels, '
-               f'guard rings or taps reserved</text>')
+               f'regions as placed, each sized for its devices and its guard ring; '
+               f'the supply grid and the routing are not drawn</text>')
     out.append("</svg>\n")
     p = os.path.join(ROOT, "doc", "datasheet", "ldo_capless_floorplan.svg")
     open(p, "w").write("\n".join(out))
