@@ -110,7 +110,7 @@ RLS_W, RLS_H = snake(701.2, 90.0)      # ldo_enable XRls -- 90 tall, not 120: se
 # Three columns, ordered by the signal rather than by packing efficiency:
 #   C1  x 6..199    the quiet end -- reference, error amplifier, and Cm above them
 #   C2  x 205..360  the feedback ladder, the boost and the status blocks
-#   C3  x 364..531  the output node: pass array, Cc and Cout
+#   C3  x 361..531  the output node: pass array, Cc and Cout
 #
 # ⛔ Cm is placed ABOVE the amplifier rather than beside it because it is 193.5 um tall and
 # the slot is 273: there is no arrangement where Cm and Cout share a column. That single fact
@@ -163,7 +163,7 @@ BLOCKS = [
     # XRls is a level-shift resistor with no matching partner, so its fold height is free.
     ("enable + Rls",      305, 165, 40,    95,    "stat"),
 
-    # --- C3 x 366..525: the output, hard against the PADFRAME-facing edge.
+    # --- C3 x 361..527: the output, hard against the PADFRAME-facing edge.
     # ⛔ Tim confirmed 2026-09-16 that every wrapper has padframe-facing pins on the RIGHT and
     # core-facing pins on the left. vout therefore exits right, and the pass array - 153.6 um
     # of device carrying up to 50 mA - is placed against that edge rather than in the middle.
@@ -176,7 +176,12 @@ BLOCKS = [
     # 101.3, not 101.2: the device is 101.24 um tall; 101.2 was a rounding.
     # 157.5 x 101.5: 64 abutted fingers plus ONE shared well tap at the left end, and each
     # finger's gate contact on top (the PyCell has none).
-    ("pass array 64x",    370, 6,   157.5, 101.5, "pass"),
+    # ⛔ 166.5 from x 361, not 157.5 from 370 (2026-11-09): ONE tap 0.78 um square at the lower-left
+    # corner left P+ up to ~150 um from any n-tie, and the PDK's maximal deck (LU.a: within 20 um)
+    # flagged 56 fingers. Six fingers now carry a tap as tall as the finger (PACK "taps_at"), each
+    # 4.28 wide instead of 2.42: 166.04 um in all. It grows LEFT into the free channel by the vin
+    # spine (x 360); the right edge stays on the vout pin.
+    ("pass array 64x",    361, 6,   166.5, 101.5, "pass"),
     # Cc and Cout keep 1 um between Cc's plates and Cout's left terminal stub.
     # 2026-10-19: Cc 2.06 -> 3.56 pF for the post-layout phase-margin retune (w 69.15 x l 40;
     # the PyCell draws w along y, so it grows up this column, which is empty above it).
@@ -213,7 +218,10 @@ PACK = {
     "Cout 125x125.5":  dict(inset=0, gap=0),
     "Cc 40x69.65":      dict(inset=0, gap=0),
     "Cb 28x28.5":      dict(inset=0, gap=0),
-    "pass array 64x":  dict(inset=0, gap=0, array=True),
+    # taps_at: the fingers that carry a full-height n-tie (tied to S = vin in Metal1 by
+    # slot_gds). Two-sided groups of 13 between them (worst P+ ~16.3 um from a tie) and a
+    # one-sided 6 at the right end; slot_gds.py lu_check() fails the build above 19 um.
+    "pass array 64x":  dict(inset=0, gap=0, array=True, taps_at=(0, 13, 26, 39, 52, 58)),
     "Rb snake":        dict(inset=0, gap=0, fold=150.0),
     "Rnx snake":       dict(inset=0, gap=0, fold=120.0),
     "enable + Rls":    dict(fold=90.0),
@@ -257,9 +265,12 @@ STRAPS = dict(
     m2_top=111.9,       # stop 0.92 um below the gate pads (finger top + 0.2), router access
     via_pitch=1.0, plate_pitch=2.0,
     bands=[
-        ("vout", ("Metal3", "Metal4"),              370.0, 80.18, 527.5, 104.95),
-        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 370.0, 8.0,   527.5, 36.0),
-        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 370.0, 44.0,  527.5, 72.0),
+        # from the array's left edge (x 361, 2026-11-09). The vin bands start at 360 so their
+        # TopMetal1 MERGES with the vin spine's (x 346-360): stopping at 361 would leave a 1 um
+        # TopMetal1 gap, and TM1.b (1.64 um) is net-blind.
+        ("vout", ("Metal3", "Metal4"),              361.0, 80.18, 527.5, 104.95),
+        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 360.0, 8.0,   527.5, 36.0),
+        ("vin",  ("Metal3", "Metal4", "TopMetal1"), 360.0, 44.0,  527.5, 72.0),
     ],
     feed=[
         ("vout", "Metal3",    527.0, 80.18, 536.15, 104.95),   # band -> s11_an[0]

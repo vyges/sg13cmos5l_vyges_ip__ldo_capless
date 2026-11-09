@@ -231,7 +231,7 @@ pin it uses to the block pin facing it. Both files are checked on the PDK decks:
 
 | Check | Block alone | In `slot_11` |
 | --- | --- | --- |
-| DRC (KLayout, main rules) | **0** | **0** |
+| DRC (KLayout, full rule set: main tables + maximal deck, `run_drc.py`) | **0** | **0** |
 | Antenna | **0** | **0** |
 | LVS (KLayout, strict top-level ports) | matches **except the 11 folded resistors' parameters** | same |
 | LVS with those resistors' drawn parameters (confirmation) | **matches** | **matches** |
@@ -404,7 +404,21 @@ gate runs once the refinements are done.
 - **Guard rings.** Every analog region and the digital row have a p+ substrate ring.
 
 Short check: DRC 0, antenna 0, keepouts 0, as-folded LVS match (block and slot), resistors by
-value 0 failures. vout 1.2117 V post-layout (tt / 27 °C, no load). Phase margin at the nine
+value 0 failures.
+
+**Full rule set (2026-11-09).** IHP's `run_drc.py` also runs the maximal deck, which the main
+tables we had signed off with do not include. On this layout it found 141 errors, all fixed in the
+generators:
+- **LU.a (58).** P+ in NWell must be within 20 µm of a contacted n-tie. The pass array had one
+  0.78 µm tap at its corner. Six fingers now carry a tap as tall as the finger, tied to the source
+  (`vin`) in Metal1, and the array grew 9 µm to the left (x 361). The w = 40 µm pMOS also gets a
+  full-height tap.
+- **NW.e1 (9).** Inside ThickGateOx the NWell must enclose an n-tie by 0.62 µm. The HV pMOS taps
+  moved 0.38 µm inward, so no wrapper changed size.
+- **M2.d / M3.d (74).** Minimum metal area. Drawn via drops with no jog were 0.08 µm² islands. A
+  min-area step after routing now grows them.
+
+Worst phase margin on the same short check: **47.76°** (was 47.2°). vout 1.2117 V post-layout (tt / 27 °C, no load). Phase margin at the nine
 worst corners of the taped-out layout, three loads each: worst **47.2°** (ff / `res_wcs` /
 −40 °C / 3.6 V, no load), against 48.4° for the taped-out layout. The floor is 45°.
 

@@ -9,9 +9,15 @@ This is the `layout-refine` layout (2026-10-26): TopMetal1 supply grid, guard ri
 `vdd_1v2` routed 1 µm wide, `vfb` under a spacing rule, pgood above the feedback ladder. The taped-out layout
 (2026-10-19) is the one on `main`.
 
-Checks on both files (2026-10-26; IHP-Open-PDK KLayout decks, block alone and in the slot):
+Rebuilt 2026-11-09 for the PDK's FULL KLayout rule set: the main tables and the maximal deck, as IHP's
+`run_drc.py` runs them. The earlier build passed the main tables but had 141 maximal-deck errors (LU.a 58,
+NW.e1 9, M2.d 73, M3.d 1). The fixes are full-height n-ties in the pass array, the HV tap enclosure and a
+min-area step.
 
-- DRC 0, antenna 0, and every unused wrapper pin clear of our metal.
+Checks on both files (2026-11-09; IHP-Open-PDK KLayout decks, block alone and in the slot):
+
+- DRC 0 on the full rule set (`run_drc.py`, main + maximal, no density), antenna 0, and every unused
+  wrapper pin clear of our metal.
 - LVS: every device and net matches except the 11 folded `rhigh` resistors. The deck extracts a serpentine
   as segment length plus bends, so it can never equal a straight schematic `l` (IHP-Open-PDK#746). Each
   is signed off by VALUE instead: its segment is drawn so that the PDK's own resistance for the folded
